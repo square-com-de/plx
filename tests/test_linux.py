@@ -56,11 +56,11 @@ def test_php_csrf_https_and_real_unix_socket(tmp_path):
         data, config = tmp_path/'data', tmp_path/'config'
         sdk = tmp_path/'sdk'
         sdk.mkdir()
-        (sdk/'loxberry_system.php').write_text('<?php $lbpdatadir = getenv("P2L_DATA"); $lbptemplatedir = getenv("P2L_TEMPLATE");')
+        (sdk/'loxberry_system.php').write_text('<?php $lbpdatadir = getenv("P2L_DATA"); $lbpconfigdir = getenv("P2L_CONFIG"); $lbptemplatedir = getenv("P2L_TEMPLATE");')
         (sdk/'loxberry_web.php').write_text('<?php class LBWeb {static function lbheader(...$args) {echo "<!doctype html><html><head><meta charset=\\\"utf-8\\\"></head><body>";} static function lbfooter(){echo "</body></html>";}}')
         router = tmp_path/'router.php'
         router.write_text('<?php if (!isset($_GET["unauthorized"])) {$_SERVER["REMOTE_USER"]="test-user";} $_SERVER["HTTPS"] = ($_SERVER["HTTP_X_TEST_HTTPS"] ?? "") === "1" ? "on" : "off"; return false;')
-        env = dict(os.environ, P2L_DATA=str(data), P2L_TEMPLATE=str(ROOT/'templates'), PYTHONPATH=str(ROOT/'bin'))
+        env = dict(os.environ, P2L_DATA=str(data), P2L_CONFIG=str(config), P2L_TEMPLATE=str(ROOT/'templates'), PYTHONPATH=str(ROOT/'bin'))
         service = subprocess.Popen([sys.executable,'-m','porsche2lox.service','--data-dir',str(data),'--config-dir',str(config)], env=env, stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
         web_port = port()
         php = subprocess.Popen(['php','-d',f'include_path={sdk}','-S',f'127.0.0.1:{web_port}','-t',str(ROOT/'webfrontend/htmlauth'),str(router)],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
