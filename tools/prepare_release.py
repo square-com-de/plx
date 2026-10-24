@@ -14,8 +14,8 @@ from zipfile import ZipFile
 
 from build import build, ROOT
 
-IMAGE_COMMIT = os.environ.get('PLX_RELEASE_COMMIT', '542f627fb3ccbc58f9335c6fcea8e78e8af80cb2')
-IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.0')
+IMAGE_COMMIT = os.environ.get('PLX_RELEASE_COMMIT')
+IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.1')
 CI_RUN = os.environ.get('PLX_RELEASE_CI', 'https://github.com/square-com-de/plx/actions/workflows/release.yml')
 
 
@@ -27,8 +27,10 @@ def prepare():
     cfg = configparser.ConfigParser()
     cfg.read(ROOT / 'plugin.cfg')
     version = cfg['PLUGIN']['VERSION']
-    if version != '0.1.0':
+    if version != '0.1.1':
         raise ValueError('Update release provenance and notes for the new version first.')
+    if '@sha256:' not in IMAGE:
+        raise ValueError('Set PLX_RELEASE_IMAGE to the reviewed immutable image digest.')
     build()
     bundle = ROOT / 'dist' / f'release-v{version}'
     if bundle.exists():
@@ -54,7 +56,7 @@ def prepare():
     shutil.copytree(ROOT / 'docs', bundle / 'docs')
     shutil.copytree(ROOT / 'icons', bundle / 'icons')
     compose = (ROOT / 'compose.registry.yaml').read_text()
-    expected = 'image: ghcr.io/square-com-de/plx:0.1.0'
+    expected = 'image: ghcr.io/square-com-de/plx:0.1.1'
     if compose.count(expected) != 1:
         raise ValueError('Unexpected registry compose image declaration.')
     (bundle / 'compose.yaml').write_text(compose.replace(expected, 'image: ' + IMAGE))
@@ -62,10 +64,10 @@ def prepare():
         'name': 'PLX', 'version': version,
         'public_repository': 'square-com-de/plx',
         'plugin_kind': 'LoxBerry plugin import ZIP', 'status': 'preview',
-        'release_url': 'https://github.com/square-com-de/plx/releases/tag/v0.1.0', 'source_commit': git('rev-parse', 'HEAD'),
+        'release_url': f'https://github.com/square-com-de/plx/releases/tag/v{version}', 'source_commit': git('rev-parse', 'HEAD'),
         'source_tree': git('rev-parse', 'HEAD^{tree}'),
         'source_dirty': bool(git('status', '--porcelain')),
-        'container': {'image': IMAGE, 'source_commit': IMAGE_COMMIT,
+        'container': {'image': IMAGE, 'source_commit': IMAGE_COMMIT or git('rev-parse', 'HEAD'),
                       'ci_run': CI_RUN, 'platforms': ['linux/amd64', 'linux/arm64'],
                       'visibility': 'public'},
         'plugin_zip': package.name,

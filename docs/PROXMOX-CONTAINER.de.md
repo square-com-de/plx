@@ -1,3 +1,5 @@
+> Historical 0.1.0 acceptance/operations reference. For 0.1.1 first start use INSTALL.md/INSTALL.de.md; manual secret/certificate setup below is not required by the new default.
+
 # PLX-Container in einer Proxmox-Linux-VM
 
 [English](PROXMOX-CONTAINER.md) · [Bevorzugte Installation](../INSTALL.de.md) · [Abnahme-Gate](https://github.com/square-com-de/plx/issues/1)

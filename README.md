@@ -1,4 +1,4 @@
-> **PLX 0.1.0 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.0). Not a stable release. Docker image: `ghcr.io/square-com-de/plx:0.1.0` (AMD64/ARM64), public pull without a GitHub token. [Status and acceptance](RELEASE.md).
+> **PLX 0.1.1 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.1). Not a stable release. Docker image: `ghcr.io/square-com-de/plx:0.1.1` (AMD64/ARM64), public pull without a GitHub token. [Status and acceptance](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -32,29 +32,11 @@ PLX runs on your own server. **Vehicle data still comes from the Porsche cloud**
 
 ## Install and get started
 
-**Container first:** use the public digest-pinned release bundle. [Fresh Proxmox VM commands and honest test results](docs/PROXMOX-CONTAINER.md) include Docker installation, lifecycle/recovery and the resolved local-firewall issue and passed direct LAN/browser test. Proxmox hosts a Linux VM, not the OCI runtime.
+**Docker/Compose is preferred.** Provide the server IP/DNS name once; PLX creates its private password, matching self-signed TLS certificate and persistent data volume automatically. No first-start mode choice or secret-file ownership steps. LAN access is the default; certificate trust and your Porsche account remain explicit prerequisites. Follow the [short installation guide](INSTALL.md).
 
-| Installation method | Who is it for? | Guide |
-| --- | --- | --- |
-| **Docker / Compose (preferred)** | Your own server or existing container environment, including Portainer. No LoxBerry required. | [Installation](INSTALL.md) · [Docker details](docs/DOCKER.md) |
-| **LoxBerry plugin (alternative)** | An existing LoxBerry 4 installation with HTTPS. | [Installation](INSTALL.md#loxberry-plugin) |
+Portainer uses the same release Compose file. LoxBerry4 remains an [alternative](INSTALL.md#alternatives-and-limits) using its dedicated plugin ZIP. Podman/rootless and real ARM64 runtime keep their separate unqualified status. Existing 0.1.0 installs and artifacts are not silently replaced.
 
-**LoxBerry import:** [Download PLX-LoxBerry-0.1.0.zip](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Upload unchanged in the plugin manager; do not use GitHub’s generic source ZIP.
-
-1. **Install PLX:** choose Docker or the plugin. Use a versioned artifact and check its checksum from the release.
-2. **Open the interface:** Docker uses your own PLX username/password; the plugin uses your LoxBerry web login. There is no default PLX password.
-3. **Connect Porsche:** sign in, load vehicles, choose your vehicle in Setup and save.
-4. **Choose MQTT values:** configure your broker, select only the values you want under Loxone and save. Subscribe to `<prefix>/#`, default `porsche2lox/#`.
-
-Polling and MQTT start disabled. The optional Loxone XML/CSV export helps with MQTT Gateway and virtual UDP inputs; it is not required for MQTT itself.
-
-**Already installed?** Back up your PLX data before updating. Follow [installation and updates](INSTALL.md#updates-backup-and-rollback). Existing detailed MQTT configurations keep their format unless you change it.
-
-**Runtime scope:** Docker/Compose on Linux AMD64 and the dedicated LoxBerry 4 setup have preview acceptance evidence. ARM64 is built/published but lacks real-machine runtime acceptance. Podman, rootless Docker, Docker Desktop and native non-LoxBerry installs are **not qualified**. See [exact versions and boundaries](INSTALL.md#runtime-status).
-
-**MQTT address:** use the broker's actual endpoint/port; a working HTTPS web-proxy hostname does not prove MQTT reachability. The optional UDP sender filter refers to the MQTT Gateway. [Network checks and the one-subscription setup](docs/MANUAL.md#mqtt-and-loxone).
-
-[Installation lessons and corrective actions](docs/INSTALLATION-LESSONS.md) · [Blocking Stable acceptance checklist #1](https://github.com/square-com-de/plx/issues/1). PLX remains a preview; these documentation changes do not update existing release artifacts or deployed applications.
+Simple MQTT is the default: select only the wanted values and subscribe to `porsche2lox/#`. Optional advanced settings remain available later without reinstallation. [Manual](docs/MANUAL.md) · [Release0.1.1 changes](docs/RELEASE-0.1.1.md).
 
 ## Feedback & contact
 
@@ -68,9 +50,9 @@ Include your PLX version, Docker or LoxBerry setup, vehicle model and a short de
 
 ## Release status and limits
 
-**0.1.0 Preview.** Separate Docker and LoxBerry test installations verified sign-in, vehicle/status fetch, HTTPS, DE/EN, mobile layout and exactly two numeric pressure messages at a broker. Real LoxBerry clean-install and update tests found and fixed an update-state-loss issue. Settings and the Porsche session now survive the official installer’s purge step.
+**0.1.1 Preview.** The simplified generated-password/host-matched-TLS first start is a new container path; its exact-artifact acceptance is tracked in [#1](https://github.com/square-com-de/plx/issues/1). Earlier0.1.0 Docker/LoxBerry sign-in, vehicle fetch and two-pressure results remain historical evidence, not a new live Porsche test for0.1.1.
 
-A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.0.md) and [test evidence](docs/TESTS.md).
+A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.1.md) and [test evidence](docs/TESTS.md).
 
 **Freshness matters:** simple MQTT sends the last reported value and `null` for missing values. It has no heartbeat or availability topics; retained values remain after a stopped container or failed connection. Check age/status in PLX or use detailed mode when your automation requires freshness signals. A cloud refresh is not a new vehicle measurement.
 

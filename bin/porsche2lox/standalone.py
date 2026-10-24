@@ -138,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
     def app(self):
         return self.server.app
 
-    def respond(self, status, body=b'', mime='text/html; charset=utf-8', headers=None):
+    def respond(self, status, body=b'', mime='text/html; charset=utf-8', headers=None, script_nonce=None):
         if isinstance(body, str):
             body = body.encode()
         self.send_response(status)
@@ -148,7 +148,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'same-origin')
         self.send_header('X-Frame-Options', 'DENY')
-        self.send_header('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+        script_policy = "'self'" + (" 'nonce-" + script_nonce + "'" if script_nonce else '')
+        self.send_header('Content-Security-Policy', f"default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src {script_policy}; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         for key, value in (headers or {}).items():
             self.send_header(key, value)
         self.end_headers()
@@ -165,9 +166,11 @@ class Handler(BaseHTTPRequestHandler):
             return ''
 
     def login_page(self, error=''):
+        nonce = secrets.token_urlsafe(24)
         language_script = "<script>(()=>{let lang='de';try{lang=localStorage.getItem('plx.language')==='en'?'en':'de'}catch(_){}const texts={'Dein Porsche x Loxone in Deinem intelligenten Zuhause.':'Your Porsche x Loxone in your smart home.','Benutzername':'Username','PLX-Passwort':'PLX password','Anmelden':'Sign in','Die Anmeldung bei Porsche erfolgt anschließend in PLX.':'You can sign in to Porsche inside PLX.','Anmeldung nicht möglich. Zugangsdaten prüfen oder eine Minute warten.':'Unable to sign in. Check your credentials or wait one minute.'};const originals=new WeakMap();function apply(){document.documentElement.lang=lang;document.title=lang==='en'?'PLX · Sign in':'PLX · Anmelden';const w=document.createTreeWalker(document.querySelector('main'),NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n.parentElement.closest('#login-language'))continue;const source=originals.get(n)||n.nodeValue;originals.set(n,source);const t=source.trim();n.nodeValue=lang==='en'?source.replace(t,texts[t]||t):source}document.querySelectorAll('#login-language button').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.lang===lang));b.style.background=b.dataset.lang===lang?'#101114':'white';b.style.color=b.dataset.lang===lang?'white':'#62656b'})}const switcher=document.createElement('div');switcher.id='login-language';switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Language / Sprache');switcher.style.cssText='position:fixed;top:16px;right:20px;display:flex;gap:4px';for(const l of ['de','en']){const b=document.createElement('button');b.type='button';b.textContent=l.toUpperCase();b.dataset.lang=l;b.style.cssText='margin:0;width:auto;padding:7px 11px;cursor:pointer';b.onclick=()=>{lang=l;try{localStorage.setItem('plx.language',lang)}catch(_){}apply()};switcher.append(b)}document.body.append(switcher);apply()})();</script>"
+        language_script = language_script.replace('<script>', '<script nonce="' + nonce + '">', 1)
         error = html.escape(error)
-        self.respond(401, f'''<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX · Anmelden</title><style>body{{margin:0;background:#f3f3f4;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#101114}}main{{max-width:360px;margin:12vh auto;padding:30px;background:white;border-radius:18px}}h1{{margin:0}}p{{color:#62656b}}label{{display:block;margin-top:16px}}input,button{{box-sizing:border-box;width:100%;padding:12px;border:1px solid #c9cbd0;border-radius:6px;font:inherit}}button{{margin-top:24px;background:#101114;color:white}}.error{{color:#a71930}}</style><main><h1>PLX</h1><p>Dein Porsche x Loxone in Deinem intelligenten Zuhause.</p><form action="/auth/login" method="post"><label>Benutzername<input name="username" autocomplete="username" required maxlength="100"></label><label>PLX-Passwort<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button>Anmelden</button><p class="error" role="alert">{error}</p></form><p>Die Anmeldung bei Porsche erfolgt anschließend in PLX.</p></main>{language_script}</html>''')
+        self.respond(401, f'''<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX · Anmelden</title><style>body{{margin:0;background:#f3f3f4;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#101114}}main{{max-width:360px;margin:12vh auto;padding:30px;background:white;border-radius:18px}}h1{{margin:0}}p{{color:#62656b}}label{{display:block;margin-top:16px}}input,button{{box-sizing:border-box;width:100%;padding:12px;border:1px solid #c9cbd0;border-radius:6px;font:inherit}}button{{margin-top:24px;background:#101114;color:white}}.error{{color:#a71930}}</style><main><h1>PLX</h1><p>Dein Porsche x Loxone in Deinem intelligenten Zuhause.</p><form action="/auth/login" method="post"><label>Benutzername<input name="username" autocomplete="username" required maxlength="100"></label><label>PLX-Passwort<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button>Anmelden</button><p class="error" role="alert">{error}</p></form><p>Die Anmeldung bei Porsche erfolgt anschließend in PLX.</p></main>{language_script}</html>''', script_nonce=nonce)
 
     def same_origin(self):
         origin = self.headers.get('Origin')
@@ -301,18 +304,21 @@ def main():
     parser.add_argument('--port', type=int, default=8443)
     args = parser.parse_args()
     os.umask(0o077)
-    password = Path(os.environ.get('PLX_PASSWORD_FILE', '/run/secrets/plx_password')).read_text().rstrip('\r\n')
-    app = Application(args.root, args.data_dir, os.environ.get('PLX_USERNAME', 'admin'), password)
-    del password
-    tls = args.data_dir / 'tls'
-    tls.mkdir(parents=True, exist_ok=True, mode=0o700)
-    cert = tls / 'cert.pem'
-    key = tls / 'key.pem'
-    if not cert.exists() or not key.exists():
-        subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:3072', '-nodes', '-keyout', str(key), '-out', str(cert), '-days', '365', '-subj', '/CN=PLX', '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.minimum_version = ssl.TLSVersion.TLSv1_2
-    context.load_cert_chain(cert, key)
+    from .bootstrap import configured_host, web_password, prepare_tls
+    try:
+        host = configured_host()
+        cert, key = prepare_tls(args.data_dir, host)
+        password = web_password(args.data_dir)
+        app = Application(args.root, args.data_dir, os.environ.get('PLX_USERNAME', 'admin'), password)
+        del password
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.load_cert_chain(cert, key)
+    except (ValueError, OSError, subprocess.SubprocessError):
+        # Deliberate validation messages contain no entered value or secret.
+        error = sys.exc_info()[1]
+        message = str(error) if isinstance(error, ValueError) else 'PLX-Start fehlgeschlagen. Datenrechte sowie Zertifikat/Schlüssel prüfen.'
+        parser.error(message)
     server = Server((args.host, args.port), app, context)
     app.worker = subprocess.Popen([sys.executable, '-m', 'porsche2lox.service', '--config-dir', str(args.data_dir / 'config'), '--data-dir', str(args.data_dir / 'runtime')])
     def shutdown(*_):

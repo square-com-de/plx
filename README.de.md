@@ -1,4 +1,4 @@
-> **PLX 0.1.0 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.0). Kein Stable-Release. Öffentliches Docker-Image: `ghcr.io/square-com-de/plx:0.1.0` (AMD64/ARM64), ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
+> **PLX 0.1.1 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.1). Kein Stable-Release. Öffentliches Docker-Image: `ghcr.io/square-com-de/plx:0.1.1` (AMD64/ARM64), ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -30,31 +30,13 @@ PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus d
 
 *Simulierte Messwerte, Modellbild aus Porsche Connect. Welche Parameter verfügbar sind, hängt vom Fahrzeug und Connect-Vertrag ab.*
 
-## Installieren und loslegen
+## Installieren und starten
 
-**Container zuerst:** Öffentliches Release-Paket mit festem Digest nutzen. [Frische Proxmox-VM: Befehle und tatsächlicher Teststand](docs/PROXMOX-CONTAINER.de.md) enthält Docker-Installation, Persistenz/Recovery und die behobene lokale Firewallursache und bestandene direkte LAN-/Browserprüfung. Proxmox stellt die Linux-VM bereit, nicht die OCI-Laufzeit.
+**Docker/Compose ist bevorzugt.** Einmal Server-IP/DNS angeben; PLX erzeugt privates Passwort, passendes selbstsigniertes TLS-Zertifikat und persistentes Datenvolume automatisch. Keine Erststart-Moduswahl oder Secret-Dateirechte-Nacharbeit. LAN-Zugriff ist Standard; Zertifikatsvertrauen und eigenes Porsche-Konto bleiben klar benannte Voraussetzungen. Zur [kurzen Installation](INSTALL.de.md).
 
-| Installationsweg | Für wen? | Anleitung |
-| --- | --- | --- |
-| **Docker / Compose (bevorzugt)** | Eigener Server oder vorhandene Container-Umgebung, auch Portainer. Kein LoxBerry nötig. | [Installation](INSTALL.de.md) · [Docker-Details](docs/DOCKER.md) |
-| **LoxBerry-Plugin (Alternative)** | Vorhandener LoxBerry 4 mit HTTPS. | [Installation](INSTALL.de.md#loxberry-plugin) |
+Portainer verwendet dieselbe Release-Compose-Datei. LoxBerry4 bleibt [Alternative](INSTALL.de.md#alternativen-und-grenzen) mit dediziertem Plugin-ZIP. Podman/Rootless und echter ARM64-Betrieb behalten ihren getrennten nicht abgenommenen Status. Bestehende0.1.0-Installationen/-Dateien werden nicht heimlich ersetzt.
 
-**LoxBerry-Import:** [PLX-LoxBerry-0.1.0.zip herunterladen](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Unverändert in der Pluginverwaltung hochladen; nicht das allgemeine GitHub-Quellcode-ZIP verwenden.
-
-1. **PLX installieren:** Docker oder Plugin wählen. Ein versioniertes Release-Paket verwenden und die Prüfsumme kontrollieren.
-2. **Oberfläche öffnen:** Docker nutzt deine eigenen PLX-Zugangsdaten, das Plugin die LoxBerry-Webanmeldung. Es gibt kein PLX-Standardpasswort.
-3. **Porsche verbinden:** Anmelden, Fahrzeuge laden, das gewünschte Fahrzeug in der Einrichtung auswählen und speichern.
-4. **MQTT auswählen:** Broker einrichten, unter Loxone nur die gewünschten Werte anhaken und speichern. Abonnement: `<Präfix>/#`, standardmäßig `porsche2lox/#`.
-
-Automatischer Abruf und MQTT sind beim ersten Start ausgeschaltet. Der optionale XML-/CSV-Export hilft bei MQTT Gateway und virtuellen UDP-Eingängen; für MQTT allein ist er nicht erforderlich.
-
-**Bereits installiert?** Vor dem Update die eigenen PLX-Daten sichern. Siehe [Installation und Updates](INSTALL.de.md#updates-sicherung-und-rückweg). Bestehende ausführliche MQTT-Konfigurationen behalten ihr Format, bis du es selbst umstellst.
-
-**Runtime-Grenzen:** Für Linux Docker/Compose auf AMD64 und die separate LoxBerry-4-Umgebung liegen Preview-Nachweise vor. ARM64 ist gebaut/veröffentlicht, aber ohne echte Hardware-Laufzeitabnahme. Podman, Rootless-Docker, Docker Desktop und native Installation außerhalb LoxBerry sind **nicht abgenommen**. [Genaue Versionen und Grenzen](INSTALL.de.md#runtime-status).
-
-**MQTT-Adresse:** Tatsächlichen Broker-Endpunkt/Port verwenden; ein funktionierender HTTPS-Webproxy-Hostname belegt keine MQTT-Erreichbarkeit. Der optionale UDP-Absenderfilter meint das MQTT Gateway. [Netzwerkprüfung und ein einziges Abonnement](docs/MANUAL.de.md#mqtt-und-loxone).
-
-[Installationsfehler und konkrete Maßnahmen](docs/INSTALLATION-LESSONS.de.md) · [Verbindliche Stable-Abnahmeliste #1](https://github.com/square-com-de/plx/issues/1). PLX bleibt Preview; diese Dokumentation aktualisiert weder bestehende Release-Dateien noch laufende Anwendungen.
+Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.1](docs/RELEASE-0.1.1.md).
 
 ## Feedback & Kontakt
 
@@ -68,9 +50,9 @@ Hilfreich sind PLX-Version, Docker-/LoxBerry-Umgebung, Fahrzeugmodell und eine k
 
 ## Release-Stand und Grenzen
 
-**0.1.0 Preview.** Auf getrennten Docker- und LoxBerry-Testinstallationen sind Anmeldung, Fahrzeug-/Statusabruf, HTTPS, DE/EN, mobile Oberfläche und genau zwei numerische Druckwerte am Broker geprüft. Der echte LoxBerry-Neuinstallations-/Updatetest fand einen Fehler beim Datenerhalt. Dieser ist behoben: Einstellungen und Porsche-Sitzung bleiben über den Löschschritt des offiziellen Installers erhalten.
+**0.1.1 Preview.** Automatisches Passwort und hostpassendes TLS sind ein neuer Container-Erststartweg; die exakte Artefaktabnahme wird in [#1](https://github.com/square-com-de/plx/issues/1) geführt. Frühere0.1.0-Nachweise zu Anmeldung, Fahrzeugabruf und zwei Druckwerten bleiben historisch und sind kein neuer echter Porsche-Test von0.1.1.
 
-Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.0.md) und [Testnachweise](docs/TESTS.md).
+Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.1.md) und [Testnachweise](docs/TESTS.md).
 
 **Datenalter beachten:** Einfaches MQTT sendet den zuletzt gemeldeten Wert und bei fehlenden Werten `null`. Es hat keinen Heartbeat und keine zusätzlichen Verfügbarkeitsthemen. Gespeicherte Brokerwerte bleiben auch nach Verbindungsabbruch oder Dienstende erhalten. Alter/Status in PLX prüfen oder für entsprechende Automationen das ausführliche Format verwenden. Ein Cloud-Abruf ist keine neue Messung des Fahrzeugs.
 

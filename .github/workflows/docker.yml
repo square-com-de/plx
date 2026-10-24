@@ -12,6 +12,8 @@ on:
       - docker/**
       - tests/**
       - .github/workflows/docker.yml
+  pull_request:
+    paths: [Dockerfile, .dockerignore, compose.yaml, compose.registry.yaml, "bin/**", "templates/**", "webfrontend/**", "docker/**", "tests/**", .github/workflows/docker.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,6 +24,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PLX_HOST: 127.0.0.1
+      PLX_BIND_ADDRESS: 127.0.0.1
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -37,10 +42,6 @@ jobs:
         run: python -m pytest tests -q
       - name: Build and smoke-test standalone container
         run: |
-          mkdir -p secrets
-          openssl rand -base64 32 > secrets/plx_password.txt
-          sudo chgrp 10001 secrets/plx_password.txt
-          chmod 640 secrets/plx_password.txt
           docker compose config --quiet
           docker compose up -d --build --wait --wait-timeout 90
           docker compose exec -T plx python /app/healthcheck.py
@@ -49,7 +50,7 @@ jobs:
         if: always()
         run: docker compose down -v
   publish:
-    if: github.repository == 'square-com-de/plx'
+    if: github.repository == 'square-com-de/plx' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 30
