@@ -1,60 +1,105 @@
 # PLX installieren
 
-[English](INSTALL.md) · [Projektseite](README.de.md)
+[English](INSTALL.md) · [Projektseite](README.de.md) · [Fehleraufarbeitung und Release-Gate](docs/INSTALLATION-LESSONS.de.md)
 
-**0.1.0 Preview:** `PLX-Docker-0.1.0.tar.gz`, `PLX-LoxBerry-0.1.0.zip` und `SHA256SUMS` aus dem [versionierten Release](https://github.com/square-com-de/plx/releases/tag/v0.1.0) laden. Das Docker-Image ist öffentlich und ohne GitHub-Konto oder Registry-Token abrufbar. Dies ist eine Preview, kein Stable-Release.
+**0.1.0 Preview, kein Stable.** [Versioniertes Release](https://github.com/square-com-de/plx/releases/tag/v0.1.0) verwenden. Image und Repository sind öffentlich; kein GitHub-Konto, Registry-Token oder `docker login` nötig. Bestehende Release-Archive behalten ihre ursprüngliche Anleitung; diese Seite korrigiert sie, ohne abgenommene Dateien/Prüfsummen zu ersetzen. [Gate #1](https://github.com/square-com-de/plx/issues/1) verlangt unabhängige Nutzerabnahme vor künftigem Stable/`latest`.
 
-## Docker / Compose
+## Runtime-Status
 
-Vorausgesetzt sind Docker Engine mit Compose v2 auf AMD64 oder ARM64, ein kompatibles Porsche-Connect-Konto und Internetzugang. Ein MQTT-Broker ist nur für MQTT nötig. Mac oder Windows können zur Bedienung des Servers verwendet werden.
+| Weg | Preview-Nachweis am 24.10.2026 |
+| --- | --- |
+| Linux Docker / Compose, AMD64 | Separater Ubuntu-26.04.1-x86_64-Testhost; aktuell Docker Engine 29.8.2, Compose-Plugin 5.6.1. Frühere Abnahmeberichte erfassten keine Runtime-Versionen; dies ist die heutige Inventur, kein rückwirkender Versionsnachweis. |
+| LoxBerry-4-Plugin | Separates LoxBerry 4.0.0.15, DietPi/Debian 13.7, Python 3.13.5, PHP 7.4.33; direktes HTTPS, offizielle Neuinstallation/Update, Porsche-Abruf und isoliertes MQTT geprüft. |
+| Linux-ARM64-Image | Gebautes/veröffentlichtes Manifest, **keine** protokollierte echte ARM64-Laufzeitabnahme. |
+| Portainer | Separater Teststack verwendet; Hostpfade und dasselbe Compose-Projekt/Volume erhalten. Portainer-Version in historischer Abnahme nicht erfasst. |
+| Podman / Rootless / Native außerhalb LoxBerry / Docker Desktop | **Für PLX nicht abgenommen.** Kein veröffentlichter geprüfter Installationsablauf. `docker` nicht einfach durch `podman` ersetzen und identische Secret-/Volume-/Healthcheck-Eigenschaften annehmen. Der Fehler eines anderen Projekts ist keine PLX-Diagnose. |
 
-1. Docker-Paket in ein eigenes Verzeichnis entpacken. Die enthaltene `compose.yaml` verweist auf den geprüften Image-Digest. Vor dem Entpacken die Archiv-Prüfsumme kontrollieren; danach die Dateien anhand von `SHA256SUMS` prüfen.
-2. Eigenes PLX-Passwort erzeugen:
+## Linux Docker / Compose: Erstinstallation
 
-   ```sh
-   mkdir -p secrets
-   openssl rand -base64 32 > secrets/plx_password.txt
-   chmod 600 secrets/plx_password.txt
-   # Linux: gezielte Leserechte für Containergruppe 10001:
-   # sudo chgrp 10001 secrets/plx_password.txt
-   # chmod 640 secrets/plx_password.txt
-   ```
+Erforderlich: Linux-Docker-Host, `docker compose`, `curl`, GNU `sha256sum`, `tar`, `openssl` und `sudo` für den Dateigruppenwechsel. Porsche-Connect-Konto sowie ausgehendes HTTPS/DNS für Anmeldung/Daten. Nur für die MQTT-Ausgabe wird ein Broker benötigt; PLX installiert keinen Broker.
 
-3. Für das öffentliche Release-Image ist kein Registry-Login nötig.
-4. `docker compose pull` und danach `docker compose up -d` ausführen.
-5. `https://localhost:8443` öffnen. Benutzername: `admin`; Passwort: Inhalt der eigenen Secret-Datei. Das erzeugte Zertifikat muss lokal vertraut oder durch ein geeignetes eigenes Zertifikat ersetzt werden. Siehe [HTTPS und SAN-Anforderungen](docs/DOCKER.md#https-und-anmeldung).
+Folgendes **einmal, zeilenweise, in einem neuen Verzeichnis ausführen; bei jedem Fehler stoppen**. Bei vorhandener Installation das Secret nicht neu erzeugen. Die Compose-Datei im Release-Paket enthält den festen öffentlichen Image-Digest. Dagegen baut `compose.yaml` im Repository `plx:local`; `compose.registry.yaml` verwendet den Versionstag. Diese drei Wege nicht vermischen.
 
-Standardmäßig ist der Port nur lokal erreichbar. Für LAN-Zugriff `PLX_BIND_ADDRESS` auf die LAN-Adresse des Servers setzen. `PLX_PORT` ändert den Host-Port, `PLX_USERNAME` den Benutzernamen. Kein produktives Porsche-/Taycan-Verzeichnis einbinden.
+```sh
+set -eu
+mkdir plx
+cd plx
+release=https://github.com/square-com-de/plx/releases/download/v0.1.0
+curl -fL "$release/PLX-Docker-0.1.0.tar.gz" -o PLX-Docker-0.1.0.tar.gz
+curl -fL "$release/SHA256SUMS" -o SHA256SUMS
+sha256sum --ignore-missing -c SHA256SUMS
+tar -xzf PLX-Docker-0.1.0.tar.gz
+cd PLX-Docker-0.1.0
+sha256sum -c SHA256SUMS
+umask 077
+mkdir -p secrets
+test ! -e secrets/plx_password.txt
+openssl rand -base64 32 > secrets/plx_password.txt
+sudo chgrp 10001 secrets/plx_password.txt
+chmod 640 secrets/plx_password.txt
+docker compose -p plx config --quiet
+docker compose -p plx pull
+docker compose -p plx up -d --wait --wait-timeout 90
+docker compose -p plx ps
+```
 
-In Portainer die Compose-Datei als eigenen Stack verwenden. Das Datei-Secret muss in dieser Portainer-Umgebung verfügbar sein; Dateipfade beziehen sich auf den Containerhost. Beim Update das Datenvolume erhalten.
+Das Secret bleibt im Eigentum des Erstellers, ist für Container-GID **10001** lesbar und nicht weltweit lesbar. Nur `chmod 600` kann den Start unter UID/GID 10001 verhindern. Nicht mit `chmod 777` lösen.
 
-**Alternativ aus Quellcode bauen:** Im Repository-Verzeichnis dasselbe Secret anlegen und mit dessen Build-Compose-Datei `docker compose up -d --build` ausführen. Das Quellcode-Repository ist öffentlich.
+`https://localhost:8443` **auf dem Docker-Host** öffnen. Benutzer `admin`, Passwort aus der erzeugten Secret-Datei, nicht das Porsche-Passwort. Standardzertifikat gilt für localhost/127.0.0.1; lokal vertrauen oder ein passendes vertrauenswürdiges Zertifikat einsetzen. Für LAN-Zugriff die Werte in `.env` **im selben Compose-Verzeichnis** speichern und `docker compose -p plx up -d` ausführen:
+
+```dotenv
+PLX_BIND_ADDRESS=192.0.2.10
+PLX_PORT=8443
+```
+
+Beispieladresse durch die echte LAN-IP ersetzen. `https://<Server-IP>:8443` öffnen; Zertifikat-SAN muss dazu passen. localhost-SAN für den eingebauten Healthcheck erhalten. Siehe [Docker-/TLS-Details](docs/DOCKER.md). `localhost` auf deinem Laptop führt nicht zum entfernten Server.
+
+Für Portainer einen separaten PLX-Stack aus der Release-Compose-Datei anlegen. Das Datei-Secret muss auf dessen Docker-Host vorhanden sein, nicht nur auf dem Desktop. Beim Update **ursprünglichen Stack-/Projektnamen und Datenvolume** beibehalten. Nicht dieselbe Installation zusätzlich als anders benanntes CLI-Projekt starten.
 
 ## LoxBerry-Plugin
 
-Erforderlich sind LoxBerry 4, Debian 12 oder neuer, Python 3.11+, HTTPS und Internetzugang während der Installation.
+Voraussetzungen laut Installer: LoxBerry 4, Debian 12+ / Python 3.11+, HTTPS und Internetzugang bei Installation. Vollständiger Plugin-Nachweis nur für die genaue Umgebung oben; keine pauschale Abnahme aller Debian-/LoxBerry-Versionen.
 
-1. `PLX-LoxBerry-0.1.0.zip` herunterladen und Prüfsumme kontrollieren. Nicht das allgemeine GitHub-Quellcode-ZIP als Plugin installieren.
-2. ZIP über die LoxBerry-Pluginverwaltung installieren.
-3. PLX in der geschützten LoxBerry-Oberfläche **über HTTPS** öffnen. Es gelten deine LoxBerry-Webzugangsdaten, nicht das Docker-PLX-Passwort.
-4. Beim Update die technische Plugin-ID `porsche2lox` beibehalten. Der Anzeigename ist PLX; die technischen Verzeichnisse bleiben kompatibel.
+1. [PLX-LoxBerry-0.1.0.zip](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip) laden und mit Release-`SHA256SUMS` vergleichen. Nicht das allgemeine GitHub-Quellcode-ZIP oder Docker-Archiv importieren.
+2. Unverändertes ZIP über die LoxBerry-Pluginverwaltung installieren.
+3. PLX im geschützten LoxBerry-Bereich **über direktes HTTPS** öffnen. LoxBerry-Webanmeldung nutzen, kein Docker-PLX-Passwort.
+4. Technische Plugin-ID/Verzeichnis `porsche2lox` beim Update erhalten; PLX ist der Anzeigename.
 
-## Erste Einrichtung
+**Proxy-Grenze in 0.1.0:** Ein HTTPS-Frontend mit internem HTTP zum LoxBerry wird von der veröffentlichten Login-/Speicherprüfung abgewiesen. Direktes LoxBerry-HTTPS oder – sofern vom Proxy unterstützt – verifiziertes HTTPS zum Backend nutzen. Browser–PLX und PLX–Porsche sind getrennte Verbindungen; Porsche-Abfragen laufen weiter über HTTPS. Schutz nicht deaktivieren oder `X-Forwarded-Proto` pauschal vertrauen. Ein Fix mit expliziter Proxy-Vertrauensliste ist nicht im veröffentlichten 0.1.0-ZIP enthalten; siehe [#1](https://github.com/square-com-de/plx/issues/1).
 
-1. Unter **Porsche-Konto** mit der Porsche-ID anmelden und bei Bedarf CAPTCHA bestätigen.
-2. Fahrzeuge laden, zur Einrichtung wechseln, Fahrzeug auswählen und speichern.
-3. In der Übersicht **Status abrufen** wählen. Automatischen Abruf bei Bedarf separat aktivieren; empfohlen sind 15 Minuten.
-4. MQTT-Broker mit seiner Netzwerkadresse und Zugangsdaten eintragen. In Docker bezeichnet `127.0.0.1` den Container selbst.
-5. Unter **Loxone** nur die gewünschten Werte auswählen und speichern. Anschließend MQTT-Ausgabe in der Einrichtung aktivieren. Abonnement: `<Präfix>/#`, standardmäßig `porsche2lox/#`.
+## Erste Einrichtung und Adressen
 
-PLX sendet keine Fahrzeugbefehle und keine Weckanforderungen. Einfaches/ausführliches MQTT und Datenalter erklärt das [Handbuch](docs/MANUAL.de.md).
+1. Unter **Porsche-Konto** anmelden, ggf. CAPTCHA bestätigen und Fahrzeuge laden. Fahrzeug in Einrichtung auswählen und **speichern**. Gefunden bedeutet noch nicht ausgewählt.
+2. In der Übersicht Status abrufen. Automatischen Abruf separat aktivieren, empfohlen sind 15 Minuten.
+3. MQTT mit dem **Broker-Endpunkt** konfigurieren, nicht automatisch mit dem Hostnamen der Webseite. HTTP-/HTTPS-Proxyrouten transportieren ohne eigene MQTT-Konfiguration kein MQTT. `127.0.0.1` in Docker ist PLX selbst. DNS/TCP aus dem PLX-Container prüfen, bevor Kennwörter geändert werden; siehe [Handbuch](docs/MANUAL.de.md#mqtt-und-loxone).
+4. Unter Loxone nur gewünschte Werte wählen, speichern und für ein Topic pro Wert **einfaches MQTT** nutzen. Danach MQTT aktivieren. Abonnement `<Präfix>/#`, standardmäßig `porsche2lox/#`. Das Abonnement wählt nicht aus, was PLX sendet.
 
-## Updates und Sicherung
+| Endpunkt | Zweck | Port |
+| --- | --- | --- |
+| PLX-HTTPS-Webseite | Browseranmeldung, Übersicht | Container 8443, Host-Port einstellbar |
+| MQTT-Broker | PLX sendet, Gateway abonniert | Tatsächlicher Broker-Listener; häufig TCP 1883 ohne oder 8883 mit TLS, keine automatische Erkennung |
+| MQTT Gateway → Miniserver | Optionale numerische XML-/UDP-Brücke | Beidseitig gleich eingestellter UDP-Port; PLX-Exportvorgabe 11883, nicht Broker-Port |
 
-Vor Updates PLX-Daten und Zugangsdaten sichern. Die Sicherung enthält private Tokens und TLS-Schlüssel.
+Keine Fahrzeug-/Weckbefehle. XML/CSV richtet Gateway oder Miniserver nicht automatisch ein. **Absender-IP meint den UDP-Sender (MQTT Gateway)**, nicht automatisch PLX, Broker, LoxBerry oder Miniserver. Leer lassen, solange der Sender nicht sicher bekannt ist.
 
-- **Docker:** Datenvolume und Web-Passwort-Secret erhalten. Auf den geprüften Image-Digest beziehungsweise die Version wechseln, Image laden und nur den PLX-Dienst neu erstellen. Für Datenerhalt kein `docker compose down -v` ausführen. Nach Neustart ist eine neue PLX-Webanmeldung nötig; die Porsche-Sitzung bleibt erhalten.
-- **LoxBerry:** Neueres Plugin-ZIP über das vorhandene Plugin installieren. Der Vorbereitungshook stoppt nur den eigenen Dienst; der preupgrade-Hook übernimmt die privaten Daten vor dem Löschen alter Verzeichnisse. Die neue Installation übernimmt sie und erstellt ihre Python-Umgebung neu. Für Datenerhalt nicht vorher deinstallieren.
-- **Rückweg:** Vorheriges geprüftes Image/Plugin und eigene Sicherung verwenden. Nicht voraussetzen, dass ältere Versionen zukünftige Datenformate lesen können. Dateirechte und Eigentümer aus der [technischen Referenz](docs/TECHNICAL.de.md) beachten.
+## Updates, Sicherung und Rückweg
 
-Beim Ändern der MQTT-Auswahl können vorher ausgewählte Topics einmal gelöscht werden. Einfaches MQTT sendet keine regelmäßigen Löschserien und keine zusätzlichen Heartbeat-Themen.
+**Docker:** Dasselbe Verzeichnis, Compose-Projekt/Stack, Datenvolume, `.env` und Passwort-Secret erhalten. Die Beispiele verwenden Projekt `plx`; Bestandsinstallationen behalten ihren bestehenden Namen. Ein anderer Projektname kann ein leeres Volume anlegen, das wie Datenverlust aussieht.
+
+Vor dem Update nur PLX stoppen und das komplette `/data`-Volume sowie Compose-Datei, `.env`, Secret und bisherigen Image-Digest privat kalt sichern. `/data` enthält Einstellungen, Porsche-Tokens, Daten/Bilder und TLS-Schlüssel. Echtes Datenvolume per `docker inspect` am PLX-Container bestimmen, nicht aus einem Verzeichnisnamen raten. Bisheriges Image lokal behalten. Sicherungen sind Zugangsdaten: Zugriff beschränken, nicht in GitHub hochladen.
+
+Nur den Image-Pin durch die neue geprüfte Version/den Digest ersetzen (oder die neue geprüfte Release-Compose-Datei übernehmen); andere Einstellungen erhalten. Im selben Verzeichnis:
+
+```sh
+docker compose -p plx pull
+docker compose -p plx up -d --wait --wait-timeout 90
+docker compose -p plx ps
+```
+
+`restart` installiert kein neues Image. Kein `down -v`, Volume-Löschen, Secret-Neuerzeugen oder Projektwechsel. Nach Neustart PLX-Webanmeldung erneuern; die Porsche-Sitzung bleibt separat gespeichert.
+
+Rückweg: nur PLX stoppen, Fehlerzustand separat zur Untersuchung erhalten. Alten Compose-Pin/Einstellungen/Secret und **passende Sicherung vor dem Update** in ein separates PLX-Volume zurückspielen, UID/GID 10001 und private Rechte erhalten. Dasselbe Projekt auf dieses Volume verweisen, PLX neu erstellen und HTTPS, gespeicherte Einstellungen, Porsche-Sitzung sowie MQTT-Auswahl prüfen. Ein altes Image muss kein neues Schema lesen können. Kein laufend verwendetes Volume überschreiben. Der konkrete Sicherungs-/Wiederherstellungsablauf muss vor Stable unabhängig in [#1](https://github.com/square-com-de/plx/issues/1) abgenommen werden; bisherige Neustart-/Update-Nachweise sind kein Restore-Test.
+
+**LoxBerry:** Beide Verzeichnisse `/opt/loxberry/config/plugins/porsche2lox/` und `/opt/loxberry/data/plugins/porsche2lox/` sichern, während nur der eigene Dienst gestoppt ist (beim Standardverzeichnis `porsche2lox-porsche2lox.service`). Bei nummerierter Installation tatsächlichen Verzeichnis-/Dienstnamen prüfen. Private Dateien mit Eigentümer/Rechten erhalten; venv ist neu erstellbar, Sockets/Locks gehören nicht in eine portable Sicherung. Vorheriges installierbares ZIP behalten. Neues ZIP **über** das Plugin installieren, nicht vorher deinstallieren. Veröffentlichte preroot/preupgrade-Hooks erhalten privaten Zustand vor dem Löschen durch den Installer und erstellen die venv neu. Für Rollback nur PLX stoppen, altes ZIP mit passender privater Sicherung verwenden und Zustand prüfen; unabhängige Recovery-Abnahme bleibt in [#1](https://github.com/square-com-de/plx/issues/1).
+
+Format-/Auswahländerung kann bekannte alte Retained-Topics einmal entfernen. Einfaches MQTT sendet keine regelmäßigen Lösch-/Heartbeat-Serien. Zur Fehlersuche keinen gemeinsam verwendeten MQTT-Baum löschen.

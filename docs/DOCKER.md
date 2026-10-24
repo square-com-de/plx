@@ -1,68 +1,39 @@
-# PLX ohne LoxBerry
+# PLX als eigenständiger Container
 
-Dieselbe Weboberfläche und derselbe Status-/MQTT-Kern, mit eigenem HTTPS-Server und PLX-Anmeldung. Kein PHP, LoxBerry, systemd oder Zugriff auf eine bestehende Taycan-Installation erforderlich. Statusabruf und MQTT sind bei Erststart ausgeschaltet. Fahrzeugbefehle werden weiterhin nicht unterstützt.
+[English installation](../INSTALL.md) · [Deutsche Installation](../INSTALL.de.md) · [Fehleraufarbeitung](INSTALLATION-LESSONS.de.md)
 
-## Start aus dem Repository
+PLX verwendet denselben Status-/MQTT-Kern und dieselbe Weboberfläche wie das LoxBerry-Plugin. Der Container hat einen eigenen HTTPS-Server und eine eigene PLX-Webanmeldung. LoxBerry/PHP/systemd werden dafür nicht benötigt; es gibt keinen nativen Nicht-LoxBerry-Installer mit Abnahmenachweis.
 
-Docker Engine mit Compose v2 vorausgesetzt. Im Repository-Verzeichnis:
+## Welcher Startweg?
 
-```sh
-mkdir -p secrets
-openssl rand -base64 32 > secrets/plx_password.txt
-chmod 600 secrets/plx_password.txt
-# Linux: dem Container gezielt Leserechte geben
-# sudo chgrp 10001 secrets/plx_password.txt && chmod 640 secrets/plx_password.txt
-docker compose up -d --build
-```
+| Datei / Paket | Verhalten |
+| --- | --- |
+| Release `PLX-Docker-0.1.0.tar.gz` | Empfohlener Preview-Pfad: enthaltene `compose.yaml` pinnt `ghcr.io/square-com-de/plx@sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f`. Image wird separat öffentlich geladen, keine Registry-Anmeldung. |
+| Repository `compose.yaml` | Quellcode-Build, `plx:local`; nicht dieselbe Datei wie im Release-Paket. Für Entwicklung, nicht als fertig getesteter Release-Befehl ausgeben. |
+| Repository `compose.registry.yaml` | Öffentliches Versionsimage `ghcr.io/square-com-de/plx:0.1.0`; für reproduzierbare Installation den Release-Digest bevorzugen. |
 
-Aufrufen: **https://localhost:8443**. Benutzername: **admin**, Passwort: Inhalt der selbst erzeugten Datei `secrets/plx_password.txt`. Das ist das PLX-Passwort; die Porsche-ID wird erst anschließend unter „Porsche-Konto“ eingegeben. Es gibt kein Standardpasswort. Mindestens 16 Zeichen erforderlich. Das Passwort wird als Compose-Secret eingebunden, nicht in das Image kopiert.
+Kopierbare Linux-Erstinstallation mit aktiven Secret-Rechten, festem Compose-Projektnamen und Prüfsummen: [Installation](../INSTALL.de.md#linux-docker--compose-erstinstallation). Bei Bestandsinstallation nie versehentlich Projekt/Volume wechseln oder das vorhandene Secret neu erzeugen. Für Update/Persistenz/Recovery gelten die Schritte unter [Updates und Rückweg](../INSTALL.de.md#updates-sicherung-und-rückweg).
 
-Linux-Hinweis: Datei-Secrets sind Bind-Mounts; der Containerbenutzer UID/GID 10001 muss die Datei lesen können. Bei fehlender Leseberechtigung gezielt GID 10001 und Modus 0640 setzen (`sudo chgrp 10001 secrets/plx_password.txt; chmod 640 secrets/plx_password.txt`). Keine weltweit lesbaren Kennwortdateien verwenden.
-
-Standardmäßig ist der Port nur am lokalen Rechner erreichbar. Für einen eigenen LAN-Server:
-
-```sh
-PLX_BIND_ADDRESS=0.0.0.0 docker compose up -d --build
-```
-
-Dann `https://<Server-IP>:8443` öffnen. Port und Benutzername können mit `PLX_PORT` beziehungsweise `PLX_USERNAME` geändert werden. Der MQTT-Broker muss aus dem Container erreichbar sein: seine LAN-Adresse oder einen Compose-Servicenamen verwenden; `127.0.0.1` bezeichnet den Container selbst. MQTT wird bewusst nicht automatisch aktiviert.
-
-## MQTT-Auswahl
-
-Bei einer neuen Installation gilt die einfache Ausgabe: pro gewähltem Parameter ein Topic, Reifendruck direkt in bar. Es gibt dabei keine zusätzlichen Diagnose-/Heartbeat-Themen. Fehlende Werte werden als `null` gesendet. Der einfache Modus sendet zuletzt gemeldete Werte; Messalter und Verbindungszustand bleiben in PLX sichtbar. Vorhandene Installationen behalten ohne bewusste Formatumstellung ihre ausführliche Ausgabe; unter Loxone → Erweiterte Ausgabeoptionen lässt sich das Format auswählen. Die UI-Anzeige der Fahrzeugdaten bleibt vollständig.
+**Runtime-Grenzen:** Linux AMD64 und separates LoxBerry sind geprüft. ARM64-Image gebaut/veröffentlicht, echter ARM64-Betrieb nicht abgenommen. Für Podman, Rootless-Docker und Docker Desktop liegt kein PLX-Installations-/Lebenszyklusnachweis vor. OCI-Kompatibilität ist keine Abnahme. [Genaue Testumgebungen](../INSTALL.de.md#runtime-status). `edge` ist Entwicklung, keine Stable-Empfehlung; diese Preview setzt kein `latest`.
 
 ## HTTPS und Anmeldung
 
-Beim ersten Start erzeugt PLX ein eigenes Zertifikat und speichert es dauerhaft. Der Browser meldet das selbst signierte Zertifikat; im eigenen LAN bewusst bestätigen oder ein eigenes vertrauenswürdiges Zertifikat einsetzen. Generierte Zertifikate gelten für localhost/127.0.0.1; für LAN-Namen/IPs eigene passende Zertifikate verwenden. Unter `/data/tls/cert.pem` und `/data/tls/key.pem` können eigene PEM-Dateien hinterlegt werden, lesbar nur für UID 10001; anschließend Container neu starten. Der private Schlüssel darf nicht passwortgeschützt sein. Der interne Healthcheck verwendet dieselbe CA und localhost, daher muss auch ein eigenes Zertifikat localhost als SAN enthalten oder der Healthcheck passend angepasst werden.
+Nur HTTPS, kein HTTP-Login. Standardbindung: `127.0.0.1:8443`; auf einem entfernten Server führt `localhost` im Laptopbrowser zum Laptop. LAN-Bindung über dauerhafte `.env` mit `PLX_BIND_ADDRESS`/`PLX_PORT`, passenden Firewallregeln und Zertifikat einrichten.
 
-Es gibt ausschließlich HTTPS, keine unsichere HTTP-Anmeldung. Weiterleitungsheader werden nicht als Nachweis für HTTPS akzeptiert. Ein Reverse Proxy kann die HTTPS-Verbindung zum Container nutzen. Websitzungen sind acht Stunden gültig, HttpOnly/Secure/SameSite=Strict und gegen CSRF geschützt. Fünf Anmeldeversuche pro Quelladresse und Minute; bei Reverse-Proxy-Betrieb gilt dessen gemeinsame Quelladresse. „PLX abmelden“ beendet ausschließlich die Websitzung. „Porsche abmelden“ im Konto beendet ausschließlich die eigene Porsche-Sitzung. Nach Containerneustart muss man sich bei PLX neu anmelden; die gespeicherte Porsche-Sitzung bleibt bestehen.
+Beim ersten Start erzeugt PLX ein eigenes Zertifikat für localhost/127.0.0.1 und speichert es in `/data/tls/`. Für LAN-Namen/IPs ein eigenes passendes Zertifikat lokal vertrauen beziehungsweise ein vertrauenswürdiges PEM-Zertifikat und dessen unverschlüsselten privaten Schlüssel als `/data/tls/cert.pem` und `/data/tls/key.pem` bereitstellen. Nur UID/GID 10001 darf den Schlüssel lesen. Danach nur PLX neu starten. Der interne Healthcheck verbindet sich verifiziert mit localhost: Eigene Zertifikate benötigen auch localhost als SAN, sofern der Healthcheck nicht gesondert angepasst und geprüft wird. Zertifikatsprüfung nicht als Fehlerbehebung abschalten.
 
-## Daten, Updates und Sicherung
+Der Docker-Server akzeptiert weitergereichte Header nicht als HTTPS-Nachweis. Ein Reverse Proxy muss den Container per verifiziertem **HTTPS** erreichen; nicht mit der noch unvollständigen TLS-Terminierungsunterstützung des LoxBerry-PHP-Frontends verwechseln. Die separate Verbindung PLX → Porsche verwendet HTTPS.
 
-Das Volume `plx_data` enthält eigene Einstellungen, Porsche-Token, Fahrzeugdaten, Modellbilder und TLS-Dateien. Keine Produktionsverzeichnisse einhängen und keine vorhandene Porsche-Sitzung importieren. Der Prozess läuft als UID/GID 10001, mit schreibgeschütztem Containerdateisystem, ohne Linux-Capabilities. Das Volume vor Updates sichern; es enthält private Daten und Zugangstoken.
+Webbenutzer standardmäßig `admin`, eigenes Passwort mindestens 16 Zeichen aus dem Datei-Secret. Kein Standardpasswort und kein Registry-Token für die öffentliche Image-Version. Secret muss UID/GID 10001 lesen können: unter dem dokumentierten Linux-Docker-Pfad gezielt GID 10001 / Modus 0640, nicht weltweit lesbar. Bei Portainer gelten Pfade auf dem Docker-Host.
 
-```sh
-docker compose logs --tail=50 plx
-docker compose ps
-docker compose down
-docker compose up -d --build
-```
+Websitzungen sind acht Stunden gültig, HttpOnly/Secure/SameSite=Strict und CSRF-geschützt. Fünf Loginversuche je Quelladresse/Minute; beim Proxy teilen sich Nutzer dessen Quelladresse. „PLX abmelden“ beendet nur die Websitzung. „Porsche abmelden“ beendet nur die eigene Porsche-Sitzung. Nach Containerneustart erneut bei PLX anmelden; gespeicherte Porsche-Tokens bleiben unabhängig erhalten.
 
-`down` behält das Volume. `down -v` löscht sämtliche PLX-Daten. Das PLX-Passwort kann durch Ersetzen der Secret-Datei und anschließendes `docker compose up -d --force-recreate` geändert werden. Einstellungen und Porsche-Token sind davon unabhängig.
+## Daten und MQTT
 
-Ein vorgebautes Image ist unter `ghcr.io/square-com-de/plx:edge` für Linux AMD64 und ARM64 veröffentlicht. Alternativ bleibt der lokale Build (`plx:local`) möglich. Die LoxBerry-ZIP bleibt ein eigener Installationsweg; Docker-Dateien werden darin nicht mitgeliefert.
+Das Datenvolume enthält Einstellungen, Porsche-Tokens, Status, Modellbilder und TLS-Schlüssel. Der Prozess läuft unter UID/GID 10001 mit schreibgeschütztem Containerdateisystem und ohne Linux-Capabilities. Keine laufenden Porsche-/Taycan-Verzeichnisse mounten oder deren Sitzung importieren. Private Kalt-Sicherung vor Updates, bisheriges Image und Compose-Konfiguration für Rückweg erhalten. Kein `down -v` für Datenerhalt. Vor Stable muss der vollständige Restore separat abgenommen werden; Neustartpersistenz allein reicht nicht.
 
-## Fertiges GitHub-Image verwenden
+MQTT und automatischer Abruf starten deaktiviert. Broker-Adresse/TCP-Port/TLS sind unabhängig von der Webadresse. Ein auf den Webproxy auflösender Hostname kann HTTPS bedienen und MQTT trotzdem ablehnen. DNS/TCP **aus dem Container** prüfen: [Handbuch](MANUAL.de.md#mqtt-und-loxone). `127.0.0.1` meint den PLX-Container.
 
-Erste Veröffentlichung erfolgreich geprüft: [GitHub Actions #1](https://github.com/square-com-de/plx/actions), Quellstand `2636646506dcdfa5bd42bc8c9f32c55c6bfc8626`. Unterstützt werden `linux/amd64` und `linux/arm64`. Tags: `ghcr.io/square-com-de/plx:edge` und `ghcr.io/square-com-de/plx:sha-542f627fb3ccbc58f9335c6fcea8e78e8af80cb2`. `edge` ist ein Entwicklungsstand, kein stabiler Release.
+Einfaches MQTT ist Neuinstallationsstandard: ein ausgewählter Druckwert = ein numerisches Topic in bar; fehlend `null`, keine zusätzlichen Heartbeat-/Diagnosethemen. Der letzte gemeldete Wert kann alt sein; Retained-Werte überleben Verbindungsabbrüche. Für frischeabhängige Logik das ausführliche Format samt Freigaben tatsächlich auswerten. Nur ein Abonnement `porsche2lox/#` (beziehungsweise eigener Präfix). Datenauswahl bestimmt den Versand, nicht das Abonnement. Beim bewussten Formatwechsel alte bekannte Topics einmalig bereinigen; keine pauschale Löschung fremder Topics.
 
-Das Release-Image `ghcr.io/square-com-de/plx:0.1.0` ist öffentlich für AMD64/ARM64 verfügbar. Kein GitHub-Konto und kein Registry-Token erforderlich. Das Docker-Releasepaket enthält eine Compose-Datei mit festem Image-Digest. Secret-Datei wie oben vorbereiten und starten:
-
-```sh
-docker compose -f compose.registry.yaml pull
-docker compose -f compose.registry.yaml up -d
-```
-
-Beim Login das GitHub-Paket-Token als Passwort verwenden, nicht das Porsche-Passwort. Der Container bekommt dieses Registry-Token nicht. Auch diese Variante bindet standardmäßig nur localhost; für LAN-Zugriff `PLX_BIND_ADDRESS=0.0.0.0` vor dem Compose-Aufruf setzen.
-
-Der Workflow „PLX Docker“ testet bei relevanten Änderungen auf `main` und veröffentlicht erst nach bestandenen Linux-Tests und Container-Smoke-Test beide Architekturen sowie einen commitbezogenen Tag. Für einen festgelegten Stand den SHA-Tag statt `edge` in der Compose-Datei eintragen. Beide Compose-Dateien verwenden dieselbe Volume- und Secret-Struktur; nicht gleichzeitig im selben Projekt starten. Updates über `pull` und `up -d`, Stoppen über `down` mit derselben `-f`-Datei.
+[Offene unabhängige Abnahme / Gate #1](https://github.com/square-com-de/plx/issues/1). Dokumentation erweitert keine Runtime-Freigabe und veröffentlicht kein neues Image.
