@@ -46,7 +46,13 @@ PLX runs on your own server. **Vehicle data still comes from the Porsche cloud**
 
 Polling and MQTT start disabled. The optional Loxone XML/CSV export helps with MQTT Gateway and virtual UDP inputs; it is not required for MQTT itself.
 
-**Already installed?** Back up your PLX data before updating. Follow [installation and updates](INSTALL.md#updates-and-backup). Existing detailed MQTT configurations keep their format unless you change it.
+**Already installed?** Back up your PLX data before updating. Follow [installation and updates](INSTALL.md#updates-backup-and-rollback). Existing detailed MQTT configurations keep their format unless you change it.
+
+**Runtime scope:** Docker/Compose on Linux AMD64 and the dedicated LoxBerry 4 setup have preview acceptance evidence. ARM64 is built/published but lacks real-machine runtime acceptance. Podman, rootless Docker, Docker Desktop and native non-LoxBerry installs are **not qualified**. See [exact versions and boundaries](INSTALL.md#runtime-status).
+
+**MQTT address:** use the broker's actual endpoint/port; a working HTTPS web-proxy hostname does not prove MQTT reachability. The optional UDP sender filter refers to the MQTT Gateway. [Network checks and the one-subscription setup](docs/MANUAL.md#mqtt-and-loxone).
+
+[Installation lessons and corrective actions](docs/INSTALLATION-LESSONS.md) · [Blocking Stable acceptance checklist #1](https://github.com/square-com-de/plx/issues/1). PLX remains a preview; these documentation changes do not update existing release artifacts or deployed applications.
 
 ## Feedback & contact
 

@@ -46,7 +46,13 @@ PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus d
 
 Automatischer Abruf und MQTT sind beim ersten Start ausgeschaltet. Der optionale XML-/CSV-Export hilft bei MQTT Gateway und virtuellen UDP-Eingängen; für MQTT allein ist er nicht erforderlich.
 
-**Bereits installiert?** Vor dem Update die eigenen PLX-Daten sichern. Siehe [Installation und Updates](INSTALL.de.md#updates-und-sicherung). Bestehende ausführliche MQTT-Konfigurationen behalten ihr Format, bis du es selbst umstellst.
+**Bereits installiert?** Vor dem Update die eigenen PLX-Daten sichern. Siehe [Installation und Updates](INSTALL.de.md#updates-sicherung-und-rückweg). Bestehende ausführliche MQTT-Konfigurationen behalten ihr Format, bis du es selbst umstellst.
+
+**Runtime-Grenzen:** Für Linux Docker/Compose auf AMD64 und die separate LoxBerry-4-Umgebung liegen Preview-Nachweise vor. ARM64 ist gebaut/veröffentlicht, aber ohne echte Hardware-Laufzeitabnahme. Podman, Rootless-Docker, Docker Desktop und native Installation außerhalb LoxBerry sind **nicht abgenommen**. [Genaue Versionen und Grenzen](INSTALL.de.md#runtime-status).
+
+**MQTT-Adresse:** Tatsächlichen Broker-Endpunkt/Port verwenden; ein funktionierender HTTPS-Webproxy-Hostname belegt keine MQTT-Erreichbarkeit. Der optionale UDP-Absenderfilter meint das MQTT Gateway. [Netzwerkprüfung und ein einziges Abonnement](docs/MANUAL.de.md#mqtt-und-loxone).
+
+[Installationsfehler und konkrete Maßnahmen](docs/INSTALLATION-LESSONS.de.md) · [Verbindliche Stable-Abnahmeliste #1](https://github.com/square-com-de/plx/issues/1). PLX bleibt Preview; diese Dokumentation aktualisiert weder bestehende Release-Dateien noch laufende Anwendungen.
 
 ## Feedback & Kontakt
 

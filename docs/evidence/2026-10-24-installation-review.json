@@ -1,0 +1,70 @@
+{
+  "review_date": "2026-10-24",
+  "release": "0.1.0",
+  "release_status": "preview unchanged",
+  "public_source_commit": "6a6ff6730978d1a91d8caee2a637a92247b3cafb",
+  "public_release": "https://github.com/square-com-de/plx/releases/tag/v0.1.0",
+  "public_workflow": "https://github.com/square-com-de/plx/actions/runs/40098473674",
+  "public_image_digest": "sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f",
+  "evidence_kind": "Sanitized operator summary of local historical test reports and current read-only runtime inventory. Not independent reproduction.",
+  "mqtt_endpoint": {
+    "dns_destination_role": "HTTPS web proxy, not MQTT broker",
+    "proxy_tcp_1883": "connection refused",
+    "actual_broker_tcp_1883": "reachable",
+    "actual_broker_mqtt_connect": "existing credentials accepted",
+    "connect_probe_published_or_subscribed": false,
+    "host_only_correction_restored_mqtt_ok": true,
+    "publish_acl_proven_by_connect": false
+  },
+  "selection_before_simple": {
+    "selected_pressure_parameters": 2,
+    "retained_messages_observed": 29,
+    "history_rows_in_old_screenshot_proven_as_new_publishes": false
+  },
+  "simple_migration": {
+    "old_known_topics_removed_once": 29,
+    "retained_after": 2,
+    "numeric_pressure_payloads": 2,
+    "extra_live_metadata_history_or_deletion_observed": false,
+    "other_containers_unchanged": 7
+  },
+  "label": {
+    "old_platform_specific_label_absent_in_authenticated_html": true,
+    "new_label_means": "UDP sender: MQTT Gateway"
+  },
+  "loxberry_installer": {
+    "exact_accepted_zip_sha256": "0e233d13ed1364f9902a611341d1803fe5f2987d4f69f951d5db02d8d1aa8262",
+    "official_clean_install": true,
+    "official_update_preserved_settings_session_selection": true,
+    "public_zip_runtime_hook_payload_compared_to_accepted_package": true,
+    "comparison_is_another_exact_zip_installer_run": false,
+    "isolated_broker_messages": 2,
+    "numeric_pressures": 2,
+    "metadata_messages": 0,
+    "delete_messages": 0,
+    "production_contacted": false
+  },
+  "tested_environment_inventory": {
+    "linux_test_host": "Ubuntu 26.04.1 LTS x86_64",
+    "docker_engine_current": "29.8.2",
+    "compose_plugin_current": "5.6.1",
+    "current_inventory_is_historical_acceptance_version_record": false,
+    "loxberry": "4.0.0.15",
+    "debian_dietpi": "13.7",
+    "python": "3.13.5",
+    "php": "7.4.33"
+  },
+  "support_limits": {
+    "podman_acceptance_record_found": false,
+    "podman_root_cause": "not established for PLX",
+    "rootless_and_docker_desktop_qualified": false,
+    "arm64_manifest_published": true,
+    "arm64_real_runtime_acceptance_record_found": false,
+    "native_non_loxberry_installer_qualified": false,
+    "gateway_miniserver_versioned_independent_acceptance": "open",
+    "backup_restore_independent_acceptance": "open",
+    "tls_termination_fix_in_public_0_1_0": false
+  },
+  "release_gate": "https://github.com/square-com-de/plx/issues/1",
+  "private_credentials_and_environment_addresses_omitted": true
+}
