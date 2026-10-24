@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "stage": "exact-public-artifact-fresh-start",
+  "source_commit": "46c2208de1f280245f3d405e9363f63d18393472",
+  "image": "ghcr.io/square-com-de/plx@sha256:5ba106f4c3de9e90b19e4772a5df217ba87d65a86b2a99e8c7343ada1254dfd8",
+  "compose_sha256": "5c11b912cfdb3999142724eb133b92b48806d9a75e7fdc085b2c617d34ef6587",
+  "download_url": "https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml",
+  "fresh_volume": true,
+  "password_retrieval_guide_command_works": true,
+  "password_not_in_logs": true,
+  "no_precreated_secret_or_manual_rights_or_certificate": true,
+  "checks": {
+    "simple_default": true,
+    "polling_mqtt_disabled": true,
+    "empty_vehicles": true,
+    "private_generated_password": true
+  },
+  "lab_only_variations": [
+    "assigned port19444",
+    "owned existing project name to preserve lab network exception",
+    "actual test IPv4 in PLX_HOST"
+  ],
+  "old_working_restored_volume_preserved": true,
+  "production_or_porsche_called": false,
+  "date": "2026-10-25",
+  "runtime": {
+    "OS": "Ubuntu26.04.1 AMD64",
+    "Docker": "29.9.2",
+    "Compose": "5.6.1"
+  },
+  "browser": {
+    "Chrome": "156.0.8078.47",
+    "explicit_isolated_test_certificate_trust": true,
+    "verification_bypass": false,
+    "login_before_and_after_restore": true,
+    "DE_EN": true,
+    "mobile_390px": true
+  },
+  "lifecycle": {
+    "restart": true,
+    "force_recreate": true,
+    "same_image_matching_state_cold_restore": true,
+    "same_settings_password_tls_hashes": true,
+    "persistent_restore_compose_selection": true
+  },
+  "mqtt": {
+    "mock_only": true,
+    "production_contacted": false,
+    "porsche_called": false,
+    "image": "ghcr.io/square-com-de/plx@sha256:5ba106f4c3de9e90b19e4772a5df217ba87d65a86b2a99e8c7343ada1254dfd8",
+    "docker_bridge_dns_tcp": true,
+    "acknowledged_numeric_pressure_messages": 2,
+    "acknowledged_null_messages": 2,
+    "live_vehicle_data": false,
+    "mock_received_messages": 4,
+    "all_qos1_retained": true,
+    "extra_or_deletion_messages": 0,
+    "status": "passed",
+    "scope": "Explicit protocol mock, not production MQTT broker ACL/TLS or car data",
+    "own_mock_removed": true,
+    "own_network_removed": true
+  },
+  "legacy_external_secret": {
+    "status": "passed",
+    "new_public_image": "ghcr.io/square-com-de/plx@sha256:5ba106f4c3de9e90b19e4772a5df217ba87d65a86b2a99e8c7343ada1254dfd8",
+    "legacy_external_secret_retained": true,
+    "no_generated_replacement_password": true,
+    "legacy_config_and_tls_clone_starts_healthy": true,
+    "existing_legacy_instance_untouched": true,
+    "network_none_no_porsche_or_broker": true,
+    "not_a_schema_downgrade_test": true
+  },
+  "prototype_reboot": {
+    "status": "passed",
+    "boot_changed": true,
+    "same_container_image_volume": true,
+    "same_settings_password_tls_hashes": true,
+    "healthy_automatic_restart": true,
+    "no_production_or_porsche_calls": true
+  },
+  "limits": [
+    "No Porsche cloud/session or live measurements",
+    "No production broker or physical Miniserver",
+    "No Portainer GUI, Podman or real ARM64 execution",
+    "No cold VM reboot of final public image; reboot proof belongs to preceding prototype",
+    "No cross-version schema downgrade",
+    "LoxBerry HTTP-backend proxy gate remains open",
+    "No Stable/latest or production deployment"
+  ]
+}

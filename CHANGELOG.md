@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 Preview
+
+- One Compose path with server host as the only required setting, LAN default, persistent generated password and matching TLS SAN.
+- Early host/certificate errors, verified local health check and legacy external-secret compatibility.
+- Correct data-age guidance for simple/detailed MQTT and nonce-protected login language switch.
+- No first-start mode chooser, no vehicle commands, no production activation implied.
+
 ## 0.1.0 Preview — unreleased
 
 - Standalone HTTPS Docker deployment for AMD64/ARM64 and LoxBerry 4 plugin.

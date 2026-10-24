@@ -125,3 +125,17 @@ def test_no_default_password_and_separate_data(tmp_path):
         Application(tmp_path, tmp_path, 'admin', 'short')
     app = Application(tmp_path, tmp_path, 'admin', PASSWORD)
     assert not app.ready()
+
+
+def test_login_language_script_uses_a_fresh_csp_nonce(site):
+    import re
+    _,_,request=site
+    nonces=[]
+    for _ in range(2):
+        status,headers,body=request('GET','/')
+        assert status==401
+        nonce=re.search(rb'<script nonce="([A-Za-z0-9_-]+)"',body).group(1).decode()
+        assert "script-src 'self' 'nonce-"+nonce+"'" in headers['Content-Security-Policy']
+        assert "script-src 'self' 'unsafe-inline'" not in headers['Content-Security-Policy']
+        nonces.append(nonce)
+    assert nonces[0]!=nonces[1]

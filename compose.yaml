@@ -3,12 +3,10 @@ services:
     image: plx:local
     build: .
     ports:
-      - "${PLX_BIND_ADDRESS:-127.0.0.1}:${PLX_PORT:-8443}:8443"
+      - "${PLX_BIND_ADDRESS:-0.0.0.0}:${PLX_PORT:-8443}:8443"
     environment:
+      PLX_HOST: "${PLX_HOST:?Bitte IP oder DNS-Namen des Docker-Servers als PLX_HOST setzen}"
       PLX_USERNAME: "${PLX_USERNAME:-admin}"
-      PLX_PASSWORD_FILE: /run/secrets/plx_password
-    secrets:
-      - plx_password
     volumes:
       - plx_data:/data
     restart: unless-stopped
@@ -23,8 +21,5 @@ services:
     stop_grace_period: 40s
     pids_limit: 64
     mem_limit: 512m
-secrets:
-  plx_password:
-    file: ./secrets/plx_password.txt
 volumes:
   plx_data:

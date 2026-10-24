@@ -69,12 +69,12 @@ The XML/CSV mapping is optional. XML targets numeric virtual UDP inputs via an M
 | Unexpectedly many topics | Check simple/detailed format and the saved selection. Historical monitor rows are not necessarily current retained topics. |
 | Old data after refresh | Compare measurement age with cloud-fetch time; PLX does not wake the car. |
 | More/fewer parameters than another car | Equipment, contract and Porsche response differ. Do not treat unavailable as numeric zero. |
-| Image pull denied | Use public release `ghcr.io/square-com-de/plx:0.1.0` or its pinned digest; verify spelling, network and Docker registry configuration. No token is needed. |
-| HTTPS address rejected by LoxBerry | 0.1.0 does not recognize frontend TLS with an HTTP backend. Use direct LoxBerry HTTPS; do not disable the guard. [Known limitation](../INSTALL.md#loxberry-plugin). |
+| Image pull denied | Use public release `ghcr.io/square-com-de/plx:0.1.1` or its pinned digest; verify spelling, network and Docker registry configuration. No token is needed. |
+| HTTPS address rejected by LoxBerry | 0.1.0 does not recognize frontend TLS with an HTTP backend. Use direct LoxBerry HTTPS; do not disable the guard. [Known limitation](../INSTALL.md#alternatives-and-limits). |
 | Sign-in unavailable after restart | Sign in to the PLX web interface again; the saved Porsche session is separate. |
 
-Runtime support, including the unqualified Podman/rootless path: [installation matrix](../INSTALL.md#runtime-status). No Stable acceptance is claimed; see [lessons and gate](INSTALLATION-LESSONS.md).
+Runtime support, including the unqualified Podman/rootless path: [installation matrix](../INSTALL.md#alternatives-and-limits). No Stable acceptance is claimed; see [lessons and gate](INSTALLATION-LESSONS.md).
 
 ## Backup and support
 
-Follow the [update/backup guide](../INSTALL.md#updates-backup-and-rollback). Protect the complete data volume/plugin data and credentials; they can contain Porsche tokens, location/trip data and TLS keys. Send only sanitized screenshots/logs in [GitHub feedback](https://github.com/square-com-de/plx/issues/new?template=feedback_question.md). See [security reporting](../SECURITY.md) for vulnerabilities.
+Follow the [update/backup guide](../INSTALL.md#update-backup-and-recovery). Protect the complete data volume/plugin data and credentials; they can contain Porsche tokens, location/trip data and TLS keys. Send only sanitized screenshots/logs in [GitHub feedback](https://github.com/square-com-de/plx/issues/new?template=feedback_question.md). See [security reporting](../SECURITY.md) for vulnerabilities.

@@ -2,6 +2,8 @@
   'use strict';
   // Presentation-only translations: MQTT keys, saved values and API payloads stay unchanged.
   const messages = {
+  "Einfaches MQTT sendet den zuletzt gemeldeten Wert ohne Altersfreigabe; fehlende Werte sind null. Das Messalter siehst du in PLX.": "Simple MQTT sends the last reported value without a freshness signal; missing values are null. Check measurement age in PLX.",
+  "Im ausführlichen MQTT-Format melden data_valid und available die Freigabe. Auch ein neuer Cloud-Abruf kann alte Fahrzeugdaten liefern.": "Detailed MQTT provides data_valid and available signals. A new cloud fetch can still return old vehicle data.",
   "Übersicht": "Overview",
   "Fahrzeugdaten": "Vehicle data",
   "Porsche-Konto": "Porsche account",
@@ -424,6 +426,7 @@
   let parameterIndex = [], parameterGroups = [], filterActive = false, filterExpansion = new Set();
   function render() {
     if (!state) return;
+    $('#data-age-help').textContent = (state.config.mqtt_format || 'detailed') === 'simple' ? 'Einfaches MQTT sendet den zuletzt gemeldeten Wert ohne Altersfreigabe; fehlende Werte sind null. Das Messalter siehst du in PLX.' : 'Im ausführlichen MQTT-Format melden data_valid und available die Freigabe. Auch ein neuer Cloud-Abruf kann alte Fahrzeugdaten liefern.';
     if (actionError) notice(actionError, 'error');
     else notice(state.job.message, state.job.state === 'error' ? 'error' : state.job.state === 'ok' ? 'ok' : '');
     const account = labels[state.login.state] || 'Unbekannt';

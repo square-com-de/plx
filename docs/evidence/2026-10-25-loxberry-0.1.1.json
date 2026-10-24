@@ -1,0 +1,105 @@
+{
+  "test_target": "dedicated LoxBerry dedicated test VM",
+  "version": "0.1.1 Preview",
+  "source_commit": "46c2208de1f280245f3d405e9363f63d18393472",
+  "zip_sha256": "a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5",
+  "phases": [
+    "original_full_plugin_private_state_ui_registration_and_unit_backed_up",
+    "official_010_to_011_update_preserved_settings_session_selection_and_matched_zip",
+    "exact_public_011_clean_import_direct_https_auth_csrf_and_defaults_verified",
+    "new_data_age_hints_verified_in_browser_for_simple_detailed_DE_EN"
+  ],
+  "production_contacted": false,
+  "explicit_porsche_login_or_api_calls": false,
+  "mqtt_used": false,
+  "status": "passed",
+  "official_upgrade_010_to_011": true,
+  "settings_and_porsche_session_preserved": true,
+  "two_pressure_selections_preserved": true,
+  "installed_public_runtime_files_compared": 17,
+  "new_hint_present_in_https_html": true,
+  "unshipped_proxy_fix_absent_from_release": true,
+  "official_clean_install_011": true,
+  "direct_https_php_api_verified_with_pinned_ca": true,
+  "web_auth_401": true,
+  "csrf_403": true,
+  "clean_simple_default": true,
+  "clean_polling_mqtt_disabled": true,
+  "clean_porsche_signed_out": true,
+  "browser": {
+    "status": "passed",
+    "version": "0.1.1",
+    "browser": "headless local Google Chrome",
+    "upstream_https_certificate_verified": true,
+    "tls_verification_bypass": false,
+    "browser_network_path": "loopback proxy to direct dedicated test VM HTTPS; browser itself does not validate the VM certificate",
+    "rendered_data_age_hints": [
+      {
+        "format": "simple",
+        "language": "DE",
+        "text": "Einfaches MQTT sendet den zuletzt gemeldeten Wert ohne Altersfreigabe; fehlende Werte sind null. Das Messalter siehst du in PLX."
+      },
+      {
+        "format": "simple",
+        "language": "EN",
+        "text": "Simple MQTT sends the last reported value without a freshness signal; missing values are null. Check measurement age in PLX."
+      },
+      {
+        "format": "detailed",
+        "language": "DE",
+        "text": "Im ausf\u00fchrlichen MQTT-Format melden data_valid und available die Freigabe. Auch ein neuer Cloud-Abruf kann alte Fahrzeugdaten liefern."
+      },
+      {
+        "format": "detailed",
+        "language": "EN",
+        "text": "Detailed MQTT provides data_valid and available signals. A new cloud fetch can still return old vehicle data."
+      }
+    ],
+    "clean_simple_default": true,
+    "clean_settings_restored": true,
+    "mobile_390px_no_horizontal_overflow": true,
+    "no_javascript_errors": true,
+    "no_porsche_login_or_api_calls": true,
+    "no_mqtt_enabled": true,
+    "upstream_failures": 0,
+    "rejected_mutations": 0
+  },
+  "original_full_plugin_restored": true,
+  "original_private_config_session_hashes_and_modes_restored": true,
+  "original_program_ui_template_files_verified": 25,
+  "original_service_unit_bytes_restored": true,
+  "original_proxy_ui_restored": true,
+  "original_registration_version_restored": "0.1.0",
+  "original_service_activity_restored": true,
+  "other_running_units_unchanged": true,
+  "checked_at_utc": "2026-10-24T22:11:09.252901+00:00",
+  "versions": {
+    "loxberry": "4.0.0.15",
+    "debian": "13.7",
+    "python": "Python 3.13.5",
+    "php": "7.4.33"
+  },
+  "not_qualified": [
+    "Porsche login or live vehicle/API fetch",
+    "Production MQTT",
+    "TLS-terminating proxy with HTTP backend",
+    "Real Loxone Config/Miniserver end-to-end acceptance",
+    "Cross-version downgrade compatibility"
+  ],
+  "package_verification": {
+    "status": "passed",
+    "version": "0.1.1",
+    "zip_sha256": "a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5",
+    "public_checksums_verified": true,
+    "manifest_source_matches_expected": true,
+    "source_commit": "46c2208de1f280245f3d405e9363f63d18393472",
+    "release_url": "https://github.com/square-com-de/plx/releases/tag/v0.1.1"
+  },
+  "php_proxy_scope": {
+    "public_011_php_index_identical_to_public_010": true,
+    "public_php_sha256": "c1c5b4627f36dacce00161af466bee6265db88768f7073a52e91fa30f6b8228c",
+    "proxy_trust_helper_in_public_011": false,
+    "claim": "No PHP proxy-transport fix shipped or newly qualified by this test"
+  },
+  "final_test_vm_state": "Original installed 0.1.0 plugin plus pre-existing local proxy UI, private configuration/session and original registration restored; public 0.1.1 was tested, not left deployed."
+}
