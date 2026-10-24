@@ -42,4 +42,12 @@ The executed lab used the same downloaded file byte-for-byte. Its `.env` additio
 
 No Porsche login, live tokens, vehicle fetch, production MQTT publish or physical Miniserver operation was performed. Portainer uses the same Compose and console password retrieval, but its GUI was not independently operated in this run. Podman/rootless and real ARM64 execution remain unqualified. LoxBerry HTTP-backend TLS termination remains a separate open gate. No Stable/`latest` promotion or production deployment follows from this acceptance.
 
+## Separate LoxBerry ZIP acceptance
+
+The [dedicated PLX-LoxBerry-0.1.1.zip](https://github.com/square-com-de/plx/releases/download/v0.1.1/PLX-LoxBerry-0.1.1.zip), SHA256 `a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5`, passed official clean import and 0.1.0→0.1.1 update on a separate LoxBerry4.0.0.15 test VM (Debian13.7, Python3.13.5, PHP7.4.33). Settings, saved session bytes and two pressure selections survived update;17 installed runtime/UI files matched the exact public ZIP. This does not authenticate the retained Porsche session.
+
+Direct HTTPS PHP/API checks verified the pinned CA,401 authentication and403 CSRF behavior. Clean install starts signed out with Simple mode, polling and MQTT disabled. Rendered DE/EN Simple/detailed age hints, harmless save/restoration and390px layout passed. **This LoxBerry browser check used a local loopback proxy with verified direct HTTPS upstream; the browser itself did not validate the test-VM certificate.** Keep this distinction from the Docker native browser TLS acceptance above.
+
+The full original test-plugin state, private data, service unit and registration were restored afterwards, including25 original code/UI file comparisons; other running units stayed unchanged. Public PHP is byte-identical to0.1.0: the HTTP-backend TLS-terminating proxy issue remains unqualified. No Porsche login/cloud fetch or MQTT was activated. [LoxBerry evidence](evidence/2026-10-25-loxberry-0.1.1.json).
+
 [Machine-readable evidence](evidence/2026-10-25-quickstart.json) · [Installation](../INSTALL.md) · [Deutsch](../INSTALL.de.md) · [Remaining gates](https://github.com/square-com-de/plx/issues/1)
