@@ -9,6 +9,7 @@ Requires a Linux Docker host with `docker compose` and `curl`, with Docker acces
 Choose the server IP or DNS name you will open in your browser. Replace **192.0.2.10** below with that address; no `https://`, path or port in `PLX_HOST`. A DNS name must already resolve to the server IPv4 address on your client; IPv6 is not qualified by this default path. There is no initial Simple/Pro choice: Simple is the usable default.
 
 ```sh
+set -eu
 mkdir plx && cd plx
 curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env

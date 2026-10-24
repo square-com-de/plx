@@ -103,11 +103,13 @@ def prepare_tls(data, host):
             fresh_key.chmod(0o600); fresh_cert.chmod(0o600)
             os.replace(fresh_key,key); os.replace(fresh_cert,cert)
     try:
-        flag = '-checkip' if ipaddress.ip_address(host) else '-checkhost'
+        ipaddress.ip_address(host)
+        flag = '-verify_ip'
     except ValueError:
-        flag = '-checkhost'
-    for args in ([flag,host], ['-checkend','0']):
-        result = subprocess.run(['openssl','x509','-in',str(cert),'-noout',*args],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-        if result.returncode:
-            raise ValueError('TLS-Zertifikat passt nicht zu PLX_HOST oder ist abgelaufen. Passendes cert.pem/key.pem-Paar einsetzen; bestehende Dateien bleiben erhalten.')
+        flag = '-verify_hostname'
+    # x509 -checkip/-checkhost can return success for a mismatch on OpenSSL 3.
+    # verify checks identity and lifetime with a reliable failure exit status.
+    result = subprocess.run(['openssl','verify','-partial_chain','-trusted',str(cert),flag,host,str(cert)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    if result.returncode:
+        raise ValueError('TLS-Zertifikat passt nicht zu PLX_HOST oder ist abgelaufen. Passendes cert.pem/key.pem-Paar einsetzen; bestehende Dateien bleiben erhalten.')
     return cert,key

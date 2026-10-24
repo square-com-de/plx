@@ -22,18 +22,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - name: Check release is not already published
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh release view v0.1.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'Release v0.1.1 already exists; refusing replacement.'
-            exit 1
-          fi
-          if docker manifest inspect ghcr.io/square-com-de/plx:0.1.1 >/dev/null 2>&1; then
-            echo 'Image version already exists; refusing replacement.'
-            exit 1
-          fi
+      - name: Check release and image are explicitly absent
+        run: python tools/check_release_absent.py 0.1.1
       - name: Install test dependencies
         run: |
           sudo apt-get update

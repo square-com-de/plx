@@ -9,6 +9,7 @@ Voraussetzung: Linux-Docker-Host mit `docker compose`, `curl` und Docker-Zugriff
 IP oder DNS-Namen des Servers wählen, den du im Browser öffnen möchtest. **192.0.2.10** unten durch diese Adresse ersetzen; kein `https://`, Pfad oder Port in `PLX_HOST`. Ein DNS-Name muss auf deinem Gerät zur IPv4-Adresse des Servers auflösen; IPv6 ist im Standardweg nicht abgenommen. Keine Moduswahl beim Erststart: Einfach ist der voll nutzbare Standard.
 
 ```sh
+set -eu
 mkdir plx && cd plx
 curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
