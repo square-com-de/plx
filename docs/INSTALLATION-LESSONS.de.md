@@ -1,5 +1,7 @@
 # Installationsfehler und Release-Abnahme
 
+**Unten steht der historische 0.1.0-Review. Aktuelles Release: 0.1.1 Preview.** Für Neuinstallationen gelten der [abgenommene 0.1.1-Quickstart](QUICKSTART-0.1.1.md) und die aktuelle INSTALL. Die manuellen Secret-/GID-Schritte in diesem datierten Vorfallsbericht beschreiben den früheren Weg; 0.1.1 erzeugt Passwort und passendes TLS privat im Volume. Die exakten öffentlichen Docker- und LoxBerry0.1.1-Artefakte wurden separat abgenommen; Proxy-/Miniserver-/Runtime-Grenzen bleiben offen.
+
 [English](INSTALLATION-LESSONS.md) · [Installation](../INSTALL.de.md) · [Release-Gate #1](https://github.com/square-com-de/plx/issues/1)
 
 Stand: 24.10.2026. PLX bleibt **0.1.0 Preview**. Diese Aufarbeitung ändert Dokumentation und Abnahmekriterien, keine laufenden Anwendungen, Release-Dateien oder Image-Tags. Bereinigte Beobachtungen: [Nachweisübersicht](evidence/2026-10-24-installation-review.json). Historische lokale Betreiberberichte sind kein neuer unabhängiger Abnahmelauf.

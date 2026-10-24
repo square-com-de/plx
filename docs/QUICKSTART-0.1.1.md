@@ -42,6 +42,8 @@ The executed lab used the same downloaded file byte-for-byte. Its `.env` additio
 
 No Porsche login, live tokens, vehicle fetch, production MQTT publish or physical Miniserver operation was performed. Portainer uses the same Compose and console password retrieval, but its GUI was not independently operated in this run. Podman/rootless and real ARM64 execution remain unqualified. LoxBerry HTTP-backend TLS termination remains a separate open gate. No Stable/`latest` promotion or production deployment follows from this acceptance.
 
+For the new default, the complete cold data-volume archive already includes `config/web-password.txt` and TLS. Back up the active Compose files and `.env` alongside it, including `compose.restore.yaml` when selected. The historical0.1.0 external-secret copy command is specific to that legacy deployment. The executed0.1.1 recovery used the same immutable image and a separate restored volume; no future-version schema downgrade is claimed.
+
 ## Separate LoxBerry ZIP acceptance
 
 The [dedicated PLX-LoxBerry-0.1.1.zip](https://github.com/square-com-de/plx/releases/download/v0.1.1/PLX-LoxBerry-0.1.1.zip), SHA256 `a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5`, passed official clean import and 0.1.0→0.1.1 update on a separate LoxBerry4.0.0.15 test VM (Debian13.7, Python3.13.5, PHP7.4.33). Settings, saved session bytes and two pressure selections survived update;17 installed runtime/UI files matched the exact public ZIP. This does not authenticate the retained Porsche session.

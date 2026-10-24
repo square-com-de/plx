@@ -1,5 +1,7 @@
 # Installation lessons and release acceptance
 
+**Historical 0.1.0 review below. Current release: 0.1.1 Preview.** Use the [accepted 0.1.1 quickstart](QUICKSTART-0.1.1.md) and current INSTALL for new deployments. The old manual secret/GID instructions in this dated incident record describe the former path; 0.1.1 creates its private password and matching TLS inside the volume. Exact public Docker and LoxBerry0.1.1 acceptance is recorded separately; open proxy/Miniserver/runtime limits still apply.
+
 [Deutsch](INSTALLATION-LESSONS.de.md) · [Installation](../INSTALL.md) · [Release gate #1](https://github.com/square-com-de/plx/issues/1)
 
 Review date: 2026-10-24. PLX remains **0.1.0 Preview**. This review changes documentation and acceptance criteria, not deployed applications, release assets or image tags. Sanitized observations: [evidence summary](evidence/2026-10-24-installation-review.json). The historical reports are local operator evidence; the summary is not a new independent acceptance run.
