@@ -34,6 +34,19 @@ PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus d
 
 **Docker/Compose ist bevorzugt.** Einmal Server-IP/DNS angeben; PLX erzeugt privates Passwort, passendes selbstsigniertes TLS-Zertifikat und persistentes Datenvolume automatisch. Keine Erststart-Moduswahl oder Secret-Dateirechte-Nacharbeit. LAN-Zugriff ist Standard; Zertifikatsvertrauen und eigenes Porsche-Konto bleiben klar benannte Voraussetzungen. Zur [kurzen Installation](INSTALL.de.md).
 
+Auf einem Linux-Docker-Host in einem neuen Verzeichnis ausführen; **192.0.2.10 durch die Server-IP oder den DNS-Namen ersetzen** (ohne Protokoll/Port):
+
+```sh
+set -eu
+mkdir plx && cd plx
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+printf 'PLX_HOST=192.0.2.10\n' > .env
+docker compose up -d --wait --wait-timeout 90
+docker compose exec -T plx cat /data/config/web-password.txt
+```
+
+Danach `https://<dein-server>:8443` öffnen, Benutzer `admin` und das in deiner Konsole ausgegebene private Passwort. Vor der Anmeldung dem eigenen Serverzertifikat ausdrücklich vertrauen; die [Installation](INSTALL.de.md#start) erklärt Fingerabdruck und Grenzen. Keine TLS-Prüfung abschalten.
+
 Portainer verwendet dieselbe Release-Compose-Datei. LoxBerry4 bleibt [Alternative](INSTALL.de.md#alternativen-und-grenzen) mit dediziertem Plugin-ZIP. Podman/Rootless und echter ARM64-Betrieb behalten ihren getrennten nicht abgenommenen Status. Bestehende0.1.0-Installationen/-Dateien werden nicht heimlich ersetzt.
 
 Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.1](docs/RELEASE-0.1.1.md).
@@ -85,3 +98,5 @@ Der eigene PLX-Code steht unter [MIT](LICENSE), einschließlich kommerzieller Nu
 Unabhängiges Projekt; keine offizielle Verbindung zu oder Unterstützung durch Porsche oder Loxone.
 
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
+
+[Neuer 0.1.1-Quickstart: tatsächliche Befehle, bestandene Prüfungen und Grenzen](docs/QUICKSTART-0.1.1.md).

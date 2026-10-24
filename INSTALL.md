@@ -52,3 +52,5 @@ docker compose ps
 **LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.1.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. Keep technical ID `porsche2lox` during updates. The separate LoxBerry HTTP-backend reverse-proxy limitation is not fixed by this Docker bootstrap; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
 
 Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.1.md).
+
+[New published0.1.1 quickstart acceptance](docs/QUICKSTART-0.1.1.md): fresh volume, verified LAN/browser login, restart/recreation and matching cold restore passed. Test limits remain explicit.

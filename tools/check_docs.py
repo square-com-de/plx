@@ -8,7 +8,7 @@ import subprocess
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md']
+GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md','docs/QUICKSTART-0.1.1.md']
 
 def slug(text):
     return re.sub(r'[^\w\- ]', '', text.lower().replace('`','')).replace(' ','-')
@@ -48,6 +48,8 @@ def main():
     standard=(ROOT/'compose.registry.yaml').read_text()
     assert 'PLX_HOST: "${PLX_HOST:?' in standard and 'PLX_BIND_ADDRESS:-0.0.0.0' in standard
     assert 'secrets:' not in standard and '/run/secrets' not in standard
+    assert blocks((ROOT/'README.md').read_text(),'sh')[0] == blocks((ROOT/'INSTALL.md').read_text(),'sh')[0], 'README and INSTALL start commands differ'
+    assert blocks((ROOT/'README.de.md').read_text(),'sh')[0] == blocks((ROOT/'INSTALL.de.md').read_text(),'sh')[0], 'German README and INSTALL start commands differ'
     docker=(ROOT/'docs/DOCKER.md').read_text()
     assert 'Beim Login das GitHub-Paket-Token als Passwort verwenden' not in docker
     assert 'Hauptwerte + Überwachung** wählen' not in (ROOT/'docs/LOXONE.md').read_text(), 'Detailed-only setup must not be the simple default'

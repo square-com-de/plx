@@ -34,6 +34,19 @@ PLX runs on your own server. **Vehicle data still comes from the Porsche cloud**
 
 **Docker/Compose is preferred.** Provide the server IP/DNS name once; PLX creates its private password, matching self-signed TLS certificate and persistent data volume automatically. No first-start mode choice or secret-file ownership steps. LAN access is the default; certificate trust and your Porsche account remain explicit prerequisites. Follow the [short installation guide](INSTALL.md).
 
+On a Linux Docker host, run in a new directory; **replace 192.0.2.10 with the server IP or DNS name** (no scheme/port):
+
+```sh
+set -eu
+mkdir plx && cd plx
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+printf 'PLX_HOST=192.0.2.10\n' > .env
+docker compose up -d --wait --wait-timeout 90
+docker compose exec -T plx cat /data/config/web-password.txt
+```
+
+Then open `https://<your-server>:8443` and sign in as `admin` with the private password shown in your console. Explicitly trust your own server certificate before sign-in; [installation](INSTALL.md#start) explains the fingerprint and limits. Do not disable TLS verification.
+
 Portainer uses the same release Compose file. LoxBerry4 remains an [alternative](INSTALL.md#alternatives-and-limits) using its dedicated plugin ZIP. Podman/rootless and real ARM64 runtime keep their separate unqualified status. Existing 0.1.0 installs and artifacts are not silently replaced.
 
 Simple MQTT is the default: select only the wanted values and subscribe to `porsche2lox/#`. Optional advanced settings remain available later without reinstallation. [Manual](docs/MANUAL.md) · [Release0.1.1 changes](docs/RELEASE-0.1.1.md).
@@ -85,3 +98,5 @@ PLX’s own code is licensed under [MIT](LICENSE), including commercial use unde
 Independent project; not affiliated with or supported by Porsche or Loxone.
 
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
+
+[New0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).
