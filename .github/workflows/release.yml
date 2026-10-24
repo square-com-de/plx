@@ -1,0 +1,92 @@
+name: Publish PLX Preview
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: plx-release-0.1.0
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.repository == 'square-com-de/plx'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Check release is not already published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v0.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release v0.1.0 already exists; refusing replacement.'
+            exit 1
+          fi
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli mosquitto mosquitto-clients
+          python -m pip install --require-hashes -r bin/requirements.lock.txt
+          python -m pip install pytest==8.4.2
+      - name: Unit and local integration tests
+        run: python -m pytest tests -q
+      - name: Build and smoke-test standalone container
+        run: |
+          mkdir -p secrets
+          openssl rand -base64 32 > secrets/plx_password.txt
+          sudo chgrp 10001 secrets/plx_password.txt
+          chmod 640 secrets/plx_password.txt
+          docker compose config --quiet
+          docker compose up -d --build --wait --wait-timeout 90
+          docker compose exec -T plx python /app/healthcheck.py
+      - name: Stop isolated test container
+        if: always()
+        run: docker compose down -v
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish versioned AMD64 and ARM64 image
+        id: image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/square-com-de/plx:0.1.0
+          labels: |
+            org.opencontainers.image.version=0.1.0
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Build both distributions with fixed image digest
+        env:
+          PLX_RELEASE_IMAGE: ghcr.io/square-com-de/plx@${{ steps.image.outputs.digest }}
+          PLX_RELEASE_COMMIT: ${{ github.sha }}
+          PLX_RELEASE_CI: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python tools/prepare_release.py
+          cd dist/release-v0.1.0
+          sha256sum --check SHA256SUMS
+          python -c 'import json; d=json.load(open("manifest.json")); assert not d["source_dirty"]; assert "@sha256:" in d["container"]["image"]'
+      - name: Publish GitHub preview release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v0.1.0 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title 'PLX 0.1.0 Preview' \
+            --prerelease \
+            --notes-file docs/PUBLISH-NOTES.md \
+            dist/release-v0.1.0/PLX-LoxBerry-0.1.0.zip \
+            dist/release-v0.1.0/PLX-Docker-0.1.0.tar.gz \
+            dist/release-v0.1.0/SHA256SUMS \
+            dist/release-v0.1.0/manifest.json \
+            dist/release-v0.1.0/compose.yaml

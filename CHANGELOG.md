@@ -1,0 +1,15 @@
+# Changelog
+
+## 0.1.0 Preview — unreleased
+
+- Standalone HTTPS Docker deployment for AMD64/ARM64 and LoxBerry 4 plugin.
+- Independent Porsche session, account sign-in/CAPTCHA and token renewal.
+- Vehicle selection, account-provided vehicle image, compact overview and searchable parameters.
+- German/English interface with aligned header and subtle Porsche connection indicator.
+- Simple MQTT: one selected value per topic; tire pressure as a number in bar, missing values as `null`.
+- Optional detailed MQTT, Loxone XML and CSV mappings.
+- Fixed LoxBerry upgrade data loss: stop the plugin service and preserve private state before the installer purges old directories.
+- MIT license for original PLX code; third-party dependencies/branding retain their own terms.
+- Bilingual project pages, installation/manual, feedback templates and release overview, using the public Hue2Lox documentation structure as a reference.
+
+See [test evidence](docs/TESTS.md) and [release limits](RELEASE.md). This is not a publication announcement.
