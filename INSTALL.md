@@ -4,6 +4,8 @@
 
 **0.1.0 Preview, not Stable.** Use the [versioned release](https://github.com/square-com-de/plx/releases/tag/v0.1.0). Image and repository are public; no GitHub account, registry token or `docker login` is needed. Existing release archives keep their original documentation; this page corrects it without replacing signed-off artifacts/checksums. [Gate #1](https://github.com/square-com-de/plx/issues/1) tracks independent end-user acceptance before any future Stable/`latest` promotion.
 
+**Preferred path: Docker/Compose in a Linux VM**, including Proxmox. LoxBerry is an alternative. [Executed fresh-VM Docker/app/recovery commands and test limits](docs/PROXMOX-CONTAINER.md). the dedicated test VM passed direct LAN HTTPS/browser and recovery after its infrastructure owner corrected a lab-only local Docker firewall block and a matching IP-SAN certificate was provided. Internal-only tests are recorded separately.
+
 ## Runtime status
 
 | Path | Preview qualification, 2026-10-24 |
@@ -17,6 +19,8 @@
 ## Linux Docker / Compose: first install
 
 Requires a Linux Docker host, `docker compose`, `curl`, GNU `sha256sum`, `tar`, `openssl` and `sudo` for the file's group change. A compatible Porsche Connect account and outbound HTTPS/DNS are needed for sign-in/data. An MQTT broker is required only for MQTT output; PLX does not install one.
+
+The application commands require Docker access. In the clean VM they ran as root; a normal administrator should prefix Docker commands with `sudo` or enter `sudo -i`. Do not grant Docker-group membership implicitly.
 
 Run the following **once, line by line, in a new directory; stop at any error**. Do not regenerate a secret for an existing installation. The release bundle's Compose definition pins the public image digest. The repository's `compose.yaml` instead builds `plx:local`; `compose.registry.yaml` uses the version tag. Do not mix these three paths.
 
@@ -98,7 +102,7 @@ docker compose -p plx ps
 
 `restart` does not install a new image. Do not use `down -v`, delete the volume, regenerate the secret, or switch project names. After restart sign in to PLX again; the Porsche session is persisted separately.
 
-For rollback, stop only PLX; preserve the failed state separately for investigation. Restore the prior Compose pin/settings/secret and a **matching pre-update data backup** into a separate PLX-only volume, preserving UID/GID 10001 and private modes. Point that same project at the restored volume, recreate PLX, and verify HTTPS, saved settings, Porsche session and selected MQTT values. Never assume an old image reads a newer schema. Do not overwrite a live mounted volume. The exact backup/restore procedure must be independently exercised for a Stable candidate in [#1](https://github.com/square-com-de/plx/issues/1); the existing restart/update evidence is not a restore test.
+For rollback, stop only PLX; preserve the failed state separately for investigation. Restore the prior Compose pin/settings/secret and a **matching pre-update data backup** into a separate PLX-only volume, preserving UID/GID 10001 and private modes. Point that same project at the restored volume, recreate PLX, and verify HTTPS, saved settings, Porsche session and selected MQTT values. Never assume an old image reads a newer schema. Do not overwrite a live mounted volume. The new [clean-VM matching-state restore](docs/PROXMOX-CONTAINER.md#cold-backup-and-matching-state-restore) passed with the same immutable image and separate target volume. It does not establish cross-version schema downgrade or live Porsche-token validity; independent Stable-candidate gates remain in [#1](https://github.com/square-com-de/plx/issues/1).
 
 **LoxBerry:** back up both `/opt/loxberry/config/plugins/porsche2lox/` and `/opt/loxberry/data/plugins/porsche2lox/` while only this plugin's service is stopped (`porsche2lox-porsche2lox.service` for the default directory). Check the real directory/service name for numbered installations. Private config and runtime files must retain ownership/modes; the venv is rebuildable, sockets/locks are not portable backups. Keep the prior installable ZIP. Install the newer ZIP **over** the plugin; do not uninstall first. Released preroot/preupgrade hooks preserve private state before the official installer purges directories and rebuilds the venv. If rolling back, stop only PLX, use the prior ZIP and its matching private backup, then verify restored state; independent recovery acceptance remains in [#1](https://github.com/square-com-de/plx/issues/1).
 

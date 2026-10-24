@@ -4,6 +4,8 @@
 
 **0.1.0 Preview, kein Stable.** [Versioniertes Release](https://github.com/square-com-de/plx/releases/tag/v0.1.0) verwenden. Image und Repository sind öffentlich; kein GitHub-Konto, Registry-Token oder `docker login` nötig. Bestehende Release-Archive behalten ihre ursprüngliche Anleitung; diese Seite korrigiert sie, ohne abgenommene Dateien/Prüfsummen zu ersetzen. [Gate #1](https://github.com/square-com-de/plx/issues/1) verlangt unabhängige Nutzerabnahme vor künftigem Stable/`latest`.
 
+**Bevorzugt: Docker/Compose in einer Linux-VM**, auch auf Proxmox. LoxBerry ist die Alternative. [Ausgeführte Docker-/App-/Recovery-Befehle und Testgrenzen](docs/PROXMOX-CONTAINER.de.md). Die separate Test-VM bestand direkte LAN-HTTPS-/Browser- und Recovery-Prüfung, nachdem Infra eine Lab-Firewallsperre für lokale Dockerzugriffe korrigiert hatte und ein passendes IP-SAN-Zertifikat eingerichtet war. Rein interne Tests bleiben getrennt erkennbar.
+
 ## Runtime-Status
 
 | Weg | Preview-Nachweis am 24.10.2026 |
@@ -17,6 +19,8 @@
 ## Linux Docker / Compose: Erstinstallation
 
 Erforderlich: Linux-Docker-Host, `docker compose`, `curl`, GNU `sha256sum`, `tar`, `openssl` und `sudo` für den Dateigruppenwechsel. Porsche-Connect-Konto sowie ausgehendes HTTPS/DNS für Anmeldung/Daten. Nur für die MQTT-Ausgabe wird ein Broker benötigt; PLX installiert keinen Broker.
+
+Die App-Befehle erfordern Docker-Zugriff. Auf der frischen VM liefen sie als root; als normaler Administrator Docker-Befehle mit `sudo` ausführen oder `sudo -i` nutzen. Docker-Gruppenmitgliedschaft nicht stillschweigend vergeben.
 
 Folgendes **einmal, zeilenweise, in einem neuen Verzeichnis ausführen; bei jedem Fehler stoppen**. Bei vorhandener Installation das Secret nicht neu erzeugen. Die Compose-Datei im Release-Paket enthält den festen öffentlichen Image-Digest. Dagegen baut `compose.yaml` im Repository `plx:local`; `compose.registry.yaml` verwendet den Versionstag. Diese drei Wege nicht vermischen.
 
@@ -98,7 +102,7 @@ docker compose -p plx ps
 
 `restart` installiert kein neues Image. Kein `down -v`, Volume-Löschen, Secret-Neuerzeugen oder Projektwechsel. Nach Neustart PLX-Webanmeldung erneuern; die Porsche-Sitzung bleibt separat gespeichert.
 
-Rückweg: nur PLX stoppen, Fehlerzustand separat zur Untersuchung erhalten. Alten Compose-Pin/Einstellungen/Secret und **passende Sicherung vor dem Update** in ein separates PLX-Volume zurückspielen, UID/GID 10001 und private Rechte erhalten. Dasselbe Projekt auf dieses Volume verweisen, PLX neu erstellen und HTTPS, gespeicherte Einstellungen, Porsche-Sitzung sowie MQTT-Auswahl prüfen. Ein altes Image muss kein neues Schema lesen können. Kein laufend verwendetes Volume überschreiben. Der konkrete Sicherungs-/Wiederherstellungsablauf muss vor Stable unabhängig in [#1](https://github.com/square-com-de/plx/issues/1) abgenommen werden; bisherige Neustart-/Update-Nachweise sind kein Restore-Test.
+Rückweg: nur PLX stoppen, Fehlerzustand separat zur Untersuchung erhalten. Alten Compose-Pin/Einstellungen/Secret und **passende Sicherung vor dem Update** in ein separates PLX-Volume zurückspielen, UID/GID 10001 und private Rechte erhalten. Dasselbe Projekt auf dieses Volume verweisen, PLX neu erstellen und HTTPS, gespeicherte Einstellungen, Porsche-Sitzung sowie MQTT-Auswahl prüfen. Ein altes Image muss kein neues Schema lesen können. Kein laufend verwendetes Volume überschreiben. Der neue [Clean-VM-Restore mit passenden Daten](docs/PROXMOX-CONTAINER.de.md#kalte-sicherung-und-passender-rückweg) bestand mit demselben unveränderlichen Image und separatem Zielvolume. Das belegt weder Schema-Downgrade zwischen Versionen noch echte Porsche-Token-Gültigkeit; unabhängige Stable-Kandidatengates bleiben in [#1](https://github.com/square-com-de/plx/issues/1).
 
 **LoxBerry:** Beide Verzeichnisse `/opt/loxberry/config/plugins/porsche2lox/` und `/opt/loxberry/data/plugins/porsche2lox/` sichern, während nur der eigene Dienst gestoppt ist (beim Standardverzeichnis `porsche2lox-porsche2lox.service`). Bei nummerierter Installation tatsächlichen Verzeichnis-/Dienstnamen prüfen. Private Dateien mit Eigentümer/Rechten erhalten; venv ist neu erstellbar, Sockets/Locks gehören nicht in eine portable Sicherung. Vorheriges installierbares ZIP behalten. Neues ZIP **über** das Plugin installieren, nicht vorher deinstallieren. Veröffentlichte preroot/preupgrade-Hooks erhalten privaten Zustand vor dem Löschen durch den Installer und erstellen die venv neu. Für Rollback nur PLX stoppen, altes ZIP mit passender privater Sicherung verwenden und Zustand prüfen; unabhängige Recovery-Abnahme bleibt in [#1](https://github.com/square-com-de/plx/issues/1).
 

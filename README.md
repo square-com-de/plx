@@ -10,7 +10,7 @@
 
 PLX brings Porsche Connect vehicle data into a compact dashboard and into Loxone over MQTT. Check battery level, range and tire pressure, browse the measurements your vehicle reports, and choose exactly which values to send.
 
-Run PLX as a standalone Docker container or a LoxBerry 4 plugin. Both use the same German/English web interface, your own Porsche session and a separate MQTT namespace. Vehicle images come from your signed-in Connect account.
+Docker/Compose is the preferred way to run PLX; the LoxBerry 4 plugin is an alternative. Both use the same German/English web interface, your own Porsche session and a separate MQTT namespace. Vehicle images come from your signed-in Connect account.
 
 PLX runs on your own server. **Vehicle data still comes from the Porsche cloud** and requires a compatible Porsche Connect account. PLX reads status only; it does not remote-control or wake your car.
 
@@ -32,12 +32,14 @@ PLX runs on your own server. **Vehicle data still comes from the Porsche cloud**
 
 ## Install and get started
 
-**LoxBerry import:** [Download PLX-LoxBerry-0.1.0.zip](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Upload unchanged in the plugin manager; do not use GitHub’s generic source ZIP.
+**Container first:** use the public digest-pinned release bundle. [Fresh Proxmox VM commands and honest test results](docs/PROXMOX-CONTAINER.md) include Docker installation, lifecycle/recovery and the resolved local-firewall issue and passed direct LAN/browser test. Proxmox hosts a Linux VM, not the OCI runtime.
 
 | Installation method | Who is it for? | Guide |
 | --- | --- | --- |
-| **Docker / Compose** | Your own server or existing container environment, including Portainer. No LoxBerry required. | [Installation](INSTALL.md) · [Docker details](docs/DOCKER.md) |
-| **LoxBerry plugin** | An existing LoxBerry 4 installation with HTTPS. | [Installation](INSTALL.md#loxberry-plugin) |
+| **Docker / Compose (preferred)** | Your own server or existing container environment, including Portainer. No LoxBerry required. | [Installation](INSTALL.md) · [Docker details](docs/DOCKER.md) |
+| **LoxBerry plugin (alternative)** | An existing LoxBerry 4 installation with HTTPS. | [Installation](INSTALL.md#loxberry-plugin) |
+
+**LoxBerry import:** [Download PLX-LoxBerry-0.1.0.zip](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Upload unchanged in the plugin manager; do not use GitHub’s generic source ZIP.
 
 1. **Install PLX:** choose Docker or the plugin. Use a versioned artifact and check its checksum from the release.
 2. **Open the interface:** Docker uses your own PLX username/password; the plugin uses your LoxBerry web login. There is no default PLX password.
