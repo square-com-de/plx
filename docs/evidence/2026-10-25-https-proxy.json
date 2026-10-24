@@ -1,0 +1,95 @@
+{
+  "status": "passed",
+  "test_target": "separate LoxBerry test VM",
+  "candidate_zip_sha256": "e494b7fe12bcd7cc40d244a320f335016fcc599d057bf39ed67a5c6190b8899f",
+  "real_porsche_calls": false,
+  "mqtt_used": false,
+  "php_policy_matrix": true,
+  "official_installer_and_private_state_preserved": true,
+  "trust_file_survives_official_update": true,
+  "last_case": "direct_https_without_proxy",
+  "last_get_status": 200,
+  "last_observation": {
+    "status_code": 200,
+    "ok": true,
+    "dispatch_count": 1,
+    "secure_cookies": 1
+  },
+  "http_proxy_matrix": [
+    {
+      "case": "untrusted_forwarded_https",
+      "accepted": false,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "trusted_https_header",
+      "accepted": true,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "trusted_ambiguous_header",
+      "accepted": false,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "trusted_missing_header",
+      "accepted": false,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "untrusted_immediate_peer",
+      "accepted": false,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "real_https_proxy_http_backend",
+      "accepted": true,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "http_frontend_overwrites_forged_https",
+      "accepted": false,
+      "dispatch_matches_policy": true
+    },
+    {
+      "case": "direct_https_without_proxy",
+      "accepted": true,
+      "dispatch_matches_policy": true
+    }
+  ],
+  "auth_401_csrf_403": true,
+  "save_login_captcha_reach_stub_only": true,
+  "tls_proxy_cookie_secure": true,
+  "real_plx_service_stopped_during_mutations": true,
+  "browser": {
+    "status": "passed",
+    "real_test_VM_https_proxy_with_http_backend": true,
+    "upstream_CA_and_IP_verified": true,
+    "browser_network_path": "Browser route adapter to real test VM HTTPS proxy; TLS verified by Node client, not native browser certificate validation",
+    "https_login_and_save_dispatch_to_local_stub": true,
+    "plain_HTTP_inputs_disabled": true,
+    "HTTP_login_captcha_save_not_sent": true,
+    "DE_EN_warning": true,
+    "mobile_no_overflow": true,
+    "no_JS_errors": true,
+    "no_real_Porsche_or_MQTT_calls": true
+  },
+  "candidate_left_installed": true,
+  "private_session_bytes_preserved": true,
+  "original_settings_preserved_except_test_polling_paused": true,
+  "test_polling_and_mqtt_disabled": true,
+  "other_running_units_unchanged": true,
+  "test_proxy_and_stub_removed": true,
+  "checked_at_utc": "2026-10-24T23:17:27.415410+00:00",
+  "source_runtime_commit": "7febab018154df0b031e82e89baaeb40b19bacd8",
+  "release_status": "Unreleased candidate; public 0.1.1 assets unchanged",
+  "final_real_service_readback": {
+    "status": "passed",
+    "runtime_files_equal_candidate": 18,
+    "real_service_active_after_test": true,
+    "direct_https_real_status_api": true,
+    "test_polling_and_mqtt_disabled": true,
+    "porsche_session_saved": true,
+    "no_porsche_fetch_performed": true
+  }
+}
