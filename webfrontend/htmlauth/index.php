@@ -8,12 +8,18 @@ if (empty($_SERVER['REMOTE_USER'])) {
     http_response_code(403);
     exit('Bitte über die LoxBerry-Pluginverwaltung anmelden.');
 }
-$https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+require_once __DIR__ . '/transport.php';
+$https = plx_is_https($_SERVER, plx_trusted_proxies($lbpconfigdir));
 $cookiePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/';
 session_name('porsche2lox_' . substr(hash('sha256', $lbpdatadir), 0, 12));
 session_set_cookie_params(['httponly' => true, 'secure' => $https, 'samesite' => 'Strict', 'path' => $cookiePath]);
 ini_set('session.use_strict_mode', '1');
 session_start();
+// Replace a pre-fix/plain-HTTP session cookie once with a Secure HTTPS cookie.
+if ($https && empty($_SESSION['plx_https_bound'])) {
+    session_regenerate_id(true);
+    $_SESSION['plx_https_bound'] = true;
+}
 if (!isset($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }

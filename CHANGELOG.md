@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — LoxBerry HTTPS proxy fix
+
+- Recognize TLS termination only from explicitly configured immediate proxy IPs and one unambiguous X-Forwarded-Proto value.
+- Upgrade pre-fix/plain-HTTP PHP sessions to a new Secure cookie on first recognized HTTPS request; retain CSRF protection.
+- Block login, CAPTCHA and configuration submission in HTTP browser pages before sending credentials; direct HTTPS and Docker HTTPS stay supported.
+- Local proxy trust config survives official plugin updates and is excluded from distributed ZIPs. See docs/REVERSE-PROXY.md.
+
 ## 0.1.1 Preview
 
 - One Compose path with server host as the only required setting, LAN default, persistent generated password and matching TLS SAN.

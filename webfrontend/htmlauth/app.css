@@ -312,3 +312,5 @@ body.porsche2lox-page #p2l{max-width:100%;padding:0 6px}
 #p2l #language-switch{order:1;flex-shrink:0}
 #p2l .connection-status,#p2l .connection-status.connected{font-size:11px;white-space:normal}
 }
+
+#p2l .transport-warning{padding:12px 14px;border:1px solid #efbdc5;border-radius:4px;background:#fff1f3;color:#ad1931}

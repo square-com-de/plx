@@ -2,6 +2,7 @@
   'use strict';
   // Presentation-only translations: MQTT keys, saved values and API payloads stay unchanged.
   const messages = {
+  "Bitte PLX über HTTPS öffnen. Anmeldung und Speichern sind über HTTP gesperrt.": "Please open PLX over HTTPS. Sign-in and saving are blocked over HTTP.",
   "Einfaches MQTT sendet den zuletzt gemeldeten Wert ohne Altersfreigabe; fehlende Werte sind null. Das Messalter siehst du in PLX.": "Simple MQTT sends the last reported value without a freshness signal; missing values are null. Check measurement age in PLX.",
   "Im ausführlichen MQTT-Format melden data_valid und available die Freigabe. Auch ein neuer Cloud-Abruf kann alte Fahrzeugdaten liefern.": "Detailed MQTT provides data_valid and available signals. A new cloud fetch can still return old vehicle data.",
   "Übersicht": "Overview",
@@ -409,7 +410,23 @@
   const stamp = (value) => value ? new Date(value * 1000).toLocaleString(window.PLXLanguage.locale) : 'Noch kein Abruf';
   const age = (seconds) => seconds == null ? 'Messalter unbekannt' : seconds < 60 ? 'Vor weniger als 1 Minute gemessen' : `Vor ${Math.floor(seconds / 60)} Minuten gemessen`;
   function notice(message, kind = '') {$('#notice').textContent = message; $('#notice').className = kind;}
+  const transportWarning = 'Bitte PLX über HTTPS öffnen. Anmeldung und Speichern sind über HTTP gesperrt.';
+  if (location.protocol !== 'https:') {
+    const warning = document.createElement('p');
+    warning.className = 'transport-warning'; warning.setAttribute('role', 'alert');
+    warning.textContent = transportWarning;
+    root.querySelector('nav').after(warning);
+    root.querySelectorAll('#login-form input, #captcha-form input, input[type=password]').forEach(input => {input.disabled = true;});
+  }
+  ['login-form', 'captcha-form', 'settings-form'].forEach(id => {
+    $('#' + id).addEventListener('submit', event => {
+      if (location.protocol === 'https:') return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      notice(transportWarning, 'error');
+    }, true);
+  });
   async function api(action, params = {}) {
+    if (location.protocol !== 'https:' && ['login', 'captcha', 'save'].includes(action)) throw new Error(transportWarning);
     const response = await fetch('index.php?api=1', {method:'POST', credentials:'same-origin', cache:'no-store', headers:{'Content-Type':'application/json', 'X-CSRF-Token':root.dataset.csrf}, body:JSON.stringify({action, params})});
     const reply = await response.json();
     if (!reply.ok) throw new Error(reply.error || 'Dienst nicht erreichbar.');

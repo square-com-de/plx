@@ -87,10 +87,16 @@ def test_php_csrf_https_and_real_unix_socket(tmp_path):
                 status = await client.post('/index.php?api=1',headers=headers,json={'action':'honk'})
                 assert not status.json()['ok']
                 # No login reaches Porsche; the entire test is local.
+                old_cookie='; '.join(k+'='+v for k,v in client.cookies.items())
                 saved = await client.post('/index.php?api=1',headers={**headers,'X-Test-HTTPS':'1'},json={'action':'save','params':state['config']})
                 assert saved.json()['ok']
+                assert 'secure' in saved.headers['set-cookie'].lower() and 'httponly' in saved.headers['set-cookie'].lower()
+                https_cookie='; '.join(k+'='+v for k,v in client.cookies.items())
+                assert https_cookie != old_cookie
+                stale = await client.post('/index.php?api=1',headers={**headers,'Cookie':old_cookie},json={'action':'status','params':{}})
+                assert stale.status_code == 403
                 # PHP must preserve {} as an object when forwarding to Python.
-                cancelled = await client.post('/index.php?api=1',headers=headers,json={'action':'cancel','params':{}})
+                cancelled = await client.post('/index.php?api=1',headers={**headers,'Cookie':https_cookie},json={'action':'cancel','params':{}})
                 assert cancelled.json()['ok'], cancelled.text
                 assert (config/'settings.json').stat().st_mode & 0o777 == 0o600
                 assert (data/'control.sock').stat().st_mode & 0o777 == 0o600
