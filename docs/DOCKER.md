@@ -30,7 +30,7 @@ Websitzungen sind acht Stunden gültig, HttpOnly/Secure/SameSite=Strict und CSRF
 
 ## Daten und MQTT
 
-Das Datenvolume enthält Einstellungen, Porsche-Tokens, Status, Modellbilder und TLS-Schlüssel. Der Prozess läuft unter UID/GID 10001 mit schreibgeschütztem Containerdateisystem und ohne Linux-Capabilities. Keine laufenden Porsche-/Taycan-Verzeichnisse mounten oder deren Sitzung importieren. Private Kalt-Sicherung vor Updates, bisheriges Image und Compose-Konfiguration für Rückweg erhalten. Kein `down -v` für Datenerhalt. Vor Stable muss der vollständige Restore separat abgenommen werden; Neustartpersistenz allein reicht nicht.
+Das Datenvolume enthält Einstellungen, Porsche-Tokens, Status, Modellbilder und TLS-Schlüssel. Der Prozess läuft unter UID/GID 10001 mit schreibgeschütztem Containerdateisystem und ohne Linux-Capabilities. Keine laufenden Porsche-/Taycan-Verzeichnisse mounten oder deren Sitzung importieren. Private Kalt-Sicherung vor Updates, bisheriges Image und Compose-Konfiguration für Rückweg erhalten. Kein `down -v` für Datenerhalt. Der [Clean-VM-Restore mit passender Datensicherung](PROXMOX-CONTAINER.de.md#kalte-sicherung-und-passender-rückweg) ist mit demselben Image und separatem Volume geprüft. Das ersetzt keine unabhängige Stable-Kandidaten- oder Versionsmigrationsabnahme; reine Neustartpersistenz war kein Restore-Nachweis.
 
 MQTT und automatischer Abruf starten deaktiviert. Broker-Adresse/TCP-Port/TLS sind unabhängig von der Webadresse. Ein auf den Webproxy auflösender Hostname kann HTTPS bedienen und MQTT trotzdem ablehnen. DNS/TCP **aus dem Container** prüfen: [Handbuch](MANUAL.de.md#mqtt-und-loxone). `127.0.0.1` meint den PLX-Container.
 

@@ -1,98 +1,79 @@
 {
   "date": "2026-10-24",
-  "environment": "Fresh Proxmox VM121, official Ubuntu 26.04 AMD64 cloud image, not cloned app VM",
-  "application": {
-    "project": "accept-plx",
-    "checked_at_utc": "20261024T180129Z-ddf114",
-    "published_image": "ghcr.io/square-com-de/plx@sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f",
-    "production_contacted": false,
-    "porsche_api_called": false,
-    "broker_contacted": false,
-    "runtime_changes_to_existing_apps": false,
+  "environment": "Fresh dedicated Proxmox Linux VM from official Ubuntu 26.04 AMD64 cloud image; not an application clone or shared production host",
+  "runtime": {
+    "ubuntu": "26.04.1 LTS",
+    "kernel": "7.0.0-38-generic",
+    "docker": "29.9.2",
+    "compose": "5.6.1",
+    "architecture": "x86_64"
+  },
+  "release": "PLX 0.1.0 Preview",
+  "image": "ghcr.io/square-com-de/plx@sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f",
+  "status": "passed for clean-VM container install, direct LAN HTTPS/browser, lifecycle and same-image matching-state recovery",
+  "checks": {
+    "public_archive_and_checksums": true,
+    "anonymous_digest_pull": true,
+    "gid10001_secret_permissions": true,
+    "healthy_nonroot_container": true,
+    "direct_external_lan_ca_and_ip_san_login": true,
+    "published_host_port": 19443,
+    "restart": true,
+    "recreate": true,
+    "cold_matching_data_restore": true,
+    "key_cert_config_password_preserved_after_provisioning": true,
+    "persistent_restore_compose_selection": true,
+    "repeat_backup_includes_active_override": true,
+    "private_backup_modes": true,
+    "other_test_application_unchanged": true
+  },
+  "browser": {
+    "version": "Chrome for Testing 156.0.8078.47",
+    "version_note": "Internal VM identifier omitted in public copy",
+    "protocol": "TLS 1.3",
+    "certificate_trust": "Temporary isolated NSS certificate database, explicit test-server trust",
+    "tls_verification_bypass": false,
     "checks": [
-      "anonymous_release_archive_download_and_all_checksums",
-      "documented_gid10001_secret_and_public_digest_clean_start",
-      "verified_tls_web_login_secure_cookie_auth_csrf_origin_private_paths_and_disabled_defaults",
-      "restart_same_container_preserves_settings_tls_password_and_private_marker",
-      "force_recreation_preserves_settings_selection_tls_password_and_generic_private_marker",
-      "private_cold_backup_and_same_digest_matching_state_rollback_to_separate_volume"
+      "direct HTTPS certificate validation",
+      "web login",
+      "Secure HttpOnly Strict cookie",
+      "DE/EN",
+      "harmless config save/reload",
+      "polling/MQTT disabled and Porsche signed out",
+      "draft retained while polling",
+      "mobile 390px no overflow",
+      "no JS errors"
     ],
-    "limitations": [
-      "No Porsche session is imported or created; private marker only tests volume persistence.",
-      "Same-image matching-data rollback only; no cross-version schema compatibility claim.",
-      "No Podman/ARM64 acceptance unless explicitly recorded below."
-    ],
-    "bounded_logs_read": true,
-    "bounded_log_lines": 1,
-    "live_porsche_session_used": false,
-    "generic_private_marker_only": true,
-    "runtime_inventory": {
-      "docker_engine": "29.9.2",
-      "compose": "5.6.1",
-      "host_architecture": "x86_64",
-      "podman_available": false,
-      "arm64_emulation_registered": false
-    },
-    "command_variations_from_docs": [
-      "Unique disposable Compose project and directory instead of plx",
-      "Assigned localhost-only host port 19443 persisted in .env",
-      "Test ran as root, so direct chgrp rather than sudo chgrp",
-      "Anonymous Docker config used explicitly for pull; no credentials supplied"
-    ],
-    "status": "partial_infrastructure_host_port_block",
-    "application_checks_passed": true,
-    "request_transport": "verified TLS inside own container via docker exec; not a passed published host-port browser test",
-    "published_host_port_acceptance": false,
-    "existing_containers_checked": 1,
-    "all_existing_container_ids_images_start_times_states_unchanged": true,
-    "cleanup_remaining_owned_containers": 0,
-    "cleanup_remaining_owned_volumes": []
+    "passed_before_and_after_recovery": true
   },
-  "isolated_mock": {
-    "mock_only": true,
-    "production_contacted": false,
-    "porsche_called": false,
-    "image": "ghcr.io/square-com-de/plx@sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f",
-    "host_to_own_docker_bridge_tcp": false,
-    "host_bridge_error": "ConnectionRefusedError",
-    "host_published_mock_error": "ConnectionResetError",
-    "docker_private_range_reject_counter_delta": 2,
+  "initial_failure_and_resolution": {
+    "first_host_port_attempt": "TLS EOF",
+    "cause": "Custom guest OUTPUT RFC1918 deny also rejected host-to-own-Docker traffic; bridge-forwarding exceptions alone did not cover that path",
+    "owned_mock_reject_counter_increase": 2,
+    "resolved_by": "Infra owner added narrowly scoped local-container OUTPUT/DNAT exceptions; private-LAN/IPv6 restrictions retained",
+    "loopback_is_not_lan_binding": true,
+    "certificate_intentionally_reissued_with_test_ip_san": true,
+    "previous_certificate_backed_up_same_private_key_reused": true,
+    "later_recreation_and_restore_kept_new_certificate": true,
+    "app_task_changed_firewall": false,
+    "initial_internal_tls_checks_not_used_as_host_port_proof": true
+  },
+  "isolated_mqtt": {
+    "protocol_mock_only": true,
     "docker_bridge_dns_tcp": true,
-    "acknowledged_numeric_pressure_messages": 2,
-    "acknowledged_null_messages": 2,
-    "live_vehicle_data": false,
-    "mock_received_messages": 4,
-    "all_qos1_retained": true,
+    "numeric_pressure_messages": 2,
+    "missing_value_null_messages": 2,
+    "qos1_retained": true,
     "extra_or_deletion_messages": 0,
-    "status": "passed",
-    "scope": "Explicit protocol mock, not production MQTT broker ACL/TLS or car data",
-    "own_mock_removed": true,
-    "own_network_removed": true
+    "live_vehicle_data": false
   },
-  "infrastructure_blocker": {
-    "vmid": 121,
-    "hostname": "sqc-container-acceptance",
-    "project": "accept-plx",
-    "phase": "clean VM published host-port access",
-    "public_release": "v0.1.0 Preview",
-    "image_digest": "sha256:5b7a6a7244c9c0e0eb59b79aa021fddb73e2326846d00aa8a64408dca9f0cf5f",
-    "first_install": "anonymous archive/internal checksums and digest pull succeeded; container internally healthy",
-    "published_https_port": 19443,
-    "published_https_failure": "SSLEOFError",
-    "root_cause_evidence": {
-      "guest_OUTPUT_chain": "ACCEPTANCE-OUT",
-      "own_host_to_mock_bridge": "ConnectionRefusedError",
-      "own_published_mock_port": "ConnectionResetError",
-      "private_docker_range_reject_counter_delta": 2,
-      "docker_bridge_to_bridge_dns_tcp_and_mock_mqtt": "passed",
-      "finding": "Host OUTPUT RFC1918 deny also blocks host-initiated connections to owned Docker bridge IPs; FORWARD bridge-to-bridge exceptions alone do not cover this path."
-    },
-    "firewall_changed": false,
-    "production_contacted": false,
-    "proposed_owner_action": "Infra owner: review minimal guest OUTPUT exemption restricted to local Docker bridge egress interfaces/subnets before the RFC1918 deny, persist it and prove private LAN deny unchanged. No general LAN opening, host/macvlan networking or IPv6 enablement.",
-    "continuing_tests": "Only internally verified TLS application checks; do not claim the published host-port end-user workflow passed until retested."
-  },
-  "release_status": "0.1.0 Preview unchanged",
-  "first_host_port_attempt": "Failed TLS EOF; safe evidence retained separately",
-  "harness_correction": "Internal fallback restart wait initially did not catch docker-exec readiness RuntimeError; retry condition corrected; no app failure inferred."
+  "limits": [
+    "No Porsche login/session import/cloud measurement",
+    "No production broker, Hue pairing or Miniserver control",
+    "No physical Loxone engine acceptance",
+    "No Podman or real ARM64 qualification",
+    "Same-image matching-state restore, not cross-version schema downgrade",
+    "No production go-live"
+  ],
+  "public_example_policy": "Private VM/network identifiers, MACs, addresses and endpoint IDs omitted. Documentation address 192.0.2.10 and generic application paths are examples, not actual infrastructure coordinates."
 }

@@ -32,7 +32,7 @@ PLX runs on your own server. **Vehicle data still comes from the Porsche cloud**
 
 ## Install and get started
 
-**Container first:** use the public digest-pinned release bundle. [Fresh Proxmox VM commands and honest test results](docs/PROXMOX-CONTAINER.md) include Docker installation, lifecycle/recovery and the currently blocked published-host-port check. Proxmox hosts a Linux VM, not the OCI runtime.
+**Container first:** use the public digest-pinned release bundle. [Fresh Proxmox VM commands and honest test results](docs/PROXMOX-CONTAINER.md) include Docker installation, lifecycle/recovery and the resolved local-firewall issue and passed direct LAN/browser test. Proxmox hosts a Linux VM, not the OCI runtime.
 
 | Installation method | Who is it for? | Guide |
 | --- | --- | --- |

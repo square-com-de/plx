@@ -32,7 +32,7 @@ PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus d
 
 ## Installieren und loslegen
 
-**Container zuerst:** Öffentliches Release-Paket mit festem Digest nutzen. [Frische Proxmox-VM: Befehle und tatsächlicher Teststand](docs/PROXMOX-CONTAINER.de.md) enthält Docker-Installation, Persistenz/Recovery und die noch blockierte Host-Port-Prüfung. Proxmox stellt die Linux-VM bereit, nicht die OCI-Laufzeit.
+**Container zuerst:** Öffentliches Release-Paket mit festem Digest nutzen. [Frische Proxmox-VM: Befehle und tatsächlicher Teststand](docs/PROXMOX-CONTAINER.de.md) enthält Docker-Installation, Persistenz/Recovery und die behobene lokale Firewallursache und bestandene direkte LAN-/Browserprüfung. Proxmox stellt die Linux-VM bereit, nicht die OCI-Laufzeit.
 
 | Installationsweg | Für wen? | Anleitung |
 | --- | --- | --- |
