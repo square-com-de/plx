@@ -10,7 +10,7 @@
 
 PLX bringt die Fahrzeugdaten aus Porsche Connect in eine kompakte Übersicht und per MQTT in Loxone. Sieh Akkustand, Reichweite und Reifendruck, durchsuche die vom Fahrzeug gelieferten Daten und wähle gezielt aus, welche Werte weitergegeben werden.
 
-PLX läuft als eigenständiger Docker-Container oder als LoxBerry-4-Plugin. Beide verwenden dieselbe deutsche und englische Weboberfläche, eine eigene Porsche-Sitzung und eigene MQTT-Topics. Das Fahrzeugbild kommt aus deinem angemeldeten Connect-Konto.
+Docker/Compose ist der bevorzugte PLX-Installationsweg; das LoxBerry-4-Plugin bleibt eine Alternative. Beide verwenden dieselbe deutsche und englische Weboberfläche, eine eigene Porsche-Sitzung und eigene MQTT-Topics. Das Fahrzeugbild kommt aus deinem angemeldeten Connect-Konto.
 
 PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus der Porsche-Cloud**; ein kompatibles Porsche-Connect-Konto ist erforderlich. PLX liest Statusdaten, steuert das Fahrzeug nicht fern und weckt es nicht auf.
 
@@ -32,12 +32,14 @@ PLX läuft auf deinem eigenen Server. **Die Fahrzeugdaten kommen weiterhin aus d
 
 ## Installieren und loslegen
 
-**LoxBerry-Import:** [PLX-LoxBerry-0.1.0.zip herunterladen](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Unverändert in der Pluginverwaltung hochladen; nicht das allgemeine GitHub-Quellcode-ZIP verwenden.
+**Container zuerst:** Öffentliches Release-Paket mit festem Digest nutzen. [Frische Proxmox-VM: Befehle und tatsächlicher Teststand](docs/PROXMOX-CONTAINER.de.md) enthält Docker-Installation, Persistenz/Recovery und die noch blockierte Host-Port-Prüfung. Proxmox stellt die Linux-VM bereit, nicht die OCI-Laufzeit.
 
 | Installationsweg | Für wen? | Anleitung |
 | --- | --- | --- |
-| **Docker / Compose** | Eigener Server oder vorhandene Container-Umgebung, auch Portainer. Kein LoxBerry nötig. | [Installation](INSTALL.de.md) · [Docker-Details](docs/DOCKER.md) |
-| **LoxBerry-Plugin** | Vorhandener LoxBerry 4 mit HTTPS. | [Installation](INSTALL.de.md#loxberry-plugin) |
+| **Docker / Compose (bevorzugt)** | Eigener Server oder vorhandene Container-Umgebung, auch Portainer. Kein LoxBerry nötig. | [Installation](INSTALL.de.md) · [Docker-Details](docs/DOCKER.md) |
+| **LoxBerry-Plugin (Alternative)** | Vorhandener LoxBerry 4 mit HTTPS. | [Installation](INSTALL.de.md#loxberry-plugin) |
+
+**LoxBerry-Import:** [PLX-LoxBerry-0.1.0.zip herunterladen](https://github.com/square-com-de/plx/releases/download/v0.1.0/PLX-LoxBerry-0.1.0.zip). Unverändert in der Pluginverwaltung hochladen; nicht das allgemeine GitHub-Quellcode-ZIP verwenden.
 
 1. **PLX installieren:** Docker oder Plugin wählen. Ein versioniertes Release-Paket verwenden und die Prüfsumme kontrollieren.
 2. **Oberfläche öffnen:** Docker nutzt deine eigenen PLX-Zugangsdaten, das Plugin die LoxBerry-Webanmeldung. Es gibt kein PLX-Standardpasswort.

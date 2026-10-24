@@ -4,6 +4,8 @@
 
 **0.1.0 Preview, kein Stable.** [Versioniertes Release](https://github.com/square-com-de/plx/releases/tag/v0.1.0) verwenden. Image und Repository sind öffentlich; kein GitHub-Konto, Registry-Token oder `docker login` nötig. Bestehende Release-Archive behalten ihre ursprüngliche Anleitung; diese Seite korrigiert sie, ohne abgenommene Dateien/Prüfsummen zu ersetzen. [Gate #1](https://github.com/square-com-de/plx/issues/1) verlangt unabhängige Nutzerabnahme vor künftigem Stable/`latest`.
 
+**Bevorzugt: Docker/Compose in einer Linux-VM**, auch auf Proxmox. LoxBerry ist die Alternative. [Ausgeführte Docker-/App-/Recovery-Befehle und Testgrenzen](docs/PROXMOX-CONTAINER.de.md). Die veröffentlichte Host-Port-Prüfung auf VM121 ist noch durch deren eigene OUTPUT-Regeln blockiert; interne App-Tests ersetzen diesen Endnutzertest nicht.
+
 ## Runtime-Status
 
 | Weg | Preview-Nachweis am 24.10.2026 |
@@ -17,6 +19,8 @@
 ## Linux Docker / Compose: Erstinstallation
 
 Erforderlich: Linux-Docker-Host, `docker compose`, `curl`, GNU `sha256sum`, `tar`, `openssl` und `sudo` für den Dateigruppenwechsel. Porsche-Connect-Konto sowie ausgehendes HTTPS/DNS für Anmeldung/Daten. Nur für die MQTT-Ausgabe wird ein Broker benötigt; PLX installiert keinen Broker.
+
+Die App-Befehle erfordern Docker-Zugriff. Auf der frischen VM liefen sie als root; als normaler Administrator Docker-Befehle mit `sudo` ausführen oder `sudo -i` nutzen. Docker-Gruppenmitgliedschaft nicht stillschweigend vergeben.
 
 Folgendes **einmal, zeilenweise, in einem neuen Verzeichnis ausführen; bei jedem Fehler stoppen**. Bei vorhandener Installation das Secret nicht neu erzeugen. Die Compose-Datei im Release-Paket enthält den festen öffentlichen Image-Digest. Dagegen baut `compose.yaml` im Repository `plx:local`; `compose.registry.yaml` verwendet den Versionstag. Diese drei Wege nicht vermischen.
 

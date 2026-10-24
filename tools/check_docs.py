@@ -7,7 +7,7 @@ import subprocess
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md']
+GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md']
 
 def slug(text):
     return re.sub(r'[^\w\- ]', '', text.lower().replace('`','')).replace(' ','-')
@@ -40,6 +40,7 @@ def main():
     docker=(ROOT/'docs/DOCKER.md').read_text()
     assert 'Beim Login das GitHub-Paket-Token als Passwort verwenden' not in docker
     assert 'Hauptwerte + Überwachung** wählen' not in (ROOT/'docs/LOXONE.md').read_text(), 'Detailed-only setup must not be the simple default'
+    assert blocks((ROOT/'docs/PROXMOX-CONTAINER.md').read_text(),'sh')==blocks((ROOT/'docs/PROXMOX-CONTAINER.de.md').read_text(),'sh'), 'Proxmox DE/EN commands differ'
     evidence=json.loads((ROOT/'docs/evidence/2026-10-24-installation-review.json').read_text())
     assert evidence['release_status']=='preview unchanged'
     assert not evidence['support_limits']['podman_acceptance_record_found']
