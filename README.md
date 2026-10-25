@@ -1,6 +1,4 @@
-> Upcoming 0.1.3 Preview: new original PLX artwork. Downloads become available after review/build/publication; not yet published.
-
-> **PLX 0.1.3 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Not a stable release. Planned Docker image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64); public pull without a GitHub token after publication. [Status and acceptance](RELEASE.md).
+> **PLX 0.1.3 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Not a stable release. Public Docker image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64); public pull without a GitHub token. [Status and acceptance](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -65,7 +63,7 @@ Include your PLX version, Docker or LoxBerry setup, vehicle model and a short de
 
 ## Release status and limits
 
-**0.1.3 Preview is in preparation.** This change replaces project artwork only. Historical 0.1.2 public-artifact acceptance is recorded separately; no fresh live Porsche login, token refresh or vehicle-fetch acceptance is claimed for 0.1.3.
+**0.1.3 Preview is published.** This change replaces project artwork only. Historical 0.1.2 public-artifact acceptance is recorded separately; no fresh live Porsche login, token refresh or vehicle-fetch acceptance is claimed for 0.1.3.
 
 A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.3.md) and [test evidence](docs/TESTS.md).
 
@@ -104,3 +102,5 @@ Independent project; not affiliated with or supported by Porsche or Loxone.
 [Historical0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).
 
 [PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).
+
+[0.1.3 public-artifact branding and test-system acceptance](docs/QUICKSTART-0.1.3.md).

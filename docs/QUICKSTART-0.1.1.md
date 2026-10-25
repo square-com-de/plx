@@ -1,10 +1,12 @@
 # PLX 0.1.1 Preview — published quickstart acceptance
 
+> Historical record. Old-logo distributions 0.1.0–0.1.2 are scheduled for withdrawal after the verified 0.1.3 replacement. Do not execute historical download commands; use current [INSTALL](../INSTALL.md). Git history/source access is not erased by release withdrawal.
+
 The **new** one-file Docker start was accepted on 24–25 October 2026. This is separate from the historical [0.1.0 procedure](PROXMOX-CONTAINER.md), which needed a host secret and certificate provisioning. 0.1.0 archives are unchanged.
 
 ## Exact public artifacts
 
-- [Compose download](https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml), SHA256 `5c11b912cfdb3999142724eb133b92b48806d9a75e7fdc085b2c617d34ef6587`.
+- Compose download (historical distribution; withdrawal scheduled), SHA256 `5c11b912cfdb3999142724eb133b92b48806d9a75e7fdc085b2c617d34ef6587`.
 - Image `ghcr.io/square-com-de/plx@sha256:5ba106f4c3de9e90b19e4772a5df217ba87d65a86b2a99e8c7343ada1254dfd8`.
 - Reviewed runtime source `46c2208de1f280245f3d405e9363f63d18393472`.
 - [Release CI](https://github.com/square-com-de/plx/actions/runs/40136887049) passed; public manifest and checksums verified before deployment. No registry login was required.
@@ -42,9 +44,11 @@ The executed lab used the same downloaded file byte-for-byte. Its `.env` additio
 
 No Porsche login, live tokens, vehicle fetch, production MQTT publish or physical Miniserver operation was performed. Portainer uses the same Compose and console password retrieval, but its GUI was not independently operated in this run. Podman/rootless and real ARM64 execution remain unqualified. LoxBerry HTTP-backend TLS termination remains a separate open gate. No Stable/`latest` promotion or production deployment follows from this acceptance.
 
+For the generated-password default, the complete cold data-volume archive already includes `config/web-password.txt` and TLS. Back up active Compose files and `.env` alongside it, including `compose.restore.yaml` when selected. The historical 0.1.0 external-secret copy command is specific to that legacy deployment. The executed 0.1.1 recovery used the same image and a separate restored volume; no future-version schema downgrade is claimed.
+
 ## Separate LoxBerry ZIP acceptance
 
-The [dedicated PLX-LoxBerry-0.1.1.zip](https://github.com/square-com-de/plx/releases/download/v0.1.1/PLX-LoxBerry-0.1.1.zip), SHA256 `a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5`, passed official clean import and 0.1.0→0.1.1 update on a separate LoxBerry4.0.0.15 test VM (Debian13.7, Python3.13.5, PHP7.4.33). Settings, saved session bytes and two pressure selections survived update;17 installed runtime/UI files matched the exact public ZIP. This does not authenticate the retained Porsche session.
+The dedicated PLX-LoxBerry-0.1.1.zip (historical distribution; withdrawal scheduled), SHA256 `a9f56c92743dcbc630890ff8be39d3caa5462111c91b0ae438694e34587189b5`, passed official clean import and 0.1.0→0.1.1 update on a separate LoxBerry4.0.0.15 test VM (Debian13.7, Python3.13.5, PHP7.4.33). Settings, saved session bytes and two pressure selections survived update;17 installed runtime/UI files matched the exact public ZIP. This does not authenticate the retained Porsche session.
 
 Direct HTTPS PHP/API checks verified the pinned CA,401 authentication and403 CSRF behavior. Clean install starts signed out with Simple mode, polling and MQTT disabled. Rendered DE/EN Simple/detailed age hints, harmless save/restoration and390px layout passed. **This LoxBerry browser check used a local loopback proxy with verified direct HTTPS upstream; the browser itself did not validate the test-VM certificate.** Keep this distinction from the Docker native browser TLS acceptance above.
 

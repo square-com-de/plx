@@ -69,7 +69,7 @@ The XML/CSV mapping is optional. XML targets numeric virtual UDP inputs via an M
 | Unexpectedly many topics | Check simple/detailed format and the saved selection. Historical monitor rows are not necessarily current retained topics. |
 | Old data after refresh | Compare measurement age with cloud-fetch time; PLX does not wake the car. |
 | More/fewer parameters than another car | Equipment, contract and Porsche response differ. Do not treat unavailable as numeric zero. |
-| Image pull denied | Use public release `ghcr.io/square-com-de/plx:0.1.2` or its pinned digest; verify spelling, network and Docker registry configuration. No token is needed. |
+| Image pull denied | Use public release `ghcr.io/square-com-de/plx:0.1.3` or its pinned digest; verify spelling, network and Docker registry configuration. No token is needed. |
 | HTTPS address rejected by LoxBerry | 0.1.0 does not recognize frontend TLS with an HTTP backend. Use direct LoxBerry HTTPS; do not disable the guard. [Known limitation](../INSTALL.md#alternatives-and-limits). |
 | Sign-in unavailable after restart | Sign in to the PLX web interface again; the saved Porsche session is separate. |
 

@@ -1,5 +1,7 @@
 PLX brings Porsche Connect into your smart home — as a standalone HTTPS Docker container and a LoxBerry 4 plugin, with the same German/English dashboard.
 
+> Historical record. Old-logo distributions 0.1.0–0.1.2 are scheduled for withdrawal after the verified 0.1.3 replacement. Do not execute historical download commands; use current [INSTALL](../INSTALL.md). Git history/source access is not erased by release withdrawal.
+
 **Deutsch:** Porsche Connect für dein intelligentes Zuhause: Docker-Container oder LoxBerry-Plugin, mit kompakter Übersicht, Fahrzeugbild, Suchfunktion und gezielter MQTT-Auswahl. Zwei gewählte Reifendrücke ergeben zwei Topics mit Zahlen in bar. Einstellungen und Sitzung bleiben beim LoxBerry-Update erhalten.
 
 **English:** Compact vehicle overview, account-provided model image, searchable parameters and selective MQTT output. Two selected tire pressures produce two numeric topics in bar. LoxBerry updates preserve settings and the Porsche session.
