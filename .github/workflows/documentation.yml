@@ -17,4 +17,6 @@ jobs:
         with:
           python-version: '3.13'
       - name: Validate links, commands and runtime boundaries
-        run: python tools/check_docs.py
+        run: |
+          python tools/check_docs.py
+          python tools/check_branding.py

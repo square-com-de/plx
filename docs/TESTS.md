@@ -47,7 +47,7 @@ Erfolgreich:
 - Einstellungen über PHP → privaten Unix-Socket → Python-Dienst gespeichert. Passwort nicht in der Statusantwort. Einstellungen und Socket mit Modus 600 und Eigentümer loxberry.
 - Statusabruf und MQTT bei Erststart deaktiviert; keine Porsche-Sitzung übernommen.
 - Übersicht und Anmeldeformular im Browser mit der echten LoxBerry-Seitenumgebung geprüft. Für den Darstellungstest wurde eine lokale Nur-Lese-Verbindung mit serverseitiger Testauthentifizierung verwendet. Keine Porsche-Zugangsdaten eingegeben.
-- Mobile Einbindung korrigiert; nach Abschluss der LoxBerry-Seitenleistenanimation kein horizontaler Überlauf bei 390 px. Bilder: preview/real-overview.png, preview/real-login.png, preview/real-mobile.png.
+- Mobile Einbindung korrigiert; nach Abschluss der LoxBerry-Seitenleistenanimation kein horizontaler Überlauf bei 390 px. Historische Bilder mit altem Projektlogo wurden aus dem aktuellen Dateibaum entfernt. Neue Branding-Vorschauen sind simulierte UI-Aufnahmen und keine Wiederholung dieser historischen Systemabnahme.
 - Klassischen index.cgi-Einstieg ergänzt; dieser leitet ausschließlich zur geschützten index.php weiter.
 
 Die Grundinstallation brauchte zwei Korrekturen ausschließlich im Testklon: DietPis ausstehende Ersteinrichtung abschließen und die vom aktuellen offiziellen Installer erwartete shellinabox.service aus dem offiziellen LoxBerry-Master ergänzen, da sie im ausgewählten Release fehlte. Für den CLI-Paketinstaller muss das Arbeitsverzeichnis für loxberry zugänglich sein; /root erzeugt eine Find-/Dateirechtewarnung.

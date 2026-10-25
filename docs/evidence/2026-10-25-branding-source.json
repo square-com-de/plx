@@ -1,0 +1,62 @@
+{
+  "status": "source and local plugin candidate checked; release/deployment pending",
+  "version": "0.1.3 Preview",
+  "original_png_sha256": "bbd8b07d633b944703f651eacbf96984956b6b6e0f5fb6803e93caaffa63470b",
+  "original_dimensions": [
+    1254,
+    1254
+  ],
+  "original_pixels_changed": false,
+  "svg_wrappers_embed_identical_original": true,
+  "known_old_logo_or_embedded_crest_detected": false,
+  "screenshots": "new simulated UI only, no account/token/broker",
+  "visual_review": "all five new UI PNGs inspected; prior eight obsolete previews replaced or removed; product model image retained separately",
+  "local_checks": [
+    "112 documentation links/contracts",
+    "127 existing tests passed, 5 platform skips",
+    "3 artwork/recursive-archive tests passed",
+    "original/wrapper/hash scan of source and local plugin ZIP",
+    "DE/EN desktop/account/settings and 390px mobile previews; no JS errors/overflow/external requests"
+  ],
+  "production_or_taycan_changed": false,
+  "online_withdrawals_completed": false,
+  "git_history_rewritten": false,
+  "assets": [
+    {
+      "path": "icons/plx-logo-original.png",
+      "sha256": "bbd8b07d633b944703f651eacbf96984956b6b6e0f5fb6803e93caaffa63470b"
+    },
+    {
+      "path": "icons/icon.svg",
+      "sha256": "80922de7ddb0baa8756c92c510236c43470a289dbfeab2931150d5bbf5caf519"
+    },
+    {
+      "path": "webfrontend/htmlauth/logo.svg",
+      "sha256": "80922de7ddb0baa8756c92c510236c43470a289dbfeab2931150d5bbf5caf519"
+    },
+    {
+      "path": "docs/preview/desktop.png",
+      "sha256": "83ef996001ebf7abbd1447a687fa89d686fac0f0bbe604a68ce79ac05568adf9"
+    },
+    {
+      "path": "docs/preview/login.png",
+      "sha256": "31cc3bf9ca0af0cfc1b97ab6f2788d49ebc43876b1add82e450920e4f9de97d3"
+    },
+    {
+      "path": "docs/preview/mobile.png",
+      "sha256": "0a48d2459a121526e6b5e9f7ce1999b936e270e811042cbb752c60f41a204200"
+    },
+    {
+      "path": "docs/preview/model.png",
+      "sha256": "308dfa228324c4e6ce92c51dfcf53b4bc46cdef7f0a96095484d87ada4ee25f2"
+    },
+    {
+      "path": "docs/preview/public-overview.png",
+      "sha256": "5a4d2689934797d043dea5a8a8eb4349ff78a562da32ac5c2871df14ca59001f"
+    },
+    {
+      "path": "docs/preview/settings.png",
+      "sha256": "84a610f4766518226b12999a187e29e7a14729fda0cf9695ed09e9f516ae66a3"
+    }
+  ]
+}
