@@ -1,14 +1,16 @@
 # PLX 0.1.2 Preview — public-artifact acceptance
 
+> Historical record. Old-logo distributions 0.1.0–0.1.2 are scheduled for withdrawal after the verified 0.1.3 replacement. Do not execute historical download commands; use current [INSTALL](../INSTALL.md). Git history/source access is not erased by release withdrawal.
+
 Accepted on 25 October 2026 on separate Docker and LoxBerry test systems. No production or Taycan application was contacted or changed. This is Preview qualification, with the limits below.
 
 ## Exact distribution
 
-- [Release](https://github.com/square-com-de/plx/releases/tag/v0.1.2), built by [release CI](https://github.com/square-com-de/plx/actions/runs/40171862451) from independently reviewed source `261ff1d32d20b17e725893c798b18666ef9fbb43`.
-- [Compose](https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml): SHA256 `c9a3a2d2a011762f11442e7b1d16317545d8f8cf1af33274b6507720253ebc3c`.
+- Release (historical distribution; withdrawal scheduled), built by [release CI](https://github.com/square-com-de/plx/actions/runs/40171862451) from independently reviewed source `261ff1d32d20b17e725893c798b18666ef9fbb43`.
+- Compose (historical distribution; withdrawal scheduled): SHA256 `c9a3a2d2a011762f11442e7b1d16317545d8f8cf1af33274b6507720253ebc3c`.
 - Image: `ghcr.io/square-com-de/plx@sha256:b0fadb6e2103315b07fc1ebe795486e3e3f4f94757257b6b3a682717afb8e827`.
-- [LoxBerry installer ZIP](https://github.com/square-com-de/plx/releases/download/v0.1.2/PLX-LoxBerry-0.1.2.zip): SHA256 `2e657baee6aae211338c0a7ae9b4bb777f10e34aadf74479aada39c9ca5d3e71`.
-- [Docker bundle](https://github.com/square-com-de/plx/releases/download/v0.1.2/PLX-Docker-0.1.2.tar.gz): SHA256 `76766fa1bc87cfb2b6f1142ccec6c9dd133ee19c59fed92b06431b88254e465a`.
+- LoxBerry installer ZIP (historical distribution; withdrawal scheduled): SHA256 `2e657baee6aae211338c0a7ae9b4bb777f10e34aadf74479aada39c9ca5d3e71`.
+- Docker bundle (historical distribution; withdrawal scheduled): SHA256 `76766fa1bc87cfb2b6f1142ccec6c9dd133ee19c59fed92b06431b88254e465a`.
 
 All five assets were downloaded anonymously and checked against the public manifest/checksums. All 43 inner Docker checksums passed; bundled Compose equals the standalone download. Published assets and tag remain unchanged; this later documentation commit does not rebuild or replace them.
 

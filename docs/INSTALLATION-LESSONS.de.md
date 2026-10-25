@@ -1,5 +1,7 @@
 # Installationsfehler und Release-Abnahme
 
+**Unten steht der historische 0.1.0-Review. Aktuelles Release: 0.1.3 Preview.** Für Neuinstallationen gilt die aktuelle [INSTALL](../INSTALL.de.md). Manuelle Secret-/GID-Schritte beschreiben den früheren Weg; Passwort und passendes TLS liegen privat im Datenvolume. Die historische [0.1.1-Lifecycle-Abnahme](QUICKSTART-0.1.1.md) bleibt versionsbezogen; der aktuelle [0.1.3-Umfang](QUICKSTART-0.1.3.md) ist separat.
+
 [English](INSTALLATION-LESSONS.md) · [Installation](../INSTALL.de.md) · [Release-Gate #1](https://github.com/square-com-de/plx/issues/1)
 
 Stand: 24.10.2026. PLX bleibt **0.1.0 Preview**. Diese Aufarbeitung ändert Dokumentation und Abnahmekriterien, keine laufenden Anwendungen, Release-Dateien oder Image-Tags. Bereinigte Beobachtungen: [Nachweisübersicht](evidence/2026-10-24-installation-review.json). Historische lokale Betreiberberichte sind kein neuer unabhängiger Abnahmelauf.

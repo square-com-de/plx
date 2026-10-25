@@ -57,6 +57,8 @@ Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Er
 
 ### LoxBerry hinter HTTPS-Proxy
 
-Ein HTTPS-Proxy mit internem HTTP benötigt eine ausdrückliche Liste vertrauenswürdiger unmittelbarer Proxy-Adressen. [Konfiguration und Sicherheitsregeln](docs/REVERSE-PROXY.md). Der Fix gehört ab0.1.2 zum Plugin; das öffentliche0.1.1 bleibt unverändert; direkte HTTPS-Verbindungen bleiben unterstützt.
+Ein HTTPS-Proxy mit internem HTTP benötigt eine ausdrückliche Liste vertrauenswürdiger unmittelbarer Proxy-Adressen. [Konfiguration und Sicherheitsregeln](docs/REVERSE-PROXY.md). Der Fix gehört ab0.1.2 zum Plugin; ältere Distributionen behalten ihre historische Versionsidentität und sind zum Rückzug vorgesehen; direkte HTTPS-Verbindungen bleiben unterstützt.
 
 [PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).
+
+[0.1.3 public-artifact branding and test-system acceptance](docs/QUICKSTART-0.1.3.md).

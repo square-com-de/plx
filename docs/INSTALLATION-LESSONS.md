@@ -1,5 +1,7 @@
 # Installation lessons and release acceptance
 
+**Historical 0.1.0 review below. Current release: 0.1.3 Preview.** Use current [INSTALL](../INSTALL.md). The old manual secret/GID steps describe the former path; generated passwords and matching TLS are stored privately in the data volume. Historical [0.1.1 lifecycle acceptance](QUICKSTART-0.1.1.md) remains version-specific; current [0.1.3 scope](QUICKSTART-0.1.3.md) is separate.
+
 [Deutsch](INSTALLATION-LESSONS.de.md) · [Installation](../INSTALL.md) · [Release gate #1](https://github.com/square-com-de/plx/issues/1)
 
 Review date: 2026-10-24. PLX remains **0.1.0 Preview**. This review changes documentation and acceptance criteria, not deployed applications, release assets or image tags. Sanitized observations: [evidence summary](evidence/2026-10-24-installation-review.json). The historical reports are local operator evidence; the summary is not a new independent acceptance run.

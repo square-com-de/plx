@@ -1,6 +1,4 @@
-> Upcoming 0.1.3 Preview: new original PLX artwork. Downloads become available after review/build/publication; not yet published.
-
-> **PLX 0.1.3 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Kein Stable-Release. Vorgesehenes Docker-Image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64), nach Veröffentlichung ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
+> **PLX 0.1.3 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Kein Stable-Release. Öffentliches Docker-Image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64), ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -65,7 +63,7 @@ Hilfreich sind PLX-Version, Docker-/LoxBerry-Umgebung, Fahrzeugmodell und eine k
 
 ## Release-Stand und Grenzen
 
-**0.1.3 Preview ist in Vorbereitung.** Diese Änderung ersetzt nur das Projektlogo. Die öffentliche Artefaktabnahme von 0.1.2 ist separat dokumentiert; ein neuer echter Porsche-Login, eine Token-Erneuerung oder ein Fahrzeugabruf für 0.1.3 wird nicht behauptet.
+**0.1.3 Preview ist veröffentlicht.** Diese Änderung ersetzt nur das Projektlogo. Die öffentliche Artefaktabnahme von 0.1.2 ist separat dokumentiert; ein neuer echter Porsche-Login, eine Token-Erneuerung oder ein Fahrzeugabruf für 0.1.3 wird nicht behauptet.
 
 Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.3.md) und [Testnachweise](docs/TESTS.md).
 
@@ -104,3 +102,5 @@ Unabhängiges Projekt; keine offizielle Verbindung zu oder Unterstützung durch 
 [Historischer 0.1.1-Quickstart: tatsächliche Befehle, bestandene Prüfungen und Grenzen](docs/QUICKSTART-0.1.1.md).
 
 [PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).
+
+[0.1.3 public-artifact branding and test-system acceptance](docs/QUICKSTART-0.1.3.md).

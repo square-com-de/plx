@@ -1,5 +1,7 @@
 > Historical 0.1.0 acceptance/operations reference. For 0.1.1 first start use INSTALL.md/INSTALL.de.md; manual secret/certificate setup below is not required by the new default.
 
+> Historical record. Old-logo distributions 0.1.0–0.1.2 are scheduled for withdrawal after the verified 0.1.3 replacement. Do not execute historical download commands; use current [INSTALL](../INSTALL.md). Git history/source access is not erased by release withdrawal.
+
 # PLX container on a Proxmox Linux VM
 
 [Deutsch](PROXMOX-CONTAINER.de.md) · [Preferred installation](../INSTALL.md) · [Acceptance gate](https://github.com/square-com-de/plx/issues/1)

@@ -1,6 +1,8 @@
 # PLX 0.1.0 Preview — release draft
 
-Release: [`v0.1.0`](https://github.com/square-com-de/plx/releases/tag/v0.1.0), marked **pre-release**. LoxBerry metadata keeps numeric version `0.1.0`.
+> Historical record. Old-logo distributions 0.1.0–0.1.2 are scheduled for withdrawal after the verified 0.1.3 replacement. Do not execute historical download commands; use current [INSTALL](../INSTALL.md). Git history/source access is not erased by release withdrawal.
+
+Release: `v0.1.0` (historical distribution; withdrawal scheduled), marked **pre-release**. LoxBerry metadata keeps numeric version `0.1.0`.
 
 ## Release notes / Deutsch
 
