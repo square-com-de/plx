@@ -100,3 +100,5 @@ Unabhängiges Projekt; keine offizielle Verbindung zu oder Unterstützung durch 
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
 
 [Historischer 0.1.1-Quickstart: tatsächliche Befehle, bestandene Prüfungen und Grenzen](docs/QUICKSTART-0.1.1.md).
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).

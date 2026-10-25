@@ -58,3 +58,5 @@ Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separat
 ### LoxBerry behind an HTTPS proxy
 
 An HTTPS proxy with an HTTP backend needs an explicit list of trusted immediate proxy addresses. [Configuration and security rules](docs/REVERSE-PROXY.md). The fix is included from0.1.2; public0.1.1 remains unchanged; direct HTTPS remains supported.
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).

@@ -100,3 +100,5 @@ Independent project; not affiliated with or supported by Porsche or Loxone.
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
 
 [Historical0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).

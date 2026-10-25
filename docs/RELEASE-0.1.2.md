@@ -12,15 +12,10 @@ LoxBerry supports HTTPS termination at an explicitly trusted proxy with an HTTP 
 
 This evidence covers the proxy-fix candidate on a0.1.1 base, not the final0.1.2 distribution/image. The new version changes metadata/packaging; exact artifacts still require acceptance. Browser evidence used a route adapter with verified upstream CA/IP, not native browser certificate validation. No Porsche cloud login, real MQTT publish, physical Miniserver or production/Taycan deployment was performed.
 
-## Build-time acceptance status
+## Published-artifact acceptance
 
-- [ ] Independent review and CI on the final release-preparation SHA.
-- [ ] Explicit absence checks for v0.1.2 release, Git tag and image0.1.2; abort on auth/network/unknown state. Never replace0.1.1.
-- [ ] Build the versioned AMD64/ARM64 image and record its actual immutable digest/source SHA; do not reuse the0.1.1 digest as0.1.2 proof.
-- [ ] Produce dedicated `PLX-LoxBerry-0.1.2.zip`, `PLX-Docker-0.1.2.tar.gz`, pinned `compose.yaml`, manifest and checksums from the clean reviewed source.
-- [ ] Publish only as a separate Preview, then test the exact public download/image and official plugin ZIP in isolated test systems before declaring release acceptance.
-- [ ] Record actual public-artifact acceptance results in the repository and issue1; retain existing support limits.
+The independently reviewed source above is now released as a separate 0.1.2 Preview. Release, Git tag and image absence were checked before publication; final CI passed. All public downloads and checksums were verified. The exact Docker image/Compose and official LoxBerry ZIP passed the scoped acceptance on separate test systems, including the real LoxBerry HTTPS-proxy path and Docker restart/recreation/cold restore.
 
-This checklist records the source/build-time gates. Current acceptance is tracked in [issue1](https://github.com/square-com-de/plx/issues/1); do not infer final acceptance merely from downloadable assets.
+[Exact artifact identities, test results and limits](QUICKSTART-0.1.2.md) · [Sanitized evidence](evidence/2026-10-25-public-0.1.2.json). The preceding PR6 candidate evidence is historical; the linked report covers the actual public 0.1.2 distribution.
 
 Podman/rootless, real ARM64 execution, physical Miniserver and production proxy qualification remain separate. A multiarch manifest is not a real ARM64 runtime test. Existing0.1.1 backups and immutable downloads remain usable.

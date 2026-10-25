@@ -1,0 +1,156 @@
+{
+  "version": "0.1.2 Preview",
+  "source_commit": "261ff1d32d20b17e725893c798b18666ef9fbb43",
+  "accepted_date": "2026-10-25",
+  "status": "passed within documented scope",
+  "production_or_taycan_changed": false,
+  "docker": {
+    "browser_passed": true,
+    "native_browser_TLS_validation": true,
+    "external_TLS_login_passed": true,
+    "post_restore_browser_and_external_login_passed": true,
+    "private_password_and_TLS_key_0600": true,
+    "password_not_logged": true,
+    "recovery": {
+      "porsche_api_called": false,
+      "production_contacted": false,
+      "firewall_changed": false,
+      "cross_version_schema_downgrade_tested": false,
+      "restart_published_tls_login_persisted": true,
+      "recreate_published_tls_login_persisted": true,
+      "status": "passed",
+      "same_image_matching_data_cold_restore": true,
+      "config_key_cert_password_preserved": true,
+      "porsche_remains_signed_out": true,
+      "original_volume_preserved": true,
+      "other_hue_container_unchanged": true,
+      "left_running_for_acceptance": true
+    },
+    "mqtt_mock": {
+      "mock_only": true,
+      "production_contacted": false,
+      "porsche_called": false,
+      "image": "ghcr.io/square-com-de/plx@sha256:b0fadb6e2103315b07fc1ebe795486e3e3f4f94757257b6b3a682717afb8e827",
+      "docker_bridge_dns_tcp": true,
+      "acknowledged_numeric_pressure_messages": 2,
+      "acknowledged_null_messages": 2,
+      "live_vehicle_data": false,
+      "mock_received_messages": 4,
+      "all_qos1_retained": true,
+      "extra_or_deletion_messages": 0,
+      "status": "passed",
+      "scope": "Explicit protocol mock, not production MQTT broker ACL/TLS or car data",
+      "own_mock_removed": true,
+      "own_network_removed": true
+    },
+    "legacy_compatibility": {
+      "status": "passed",
+      "new_public_image": "ghcr.io/square-com-de/plx@sha256:b0fadb6e2103315b07fc1ebe795486e3e3f4f94757257b6b3a682717afb8e827",
+      "legacy_external_secret_retained": true,
+      "no_generated_replacement_password": true,
+      "legacy_config_and_tls_clone_starts_healthy": true,
+      "existing_legacy_instance_untouched": true,
+      "network_none_no_porsche_or_broker": true,
+      "not_a_schema_downgrade_test": true
+    }
+  },
+  "loxberry": {
+    "version": "0.1.2 Preview",
+    "source_commit": "261ff1d32d20b17e725893c798b18666ef9fbb43",
+    "public_checksums_verified": true,
+    "status": "passed",
+    "test_target": "separate LoxBerry test VM",
+    "zip_sha256": "2e657baee6aae211338c0a7ae9b4bb777f10e34aadf74479aada39c9ca5d3e71",
+    "real_porsche_calls": false,
+    "mqtt_used": false,
+    "php_policy_matrix": true,
+    "official_installer_and_private_state_preserved": true,
+    "trust_file_survives_official_update": true,
+    "last_case": "direct_https_without_proxy",
+    "last_get_status": 200,
+    "last_observation": {
+      "status_code": 200,
+      "ok": true,
+      "dispatch_count": 1,
+      "secure_cookies": 1
+    },
+    "http_proxy_matrix": [
+      {
+        "case": "untrusted_forwarded_https",
+        "accepted": false,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "trusted_https_header",
+        "accepted": true,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "trusted_ambiguous_header",
+        "accepted": false,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "trusted_missing_header",
+        "accepted": false,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "untrusted_immediate_peer",
+        "accepted": false,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "real_https_proxy_http_backend",
+        "accepted": true,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "http_frontend_overwrites_forged_https",
+        "accepted": false,
+        "dispatch_matches_policy": true
+      },
+      {
+        "case": "direct_https_without_proxy",
+        "accepted": true,
+        "dispatch_matches_policy": true
+      }
+    ],
+    "auth_401_csrf_403": true,
+    "save_login_captcha_reach_stub_only": true,
+    "tls_proxy_cookie_secure": true,
+    "real_plx_service_stopped_during_mutations": true,
+    "browser": {
+      "status": "passed",
+      "real_test_VM_https_proxy_with_http_backend": true,
+      "upstream_CA_and_IP_verified": true,
+      "browser_network_path": "Browser route adapter to real test VM HTTPS proxy; TLS verified by Node client, not native browser certificate validation",
+      "https_login_and_save_dispatch_to_local_stub": true,
+      "plain_HTTP_inputs_disabled": true,
+      "HTTP_login_captcha_save_not_sent": true,
+      "DE_EN_warning": true,
+      "mobile_no_overflow": true,
+      "no_JS_errors": true,
+      "no_real_Porsche_or_MQTT_calls": true
+    },
+    "official_public_zip_clean_import": true,
+    "clean_defaults_simple_disabled_signed_out": true,
+    "private_state_restored_after_clean_import": true,
+    "published_012_left_installed": true,
+    "private_session_bytes_preserved": true,
+    "original_settings_preserved_except_test_polling_paused": true,
+    "test_polling_and_mqtt_disabled": true,
+    "other_running_units_unchanged": true,
+    "test_proxy_and_stub_removed": true
+  },
+  "unqualified": [
+    "live Porsche authentication/token refresh/vehicle fetch",
+    "production MQTT broker ACL/TLS",
+    "physical Miniserver",
+    "final-image VM cold reboot",
+    "Portainer GUI",
+    "Podman/rootless",
+    "real ARM64 runtime",
+    "production proxy deployment"
+  ]
+}
