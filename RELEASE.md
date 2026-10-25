@@ -1,8 +1,16 @@
 # PLX releases / Releases
 
-**[PLX 0.1.3 Preview](https://github.com/square-com-de/plx/releases/tag/v0.1.3)** is the current public version with the exact user-selected original PLX logo.
+## LoxBerry: 0.1.4 Preview — new installation
 
-- [LoxBerry plugin import ZIP](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-LoxBerry-0.1.3.zip).
+[Release and dedicated ZIP](https://github.com/square-com-de/plx/releases/tag/v0.1.4) · [New-installation instructions](docs/RELEASE-0.1.4-LoxBerry.md).
+
+Company author **square | com**. New plugin identity: **not** an in-place upgrade or automatic migration of older PLX/Porsche2Lox installations. Remove the earlier plugin before a deliberate fresh installation; settings/session may be deleted. This release publishes no Docker image or container update.
+
+## Docker: 0.1.3 Preview (unchanged)
+
+**[PLX 0.1.3 Preview](https://github.com/square-com-de/plx/releases/tag/v0.1.3)** remains the current Docker version with the exact user-selected original PLX logo.
+
+- [Historical LoxBerry 0.1.3 ZIP — old author identity](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-LoxBerry-0.1.3.zip).
 - [Docker Compose](https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml) and [Docker bundle](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-Docker-0.1.3.tar.gz).
 - [Manifest](https://github.com/square-com-de/plx/releases/download/v0.1.3/manifest.json) and [checksums](https://github.com/square-com-de/plx/releases/download/v0.1.3/SHA256SUMS).
 

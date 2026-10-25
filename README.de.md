@@ -3,7 +3,7 @@
 <p align="center"><strong>Porsche-Connect-Status – mit genau den MQTT-Werten, die dein Zuhause braucht.</strong></p>
 <p align="center"><a href="#schnellstart">Schnellstart</a> · <a href="INSTALL.de.md">Installation</a> · <a href="docs/MANUAL.de.md">Handbuch</a> · <a href="README.md">English</a></p>
 
-**0.1.3 Preview** · [Downloads & Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release-Stand](RELEASE.md)
+**Docker 0.1.3 Preview** · [Downloads & Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release-Stand](RELEASE.md)
 
 Betreibe PLX auf deinem eigenen Server, sieh die von deinem Porsche gemeldeten Daten und wähle aus, was Loxone oder ein anderer MQTT-Empfänger erhalten soll. Docker und das LoxBerry-4-Plugin verwenden dieselbe deutsche und englische Weboberfläche.
 
@@ -61,7 +61,7 @@ Eine Webproxy-Adresse ist nicht automatisch ein MQTT-Broker. PLX verwendet eine 
 | Deine Umgebung | Einstieg |
 | --- | --- |
 | Portainer | [Separaten Stack anlegen](INSTALL.de.md#portainer), Release-Compose verwenden, `PLX_HOST` setzen und das Passwort in der Containerkonsole lesen. |
-| LoxBerry 4 | [PLX-LoxBerry-0.1.3.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-LoxBerry-0.1.3.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. [Installation](INSTALL.de.md#alternativen-und-grenzen). |
+| LoxBerry 4 | [PLX-LoxBerry-0.1.4-New-Installation.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.4/PLX-LoxBerry-0.1.4-New-Installation.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. [Installation](INSTALL.de.md#alternativen-und-grenzen). |
 | LoxBerry hinter einem HTTPS-Proxy | [Unmittelbaren vertrauenswürdigen Proxy konfigurieren](docs/REVERSE-PROXY.md); die Plugininstallation allein erkennt deinen Proxy nicht. |
 | Proxmox oder eigene Container-Einrichtung | [Anleitung für Container, Sicherung und Rückweg](docs/PROXMOX-CONTAINER.de.md). Docker in einer Linux-VM betreiben, nicht auf dem Hypervisor. |
 

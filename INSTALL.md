@@ -49,7 +49,7 @@ docker compose ps
 
 ## Alternatives and limits
 
-**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.3.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. Keep technical ID `porsche2lox` during updates. For LoxBerry TLS termination with an HTTP backend, configure the explicit trusted proxy peers below; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
+**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.4-New-Installation.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. **New installation only:** this company identity is not an in-place upgrade. Remove an older PLX/Porsche2Lox plugin through its plugin manager before importing; settings/session may be removed. No automatic data migration. [Details and limits](docs/RELEASE-0.1.4-LoxBerry.md). For LoxBerry TLS termination with an HTTP backend, configure the explicit trusted proxy peers below; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
 
 Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.3.md).
 
