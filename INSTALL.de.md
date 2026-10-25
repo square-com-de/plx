@@ -1,5 +1,3 @@
-> **Nur Release-Vorbereitung:**0.1.2 ist noch nicht veröffentlicht. Die Befehle unten gelten für das kommende Release; bis zur kontrollierten Veröffentlichung und Abnahme [öffentliches0.1.1](https://github.com/square-com-de/plx/releases/tag/v0.1.1) verwenden.
-
 # PLX installieren — Docker zuerst
 
 [English](INSTALL.md) · [README](README.de.md)

@@ -1,7 +1,9 @@
 # PLX releases / Releases
 
-**0.1.2 Preview is prepared, not published.** [Preparation notes and remaining gates](docs/RELEASE-0.1.2.md). No Stable/latest or production promotion. The last published release remains [0.1.1 Preview](https://github.com/square-com-de/plx/releases/tag/v0.1.1).
+**0.1.2 Preview:** [versioned downloads](https://github.com/square-com-de/plx/releases/tag/v0.1.2). No Stable/latest promotion. [Notes and acceptance scope](docs/RELEASE-0.1.2.md).
 
-The new release will contain the reviewed LoxBerry trusted-HTTPS-proxy fix. Intended dedicated assets: `PLX-LoxBerry-0.1.2.zip`, `PLX-Docker-0.1.2.tar.gz`, pinned `compose.yaml`, `manifest.json`, `SHA256SUMS`. The registry image must be newly built and pinned by its actual digest; no unpublished digest is invented.
+This separate version contains the reviewed LoxBerry trusted-HTTPS-proxy fix. Dedicated assets: `PLX-LoxBerry-0.1.2.zip`, `PLX-Docker-0.1.2.tar.gz`, pinned `compose.yaml`, `manifest.json`, `SHA256SUMS`. The container reference must be the actual build digest recorded by the release workflow; a prior-version digest is not reused.
 
-The release workflow is manual and refuses an existing release/image or indeterminate existence check. Keep this preparation branch separate from the accepted0.1.1 documentation until controlled publication and exact-artifact acceptance. [0.1.1 acceptance](docs/QUICKSTART-0.1.1.md) and old archives remain unchanged.
+The manual release workflow rejects an existing release, Git tag, registry version or indeterminate existence lookup. [Current acceptance gate](https://github.com/square-com-de/plx/issues/1) distinguishes source review from exact public-artifact tests. No live Porsche, physical Miniserver, Podman/ARM64-runtime or production qualification is implied.
+
+The prior [0.1.1 Preview](https://github.com/square-com-de/plx/releases/tag/v0.1.1), its [recorded acceptance](docs/QUICKSTART-0.1.1.md) and all old archives remain unchanged.

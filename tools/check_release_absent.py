@@ -1,4 +1,4 @@
-"""Fail closed unless both public release and registry version explicitly do not exist."""
+"""Fail closed unless public release, Git tag and registry version explicitly do not exist."""
 import json
 import re
 import sys
@@ -26,6 +26,9 @@ def main(version):
     status, _ = request('https://api.github.com/repos/square-com-de/plx/releases/tags/v' + version)
     if status != 404:
         raise RuntimeError('Release version already exists; refusing replacement.')
+    status, _ = request('https://api.github.com/repos/square-com-de/plx/git/ref/tags/v' + version)
+    if status != 404:
+        raise RuntimeError('Git tag already exists; refusing source/tag mismatch.')
     query = urllib.parse.urlencode({'service': 'ghcr.io', 'scope': 'repository:square-com-de/plx:pull'})
     status, body = request('https://ghcr.io/token?' + query)
     if status != 200:
@@ -36,7 +39,7 @@ def main(version):
     status, _ = request('https://ghcr.io/v2/square-com-de/plx/manifests/' + version, method='HEAD', headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json'})
     if status != 404:
         raise RuntimeError('Image version already exists; refusing replacement.')
-    print('Public release and image version explicitly absent; publication may proceed.')
+    print('Public release, Git tag and image version explicitly absent; publication may proceed.')
 
 
 if __name__ == '__main__':

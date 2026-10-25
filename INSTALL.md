@@ -1,5 +1,3 @@
-> **Release preparation only:**0.1.2 has not been published. The commands below target the upcoming release; use [published0.1.1](https://github.com/square-com-de/plx/releases/tag/v0.1.1) until controlled publication and acceptance are complete.
-
 # Install PLX — Docker first
 
 [Deutsch](INSTALL.de.md) · [README](README.md)

@@ -1,4 +1,4 @@
-"""Publication is allowed only after two explicit not-found results."""
+"""Publication is allowed only after three explicit not-found results."""
 import importlib.util
 from pathlib import Path
 import urllib.error
@@ -7,17 +7,19 @@ import pytest
 spec=importlib.util.spec_from_file_location('release_guard',Path(__file__).parents[1]/'tools/check_release_absent.py')
 guard=importlib.util.module_from_spec(spec);spec.loader.exec_module(guard)
 
-def test_two_explicit_not_found_allow_publication(monkeypatch):
-    results=iter([(404,b''),(200,b'{"token":"test-only"}'),(404,b'')]);calls=[]
+def test_three_explicit_not_found_allow_publication(monkeypatch):
+    results=iter([(404,b''),(404,b''),(200,b'{"token":"test-only"}'),(404,b'')]);calls=[]
     def request(url,**kwargs):calls.append((url,kwargs));return next(results)
     monkeypatch.setattr(guard,'request',request);guard.main('0.1.1')
-    assert len(calls)==3 and calls[2][1]['method']=='HEAD'
+    assert len(calls)==4 and calls[3][1]['method']=='HEAD'
+    assert '/git/ref/tags/v0.1.1' in calls[1][0]
 
 @pytest.mark.parametrize('results',[
  [(200,b'')],
- [(404,b''),(404,b'')],
- [(404,b''),(200,b'{}')],
- [(404,b''),(200,b'{"token":"test-only"}'),(200,b'')],
+ [(404,b''),(200,b'{"ref":"refs/tags/v0.1.1"}')],
+ [(404,b''),(404,b''),(404,b'')],
+ [(404,b''),(404,b''),(200,b'{}')],
+ [(404,b''),(404,b''),(200,b'{"token":"test-only"}'),(200,b'')],
 ])
 def test_existing_or_unauthorized_version_aborts(monkeypatch,results):
     values=iter(results);monkeypatch.setattr(guard,'request',lambda *a,**k:next(values))

@@ -1,5 +1,3 @@
-> **Release preparation only:**0.1.2 has not been published. The commands below target the upcoming release; use [published0.1.1](https://github.com/square-com-de/plx/releases/tag/v0.1.1) until controlled publication and acceptance are complete.
-
 > **PLX 0.1.2 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.2). Not a stable release. Planned Docker image: `ghcr.io/square-com-de/plx:0.1.2` (AMD64/ARM64); public pull without a GitHub token after publication. [Status and acceptance](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
