@@ -13,3 +13,7 @@ Porsche and Loxone are trademarks of their respective owners. This integration i
 ## PLX artwork
 
 From 0.1.3 the project icon uses the user-selected original PLX artwork: abstract silver vehicle line, dark smart-home circuit motif and red X. The original PNG is retained byte-for-byte in `icons/plx-logo-original.png`; SVG delivery wrappers embed that same PNG. Provenance and checksums are in `icons/provenance.json`. It replaces the former Porsche crest app icon. The icon is project artwork, not a Porsche badge or endorsement. Historical versions and Git history may retain prior artwork until separately withdrawn; no history rewrite is performed by this change.
+
+## Release preparation and vehicle illustrations
+
+PLX’s own source code is licensed under MIT; see LICENSE. Third-party dependencies and Porsche branding are excluded from that grant and retain their respective terms. The MIT license grants no trademark rights or ownership of Porsche artwork. Attribution does not extend the original rights. Vehicle images in the running app are fetched from the signed-in account; private runtime image-cache files are not bundled. The public preview fixture `docs/preview/model.png` and regenerated dashboard screenshots contain a Porsche Connect model illustration alongside simulated measurements. Porsche retains the rights to that model artwork; the illustration and its appearance in screenshots are not covered by the PLX MIT grant. It is distinct from the new PLX project icon. Docker images install dependency wheels; retain their bundled license metadata.

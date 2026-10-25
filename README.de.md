@@ -51,7 +51,7 @@ Danach `https://<dein-server>:8443` öffnen, Benutzer `admin` und das in deiner 
 
 Portainer verwendet dieselbe Release-Compose-Datei. LoxBerry4 bleibt [Alternative](INSTALL.de.md#alternativen-und-grenzen) mit dediziertem Plugin-ZIP. Podman/Rootless und echter ARM64-Betrieb behalten ihren getrennten nicht abgenommenen Status. Bestehende0.1.0-Installationen/-Dateien werden nicht heimlich ersetzt.
 
-Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.2](docs/RELEASE-0.1.3.md).
+Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen 0.1.3](docs/RELEASE-0.1.3.md).
 
 ## Feedback & Kontakt
 
