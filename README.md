@@ -1,40 +1,34 @@
-> **PLX 0.1.3 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Not a stable release. Public Docker image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64); public pull without a GitHub token. [Status and acceptance](RELEASE.md).
-
-<p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
-<p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
+<p align="center"><img src="icons/plx-logo-original.png" width="112" alt="PLX app icon"></p>
 <h1 align="center">PLX</h1>
-<p align="center">Your Porsche x Loxone in your smart home.</p>
-<p align="center"><a href="docs/MANUAL.md">Manual</a> · <a href="INSTALL.md">Installation</a> · <a href="RELEASE.md">Release status</a></p>
+<p align="center"><strong>Porsche Connect status, with only the MQTT values your smart home needs.</strong></p>
+<p align="center"><a href="#quick-start">Quick start</a> · <a href="INSTALL.md">Installation</a> · <a href="docs/MANUAL.md">Manual</a> · <a href="README.de.md">Deutsch</a></p>
 
-**Your Porsche data in one place. Select what your smart home receives.**
+**0.1.3 Preview** · [Downloads & checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release status](RELEASE.md)
 
-PLX brings Porsche Connect vehicle data into a compact dashboard and into Loxone over MQTT. Check battery level, range and tire pressure, browse the measurements your vehicle reports, and choose exactly which values to send.
+Run PLX on your own server, view the data your Porsche reports, and choose what to send to Loxone or another MQTT consumer. Docker and the LoxBerry 4 plugin share the same German/English web interface.
 
-Docker/Compose is the preferred way to run PLX; the LoxBerry 4 plugin is an alternative. Both use the same German/English web interface, your own Porsche session and a separate MQTT namespace. Vehicle images come from your signed-in Connect account.
+## See it in action
 
-PLX runs on your own server. **Vehicle data still comes from the Porsche cloud** and requires a compatible Porsche Connect account. PLX reads status only; it does not remote-control or wake your car.
+![PLX 0.1.3 dashboard showing a vehicle image, battery and range](docs/preview/public-overview.png)
 
-## Features
+*The real PLX interface with simulated measurements, not a live account screenshot. The model illustration comes from Porsche Connect. Available data depends on your vehicle and Connect contract.*
 
-- Sign in to Porsche, complete a CAPTCHA if requested, and keep your session across restarts.
-- Select vehicles and see their model image, battery, range and reported measurement age.
-- Search and filter available vehicle parameters, including tire pressure, charging, doors, climate, trips and maintenance where supported.
-- Select exactly what MQTT sends: two selected tire pressures produce two numeric topics in bar.
-- Use optional detailed diagnostics or export selected numeric inputs as Loxone XML/CSV.
-- Switch between German and English; your browser remembers your choice.
-- Run over HTTPS in Docker on AMD64/ARM64 or as a LoxBerry 4 plugin.
+## What you can do
 
-## Preview
+- **See the essentials:** battery, range, charge target and measurement age in a compact dashboard.
+- **Choose your vehicles:** sign in with your own Porsche account and display its vehicle images.
+- **Explore reported data:** search and filter parameters such as tires, charging, doors, climate, trips and maintenance where supported.
+- **Send only selected MQTT values:** in Simple mode, two selected tire pressures produce two numeric value topics in bar.
+- **Prepare Loxone inputs:** export selected numeric values as XML/CSV; detailed MQTT is available when you need freshness signals.
+- **Use the same interface in two languages:** German/English, in Docker or as a LoxBerry 4 plugin.
 
-![PLX dashboard with simulated vehicle data](docs/preview/public-overview.png)
+PLX reads status; it does not remote-control or wake your car. **It still needs Porsche's cloud and a compatible Porsche Connect account.** Hosting PLX yourself does not make the vehicle API local.
 
-*Example measurements are simulated; the vehicle illustration comes from Porsche Connect. Available parameters depend on your car and Connect contract.*
+## Quick start
 
-## Install and get started
+For a **fresh installation** on a Linux host with Docker Compose and `curl`. Use an administrator shell with Docker access. The public image needs no GitHub account or registry token.
 
-**Docker/Compose is preferred.** Provide the server IP/DNS name once; PLX creates its private password, matching self-signed TLS certificate and persistent data volume automatically. No first-start mode choice or secret-file ownership steps. LAN access is the default; certificate trust and your Porsche account remain explicit prerequisites. Follow the [short installation guide](INSTALL.md).
-
-On a Linux Docker host, run in a new directory; **replace 192.0.2.10 with the server IP or DNS name** (no scheme/port):
+Replace **192.0.2.10** below with the IP or DNS name of your Docker server, without `https://`, path or port. A DNS name must already resolve to that server from your browser. Run in a new directory:
 
 ```sh
 set -eu
@@ -45,62 +39,63 @@ docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
 ```
 
-Then open `https://<your-server>:8443` and sign in as `admin` with the private password shown in your console. Explicitly trust your own server certificate before sign-in; [installation](INSTALL.md#start) explains the fingerprint and limits. Do not disable TLS verification.
+1. Open **`https://<your-server>:8443`**.
+2. **Before entering credentials, establish trust for your server certificate.** PLX generates a matching self-signed certificate; browsers will not trust it automatically. Check its fingerprint from the server with `docker compose exec -T plx openssl x509 -in /data/tls/cert.pem -noout -fingerprint -sha256`, then use your client's certificate-trust process or your own suitable trusted certificate. Do not disable TLS verification. See [HTTPS and first start](INSTALL.md#start).
+3. Sign in as **`admin`** with the password shown by the last command. It is deliberately printed only in your server console; keep it private.
 
-Portainer uses the same release Compose file. LoxBerry4 remains an [alternative](INSTALL.md#alternatives-and-limits) using its dedicated plugin ZIP. Podman/rootless and real ARM64 runtime keep their separate unqualified status. Existing 0.1.0 installs and artifacts are not silently replaced.
+PLX generates its password and TLS files once in a **persistent named volume**, alongside settings and any saved Porsche session. Keep the same Compose directory/project and volume for updates; do not use `down -v`. [Backup, update and recovery](INSTALL.md#update-backup-and-recovery).
 
-Simple MQTT is the default: select only the wanted values and subscribe to `porsche2lox/#`. Optional advanced settings remain available later without reinstallation. [Manual](docs/MANUAL.md) · [Release 0.1.3 changes](docs/RELEASE-0.1.3.md).
+This is the documented release Compose workflow, with [historical quickstart evidence](docs/QUICKSTART-0.1.2.md). A fresh deployment of the exact 0.1.3 image also passed [Portainer, login, restart and HTTPS-proxy checks](docs/DEPLOYMENT-0.1.3.md). These records describe their actual scopes, not every host or installation method.
 
-## Feedback & contact
+## First use
 
-Tried PLX? Feedback is welcome — including what works well!
+1. In **Porsche account**, sign in to Porsche and complete a CAPTCHA if requested.
+2. Load your vehicles, select the ones to use in **Setup**, and save.
+3. Review vehicle status and measurement age. Automatic polling and MQTT start **disabled**; enable polling when you are ready.
+4. To send data, configure your actual MQTT broker, select only the values you want, then enable MQTT and save. Simple mode is the default. Subscribe to `porsche2lox/#`, or your own prefix.
 
-- **By email, no GitHub account needed:** [plx@square-com.de](mailto:plx@square-com.de)
-- [Feedback or questions](https://github.com/square-com-de/plx/issues/new?template=feedback_question.md)
-- [Report a bug or suggest an improvement](https://github.com/square-com-de/plx/issues/new/choose)
+A web-proxy address is not automatically an MQTT broker. PLX uses its own session and topics; it does not migrate or replace another integration automatically. [MQTT setup and troubleshooting](docs/MANUAL.md#mqtt-and-loxone).
 
-Include your PLX version, Docker or LoxBerry setup, vehicle model and a short description. Remove Porsche IDs, VINs, locations, passwords and tokens from screenshots or logs. Report security issues privately; see [security reporting](SECURITY.md).
+## Other installation paths
 
-## Release status and limits
+| Your setup | Start here |
+| --- | --- |
+| Portainer | [Create a separate stack](INSTALL.md#portainer) with the release Compose file; set `PLX_HOST` and read the password in its container console. |
+| LoxBerry 4 | [Import PLX-LoxBerry-0.1.3.zip](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-LoxBerry-0.1.3.zip) through the plugin manager — not GitHub's source ZIP. [Installation](INSTALL.md#alternatives-and-limits). |
+| LoxBerry behind an HTTPS proxy | [Configure the immediate trusted proxy](docs/REVERSE-PROXY.md); installing the plugin alone does not identify your proxy. |
+| Proxmox or a custom container setup | [Container, backup and recovery guide](docs/PROXMOX-CONTAINER.md). Run Docker in a Linux VM, not on the hypervisor. |
 
-**0.1.3 Preview is published.** This change replaces project artwork only. Historical 0.1.2 public-artifact acceptance is recorded separately; no fresh live Porsche login, token refresh or vehicle-fetch acceptance is claimed for 0.1.3.
+Keep PLX on a trusted LAN. Other ports, certificate changes, reverse proxies and existing explicit password secrets are covered in [installation](INSTALL.md) and the [Docker reference (German)](docs/DOCKER.md).
 
-A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.3.md) and [test evidence](docs/TESTS.md).
+## Preview boundaries
 
-**Freshness matters:** simple MQTT sends the last reported value and `null` for missing values. It has no heartbeat or availability topics; retained values remain after a stopped container or failed connection. Check age/status in PLX or use detailed mode when your automation requires freshness signals. A cloud refresh is not a new vehicle measurement.
+**0.1.3 is Preview, not Stable.** Linux/AMD64 has runtime evidence. AMD64/ARM64 images are published, but real ARM64, Podman/rootless and native installation outside LoxBerry remain unqualified. Complete MQTT Gateway → Loxone Miniserver acceptance remains open. A successful installation is not proof of live Porsche login, token refresh or support for every model. [Release notes](docs/RELEASE-0.1.3.md) · [Tests](docs/TESTS.md).
 
-PLX uses its own session and topics. It does not import or replace an existing Taycan integration automatically.
+**For automations that depend on fresh data:** Simple MQTT sends the last reported value, or `null` when missing, without heartbeat/availability topics. Retained broker values can survive a stopped container or failed connection. Check age/status in PLX, or use detailed mode for freshness signals. A cloud refresh is not a new vehicle measurement. [Manual](docs/MANUAL.md).
 
 ## Documentation
 
-| Topic | Start here |
+| Topic | Guide |
 | --- | --- |
-| Setup, Docker and LoxBerry | [Installation](INSTALL.md) |
+| Installation, updates and recovery | [Installation](INSTALL.md) · [Container operations](docs/PROXMOX-CONTAINER.md) |
 | Everyday use and troubleshooting | [Manual](docs/MANUAL.md) |
-| Container, HTTPS, volumes and registry | [Docker guide (German)](docs/DOCKER.md) |
-| MQTT, XML and Loxone mapping | [Loxone guide (German)](docs/LOXONE.md) |
+| MQTT, XML and Loxone mapping | [Loxone reference (German)](docs/LOXONE.md) |
 | Architecture, authentication and data quality | [Technical reference (German)](docs/TECHNICAL.de.md) |
-| Current preview and downloads | [Release overview](RELEASE.md) |
-| Changes | [Changelog](CHANGELOG.md) |
-| Tests and contributions | [Contributing](CONTRIBUTING.md) |
-| Sources and third-party assets | [Third-party notices](THIRD-PARTY-NOTICES.md) |
+| Releases and changes | [Release overview](RELEASE.md) · [Changelog](CHANGELOG.md) |
+| Tested workflows and lessons learned | [Installation lessons](docs/INSTALLATION-LESSONS.md) · [0.1.1](docs/QUICKSTART-0.1.1.md) · [0.1.2](docs/QUICKSTART-0.1.2.md) · [0.1.3 artifacts](docs/QUICKSTART-0.1.3.md) · [0.1.3 deployment](docs/DEPLOYMENT-0.1.3.md) |
 
-## Quality and security
+## Get help or contribute
 
-[GitHub checks](https://github.com/square-com-de/plx/actions/workflows/docker.yml) run the tests, build and smoke-test the standalone container, then publish AMD64/ARM64 development images. Release images are public; no registry login is required. Passing CI is not a complete vehicle or Miniserver acceptance test.
+Questions, bug reports and feedback are welcome: [GitHub Issues](https://github.com/square-com-de/plx/issues/new/choose) or [plx@square-com.de](mailto:plx@square-com.de), without a GitHub account. Include your PLX version, Docker/LoxBerry setup, vehicle model and a short description.
 
-Never upload Porsche tokens, private keys, settings files or private backups to issues or pull requests. See [security reporting](SECURITY.md).
+Remove Porsche IDs, VINs, locations, passwords and tokens from screenshots and logs. Never upload settings files, private keys or backups. Report security issues privately via [SECURITY.md](SECURITY.md).
+
+Want to help? Start with [Contributing](CONTRIBUTING.md) and [automated checks](https://github.com/square-com-de/plx/actions/workflows/docker.yml). Passing CI does not replace vehicle or Miniserver acceptance.
 
 ## License
 
-PLX’s own code is licensed under [MIT](LICENSE), including commercial use under its terms. Third-party dependencies and Porsche branding retain their own terms; see [notices](THIRD-PARTY-NOTICES.md). The MIT license does not grant rights to Porsche trademarks or artwork.
+PLX's own code uses the [MIT license](LICENSE), including commercial use under its terms. Dependencies and third-party assets retain their own terms: [Third-party notices](THIRD-PARTY-NOTICES.md). MIT does not grant rights to Porsche trademarks or artwork.
 
 Independent project; not affiliated with or supported by Porsche or Loxone.
 
-<p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
-
-[Historical0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).
-
-[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).
-
-[0.1.3 public-artifact branding and test-system acceptance](docs/QUICKSTART-0.1.3.md).
+<p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Legal notice</a></p>
