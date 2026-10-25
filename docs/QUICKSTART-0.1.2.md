@@ -10,7 +10,7 @@ Accepted on 25 October 2026 on separate Docker and LoxBerry test systems. No pro
 - [LoxBerry installer ZIP](https://github.com/square-com-de/plx/releases/download/v0.1.2/PLX-LoxBerry-0.1.2.zip): SHA256 `2e657baee6aae211338c0a7ae9b4bb777f10e34aadf74479aada39c9ca5d3e71`.
 - [Docker bundle](https://github.com/square-com-de/plx/releases/download/v0.1.2/PLX-Docker-0.1.2.tar.gz): SHA256 `76766fa1bc87cfb2b6f1142ccec6c9dd133ee19c59fed92b06431b88254e465a`.
 
-All five assets were downloaded anonymously and checked against the public manifest/checksums. All 43 inner Docker checksums passed; bundled Compose equals the standalone download. Versioned assets and tag remain immutable; this report is a later documentation-only acceptance record.
+All five assets were downloaded anonymously and checked against the public manifest/checksums. All 43 inner Docker checksums passed; bundled Compose equals the standalone download. Published assets and tag remain unchanged; this later documentation commit does not rebuild or replace them.
 
 ## Docker
 
