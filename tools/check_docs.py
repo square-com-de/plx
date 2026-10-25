@@ -8,7 +8,7 @@ import subprocess
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md','docs/QUICKSTART-0.1.1.md','docs/QUICKSTART-0.1.2.md','docs/REVERSE-PROXY.md','docs/BRANDING.md','docs/RELEASE-0.1.3.md','docs/QUICKSTART-0.1.3.md']
+GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md','docs/QUICKSTART-0.1.1.md','docs/QUICKSTART-0.1.2.md','docs/REVERSE-PROXY.md','docs/BRANDING.md','docs/RELEASE-0.1.3.md','docs/QUICKSTART-0.1.3.md','docs/RELEASE-0.1.4-LoxBerry.md']
 
 def slug(text):
     return re.sub(r'[^\w\- ]', '', text.lower().replace('`','')).replace(' ','-')
@@ -39,7 +39,8 @@ def main():
     assert blocks(en,'sh')==blocks(de,'sh'), 'DE/EN install commands differ'
     assert blocks((ROOT/'docs/MANUAL.md').read_text(),'sh')==blocks((ROOT/'docs/MANUAL.de.md').read_text(),'sh'), 'DE/EN network checks differ'
     metadata=configparser.ConfigParser();metadata.read(ROOT/'plugin.cfg')
-    version=metadata['PLUGIN']['VERSION']
+    # Plugin-only releases must not redirect Docker users to an unpublished image.
+    version=re.search(r'image: ghcr.io/square-com-de/plx:(\d+\.\d+\.\d+)', (ROOT/'compose.registry.yaml').read_text()).group(1)
     for text in (en,de):
         for required in [f'releases/download/v{version}/compose.yaml','PLX_HOST=192.0.2.10','docker compose up -d --wait','/data/config/web-password.txt','porsche2lox/#','Podman']:
             assert required in text, ('new standard start missing',required)

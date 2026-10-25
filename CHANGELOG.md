@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 Preview — LoxBerry new installation only
+
+- Company author square | com and contact plx@square-com.de create a new LoxBerry plugin identity. Not an in-place upgrade; no automatic state migration.
+- Render plugin package version in its UI badge; Docker source/interface/image stay on 0.1.3.
+- Dedicated plugin-only build/publication workflow, archive checks and source manifest. No running container change.
+
 ## 0.1.3 Preview
 
 - Replace the former crest app icon with the exact user-selected original PLX artwork, in UI, README, plugin and container assets.

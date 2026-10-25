@@ -3,7 +3,7 @@
 <p align="center"><strong>Porsche Connect status, with only the MQTT values your smart home needs.</strong></p>
 <p align="center"><a href="#quick-start">Quick start</a> · <a href="INSTALL.md">Installation</a> · <a href="docs/MANUAL.md">Manual</a> · <a href="README.de.md">Deutsch</a></p>
 
-**0.1.3 Preview** · [Downloads & checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release status](RELEASE.md)
+**Docker 0.1.3 Preview** · [Downloads & checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release status](RELEASE.md)
 
 Run PLX on your own server, view the data your Porsche reports, and choose what to send to Loxone or another MQTT consumer. Docker and the LoxBerry 4 plugin share the same German/English web interface.
 
@@ -61,7 +61,7 @@ A web-proxy address is not automatically an MQTT broker. PLX uses its own sessio
 | Your setup | Start here |
 | --- | --- |
 | Portainer | [Create a separate stack](INSTALL.md#portainer) with the release Compose file; set `PLX_HOST` and read the password in its container console. |
-| LoxBerry 4 | [Import PLX-LoxBerry-0.1.3.zip](https://github.com/square-com-de/plx/releases/download/v0.1.3/PLX-LoxBerry-0.1.3.zip) through the plugin manager — not GitHub's source ZIP. [Installation](INSTALL.md#alternatives-and-limits). |
+| LoxBerry 4 | [Import PLX-LoxBerry-0.1.4-New-Installation.zip](https://github.com/square-com-de/plx/releases/download/v0.1.4/PLX-LoxBerry-0.1.4-New-Installation.zip) through the plugin manager — not GitHub's source ZIP. **0.1.4 Preview is a new company-identity installation, not an in-place upgrade.** Removing the old plugin can delete its settings and sessions. [Read first](docs/RELEASE-0.1.4-LoxBerry.md). [Installation](INSTALL.md#alternatives-and-limits). |
 | LoxBerry behind an HTTPS proxy | [Configure the immediate trusted proxy](docs/REVERSE-PROXY.md); installing the plugin alone does not identify your proxy. |
 | Proxmox or a custom container setup | [Container, backup and recovery guide](docs/PROXMOX-CONTAINER.md). Run Docker in a Linux VM, not on the hypervisor. |
 

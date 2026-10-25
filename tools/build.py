@@ -2,6 +2,7 @@
 """Build only explicit plugin inputs; never package local settings or sessions."""
 import hashlib
 import configparser
+import re
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
@@ -24,11 +25,20 @@ def build():
         paths.extend([path] if path.is_file() else [p for p in path.rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc'])
     with ZipFile(target, 'w', ZIP_DEFLATED) as archive:
         for path in sorted(paths):
+            if path.is_symlink():
+                raise ValueError('Source symlinks are not valid package inputs.')
             relative = path.relative_to(ROOT).as_posix()
             info = ZipInfo(relative, (2026, 10, 21, 0, 0, 0))
             info.compress_type = ZIP_DEFLATED
             info.external_attr = (0o100755 if path.suffix == '.sh' else 0o100644) << 16
-            archive.writestr(info, path.read_bytes())
+            data = path.read_bytes()
+            if relative == 'templates/dashboard.html':
+                # The plugin package has its own version; Docker source/UI is unchanged.
+                data, count = re.subn(rb'<span class="beta">[^<]+ \xc2\xb7 Preview</span>',
+                    lambda _: ('<span class="beta">' + version + ' · Preview</span>').encode(), data)
+                if count != 1:
+                    raise ValueError('Expected exactly one plugin version badge.')
+            archive.writestr(info, data)
     digest = hashlib.sha256(target.read_bytes()).hexdigest()
     target.with_suffix('.zip.sha256').write_text(f'{digest}  {target.name}\n')
     print(f'{target}\nSHA256 {digest}\n{len(paths)} Dateien')

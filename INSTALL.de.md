@@ -49,7 +49,7 @@ docker compose ps
 
 ## Alternativen und Grenzen
 
-**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-0.1.3.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. Technische ID `porsche2lox` beim Update erhalten. Für LoxBerry-TLS-Terminierung mit internem HTTP müssen die vertrauenswürdigen Proxy-Adressen unten ausdrücklich konfiguriert werden; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
+**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-0.1.4-New-Installation.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. **Nur Neuinstallation:** Die neue Firmenkennung ist kein direktes Upgrade. Ein älteres PLX/Porsche2Lox zuerst über dessen Pluginverwaltung entfernen; dabei können Einstellungen/Sitzung gelöscht werden. Keine automatische Datenübernahme. [Details und Grenzen (Englisch)](docs/RELEASE-0.1.4-LoxBerry.md). Für LoxBerry-TLS-Terminierung mit internem HTTP müssen die vertrauenswürdigen Proxy-Adressen unten ausdrücklich konfiguriert werden; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
 
 Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.3.md).
 
