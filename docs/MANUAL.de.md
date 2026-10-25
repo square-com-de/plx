@@ -69,7 +69,7 @@ XML/CSV ist optional. XML dient numerischen virtuellen UDP-Eingängen über ein 
 | Unerwartet viele Topics | Format und gespeicherte Datenauswahl prüfen. Alte Monitorzeilen sind nicht zwingend aktuell gespeicherte Broker-Topics. |
 | Trotz Abruf alte Daten | Messalter und Cloud-Abruf unterscheiden. PLX weckt das Auto nicht auf. |
 | Anderes Auto liefert andere Parameter | Ausstattung, Vertrag und Porsche-Antwort unterscheiden sich. Fehlend nicht als Null behandeln. |
-| Image lässt sich nicht laden | Öffentliches Release `ghcr.io/square-com-de/plx:0.1.1` oder dessen Digest verwenden; Schreibweise, Netzwerk und Registry-Konfiguration prüfen. Kein Token nötig. |
+| Image lässt sich nicht laden | Öffentliches Release `ghcr.io/square-com-de/plx:0.1.2` oder dessen Digest verwenden; Schreibweise, Netzwerk und Registry-Konfiguration prüfen. Kein Token nötig. |
 | HTTPS-Adresse bei LoxBerry abgewiesen | 0.1.0 erkennt HTTPS am Frontend mit internem HTTP nicht. Direktes LoxBerry-HTTPS verwenden, Schutz nicht abschalten. [Bekannte Grenze](../INSTALL.de.md#alternativen-und-grenzen). |
 | Nach Neustart erneut anmelden | Die PLX-Webanmeldung ist getrennt von der gespeicherten Porsche-Sitzung. |
 

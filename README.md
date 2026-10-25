@@ -1,4 +1,6 @@
-> **PLX 0.1.1 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.1). Not a stable release. Docker image: `ghcr.io/square-com-de/plx:0.1.1` (AMD64/ARM64), public pull without a GitHub token. [Status and acceptance](RELEASE.md).
+> **Release preparation only:**0.1.2 has not been published. The commands below target the upcoming release; use [published0.1.1](https://github.com/square-com-de/plx/releases/tag/v0.1.1) until controlled publication and acceptance are complete.
+
+> **PLX 0.1.2 Preview** — [Downloads and checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.2). Not a stable release. Planned Docker image: `ghcr.io/square-com-de/plx:0.1.2` (AMD64/ARM64); public pull without a GitHub token after publication. [Status and acceptance](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -39,7 +41,7 @@ On a Linux Docker host, run in a new directory; **replace 192.0.2.10 with the se
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,7 +51,7 @@ Then open `https://<your-server>:8443` and sign in as `admin` with the private p
 
 Portainer uses the same release Compose file. LoxBerry4 remains an [alternative](INSTALL.md#alternatives-and-limits) using its dedicated plugin ZIP. Podman/rootless and real ARM64 runtime keep their separate unqualified status. Existing 0.1.0 installs and artifacts are not silently replaced.
 
-Simple MQTT is the default: select only the wanted values and subscribe to `porsche2lox/#`. Optional advanced settings remain available later without reinstallation. [Manual](docs/MANUAL.md) · [Release0.1.1 changes](docs/RELEASE-0.1.1.md).
+Simple MQTT is the default: select only the wanted values and subscribe to `porsche2lox/#`. Optional advanced settings remain available later without reinstallation. [Manual](docs/MANUAL.md) · [Release0.1.2 changes](docs/RELEASE-0.1.2.md).
 
 ## Feedback & contact
 
@@ -63,9 +65,9 @@ Include your PLX version, Docker or LoxBerry setup, vehicle model and a short de
 
 ## Release status and limits
 
-**0.1.1 Preview.** The simplified generated-password/host-matched-TLS first start is a new container path; its exact-artifact acceptance is tracked in [#1](https://github.com/square-com-de/plx/issues/1). Earlier0.1.0 Docker/LoxBerry sign-in, vehicle fetch and two-pressure results remain historical evidence, not a new live Porsche test for0.1.1.
+**0.1.2 Preview.** The generated-password/host-matched-TLS start was accepted for0.1.1; exact0.1.2 artifact acceptance remains tracked in [#1](https://github.com/square-com-de/plx/issues/1). Earlier0.1.0 Docker/LoxBerry sign-in, vehicle fetch and two-pressure results remain historical evidence, not a new live Porsche test for0.1.2.
 
-A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.1.md) and [test evidence](docs/TESTS.md).
+A complete MQTT Gateway → Loxone Miniserver acceptance test remains open. Tests do not qualify every Porsche model, contract or future API version. See [release notes](docs/RELEASE-0.1.2.md) and [test evidence](docs/TESTS.md).
 
 **Freshness matters:** simple MQTT sends the last reported value and `null` for missing values. It has no heartbeat or availability topics; retained values remain after a stopped container or failed connection. Check age/status in PLX or use detailed mode when your automation requires freshness signals. A cloud refresh is not a new vehicle measurement.
 
@@ -99,4 +101,4 @@ Independent project; not affiliated with or supported by Porsche or Loxone.
 
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
 
-[New0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).
+[Historical0.1.1 quickstart: executed commands, passed checks and limits](docs/QUICKSTART-0.1.1.md).

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — LoxBerry HTTPS proxy fix
+## 0.1.2 Preview — prepared, not published
 
 - Recognize TLS termination only from explicitly configured immediate proxy IPs and one unambiguous X-Forwarded-Proto value.
 - Upgrade pre-fix/plain-HTTP PHP sessions to a new Secure cookie on first recognized HTTPS request; retain CSRF protection.
