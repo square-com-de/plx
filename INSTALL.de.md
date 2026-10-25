@@ -54,3 +54,7 @@ docker compose ps
 Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.1.md).
 
 [Abnahme des neuen veröffentlichten 0.1.1-Quickstarts](docs/QUICKSTART-0.1.1.md): frisches Volume, strenger LAN-/Browserlogin, Neustart/Neuerstellung und passende kalte Wiederherstellung bestanden. Die Testgrenzen bleiben dort ausdrücklich genannt.
+
+### LoxBerry hinter HTTPS-Proxy (unveröffentlichter Fix)
+
+Ein HTTPS-Proxy mit internem HTTP benötigt eine ausdrückliche Liste vertrauenswürdiger unmittelbarer Proxy-Adressen. [Konfiguration und Sicherheitsregeln](docs/REVERSE-PROXY.md). Das öffentliche ZIP0.1.1 enthält diesen Fix noch nicht; direkte HTTPS-Verbindungen bleiben unterstützt.

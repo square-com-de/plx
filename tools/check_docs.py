@@ -8,7 +8,7 @@ import subprocess
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md','docs/QUICKSTART-0.1.1.md']
+GUIDES = ['README.md','README.de.md','INSTALL.md','INSTALL.de.md','docs/MANUAL.md','docs/MANUAL.de.md','docs/DOCKER.md','docs/LOXONE.md','docs/INSTALLATION-LESSONS.md','docs/INSTALLATION-LESSONS.de.md','docs/PROXMOX-CONTAINER.md','docs/PROXMOX-CONTAINER.de.md','docs/QUICKSTART-0.1.1.md','docs/REVERSE-PROXY.md']
 
 def slug(text):
     return re.sub(r'[^\w\- ]', '', text.lower().replace('`','')).replace(' ','-')

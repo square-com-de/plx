@@ -54,3 +54,7 @@ docker compose ps
 Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.1.md).
 
 [New published0.1.1 quickstart acceptance](docs/QUICKSTART-0.1.1.md): fresh volume, verified LAN/browser login, restart/recreation and matching cold restore passed. Test limits remain explicit.
+
+### LoxBerry behind an HTTPS proxy (unreleased fix)
+
+An HTTPS proxy with an HTTP backend needs an explicit list of trusted immediate proxy addresses. [Configuration and security rules](docs/REVERSE-PROXY.md). Public ZIP0.1.1 does not contain this fix yet; direct HTTPS remains supported.
