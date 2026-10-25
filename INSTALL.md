@@ -2,7 +2,7 @@
 
 [Deutsch](INSTALL.de.md) · [README](README.md)
 
-Requires a Linux Docker host with `docker compose` and `curl`, with Docker access (for example an administrator shell). Proxmox users run Docker in a normal Linux VM, not on the hypervisor. Portainer uses the same Compose file. PLX 0.1.1 remains a **Preview**.
+Requires a Linux Docker host with `docker compose` and `curl`, with Docker access (for example an administrator shell). Proxmox users run Docker in a normal Linux VM, not on the hypervisor. Portainer uses the same Compose file. PLX 0.1.2 remains a **Preview**.
 
 ## Start
 
@@ -11,7 +11,7 @@ Choose the server IP or DNS name you will open in your browser. Replace **192.0.
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,12 +49,14 @@ docker compose ps
 
 ## Alternatives and limits
 
-**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.1.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. Keep technical ID `porsche2lox` during updates. The separate LoxBerry HTTP-backend reverse-proxy limitation is not fixed by this Docker bootstrap; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
+**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.2.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. Keep technical ID `porsche2lox` during updates. For LoxBerry TLS termination with an HTTP backend, configure the explicit trusted proxy peers below; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
 
-Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.1.md).
+Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.2.md).
 
-[New published0.1.1 quickstart acceptance](docs/QUICKSTART-0.1.1.md): fresh volume, verified LAN/browser login, restart/recreation and matching cold restore passed. Test limits remain explicit.
+[Historical published0.1.1 quickstart acceptance](docs/QUICKSTART-0.1.1.md): fresh volume, verified LAN/browser login, restart/recreation and matching cold restore passed. Test limits remain explicit.
 
-### LoxBerry behind an HTTPS proxy (unreleased fix)
+### LoxBerry behind an HTTPS proxy
 
-An HTTPS proxy with an HTTP backend needs an explicit list of trusted immediate proxy addresses. [Configuration and security rules](docs/REVERSE-PROXY.md). Public ZIP0.1.1 does not contain this fix yet; direct HTTPS remains supported.
+An HTTPS proxy with an HTTP backend needs an explicit list of trusted immediate proxy addresses. [Configuration and security rules](docs/REVERSE-PROXY.md). The fix is included from0.1.2; public0.1.1 remains unchanged; direct HTTPS remains supported.
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).

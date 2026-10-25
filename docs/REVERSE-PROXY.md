@@ -1,6 +1,6 @@
 # LoxBerry behind an HTTPS reverse proxy
 
-This fix is an unreleased candidate until included in a new version; public0.1.1 does not contain it.
+The fix is included from0.1.2. Public0.1.1 does not contain it and its assets are not replaced. See the0.1.2 release notes for publication/acceptance status.
 
 Direct HTTPS works without extra configuration. When TLS terminates at a reverse proxy and its backend connection uses HTTP, PLX needs an explicit trust setting. It never trusts a forwarded header from an arbitrary client.
 

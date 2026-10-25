@@ -1,4 +1,4 @@
-> **PLX 0.1.1 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.1). Kein Stable-Release. Öffentliches Docker-Image: `ghcr.io/square-com-de/plx:0.1.1` (AMD64/ARM64), ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
+> **PLX 0.1.2 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.2). Kein Stable-Release. Vorgesehenes Docker-Image: `ghcr.io/square-com-de/plx:0.1.2` (AMD64/ARM64), nach Veröffentlichung ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -39,7 +39,7 @@ Auf einem Linux-Docker-Host in einem neuen Verzeichnis ausführen; **192.0.2.10 
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,7 +49,7 @@ Danach `https://<dein-server>:8443` öffnen, Benutzer `admin` und das in deiner 
 
 Portainer verwendet dieselbe Release-Compose-Datei. LoxBerry4 bleibt [Alternative](INSTALL.de.md#alternativen-und-grenzen) mit dediziertem Plugin-ZIP. Podman/Rootless und echter ARM64-Betrieb behalten ihren getrennten nicht abgenommenen Status. Bestehende0.1.0-Installationen/-Dateien werden nicht heimlich ersetzt.
 
-Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.1](docs/RELEASE-0.1.1.md).
+Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.2](docs/RELEASE-0.1.2.md).
 
 ## Feedback & Kontakt
 
@@ -63,9 +63,9 @@ Hilfreich sind PLX-Version, Docker-/LoxBerry-Umgebung, Fahrzeugmodell und eine k
 
 ## Release-Stand und Grenzen
 
-**0.1.1 Preview.** Automatisches Passwort und hostpassendes TLS sind ein neuer Container-Erststartweg; die exakte Artefaktabnahme wird in [#1](https://github.com/square-com-de/plx/issues/1) geführt. Frühere0.1.0-Nachweise zu Anmeldung, Fahrzeugabruf und zwei Druckwerten bleiben historisch und sind kein neuer echter Porsche-Test von0.1.1.
+**0.1.2 Preview.** Der Start mit automatischem Passwort und hostpassendem TLS wurde für0.1.1 abgenommen; die exakte0.1.2-Artefaktabnahme bleibt in [#1](https://github.com/square-com-de/plx/issues/1) geführt. Frühere0.1.0-Nachweise zu Anmeldung, Fahrzeugabruf und zwei Druckwerten bleiben historisch und sind kein neuer echter Porsche-Test von0.1.2.
 
-Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.1.md) und [Testnachweise](docs/TESTS.md).
+Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.2.md) und [Testnachweise](docs/TESTS.md).
 
 **Datenalter beachten:** Einfaches MQTT sendet den zuletzt gemeldeten Wert und bei fehlenden Werten `null`. Es hat keinen Heartbeat und keine zusätzlichen Verfügbarkeitsthemen. Gespeicherte Brokerwerte bleiben auch nach Verbindungsabbruch oder Dienstende erhalten. Alter/Status in PLX prüfen oder für entsprechende Automationen das ausführliche Format verwenden. Ein Cloud-Abruf ist keine neue Messung des Fahrzeugs.
 
@@ -99,4 +99,6 @@ Unabhängiges Projekt; keine offizielle Verbindung zu oder Unterstützung durch 
 
 <p align="center"><strong>by <a href="https://square-com.de/">square | com</a></strong> · <a href="https://square-com.de/impressum/">Impressum / Legal notice</a></p>
 
-[Neuer 0.1.1-Quickstart: tatsächliche Befehle, bestandene Prüfungen und Grenzen](docs/QUICKSTART-0.1.1.md).
+[Historischer 0.1.1-Quickstart: tatsächliche Befehle, bestandene Prüfungen und Grenzen](docs/QUICKSTART-0.1.1.md).
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).

@@ -4,7 +4,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: plx-release-0.1.1
+  group: plx-release-0.1.2
   cancel-in-progress: false
 jobs:
   release:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Check release and image are explicitly absent
-        run: python tools/check_release_absent.py 0.1.1
+        run: python tools/check_release_absent.py 0.1.2
       - name: Install test dependencies
         run: |
           sudo apt-get update
@@ -54,9 +54,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/square-com-de/plx:0.1.1
+          tags: ghcr.io/square-com-de/plx:0.1.2
           labels: |
-            org.opencontainers.image.version=0.1.1
+            org.opencontainers.image.version=0.1.2
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Build both distributions with fixed image digest
         env:
@@ -65,21 +65,21 @@ jobs:
           PLX_RELEASE_CI: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           python tools/prepare_release.py
-          cd dist/release-v0.1.1
+          cd dist/release-v0.1.2
           sha256sum --check SHA256SUMS
           python -c 'import json; d=json.load(open("manifest.json")); assert not d["source_dirty"]; assert "@sha256:" in d["container"]["image"]'
       - name: Publish GitHub preview release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v0.1.1 \
+          gh release create v0.1.2 \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title 'PLX 0.1.1 Preview' \
+            --title 'PLX 0.1.2 Preview' \
             --prerelease \
-            --notes-file docs/RELEASE-0.1.1.md \
-            dist/release-v0.1.1/PLX-LoxBerry-0.1.1.zip \
-            dist/release-v0.1.1/PLX-Docker-0.1.1.tar.gz \
-            dist/release-v0.1.1/SHA256SUMS \
-            dist/release-v0.1.1/manifest.json \
-            dist/release-v0.1.1/compose.yaml
+            --notes-file docs/RELEASE-0.1.2.md \
+            dist/release-v0.1.2/PLX-LoxBerry-0.1.2.zip \
+            dist/release-v0.1.2/PLX-Docker-0.1.2.tar.gz \
+            dist/release-v0.1.2/SHA256SUMS \
+            dist/release-v0.1.2/manifest.json \
+            dist/release-v0.1.2/compose.yaml

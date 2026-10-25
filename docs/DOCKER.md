@@ -2,7 +2,7 @@
 
 [Kurzer Standardstart](../INSTALL.de.md) · [English](../INSTALL.md)
 
-PLX0.1.1 benötigt im neuen Compose-Standard nur `PLX_HOST` (Server-IP/DNS). Der Hostport8443 ist aus dem LAN erreichbar. Datenvolume, privates Webpasswort und passendes selbstsigniertes Zertifikat werden automatisch erstellt; keine externe Secret-Datei oder UID-Nacharbeit. Einfaches MQTT bleibt Standard, ohne Modusfrage beim Start.
+PLX0.1.2 benötigt im neuen Compose-Standard nur `PLX_HOST` (Server-IP/DNS). Der Hostport8443 ist aus dem LAN erreichbar. Datenvolume, privates Webpasswort und passendes selbstsigniertes Zertifikat werden automatisch erstellt; keine externe Secret-Datei oder UID-Nacharbeit. Einfaches MQTT bleibt Standard, ohne Modusfrage beim Start.
 
 Browser müssen dem eigenen selbstsignierten Zertifikat ausdrücklich vertrauen; private IPs erhalten kein öffentliches Zertifikat automatisch. Eigene passende PEM-Dateien können unter `/data/tls/cert.pem` und `/data/tls/key.pem` liegen. Vorhandene Dateien werden nicht bei Adressfehlern überschrieben. Falscher Host, unvollständiges oder unpassendes Zertifikat führen früh zu einer verständlichen Startmeldung. Healthcheck verbindet lokal, prüft aber die konfigurierte Zertifikatsidentität. Kein TLS-/Origin-/CSRF-Bypass.
 

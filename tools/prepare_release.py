@@ -15,7 +15,7 @@ from zipfile import ZipFile
 from build import build, ROOT
 
 IMAGE_COMMIT = os.environ.get('PLX_RELEASE_COMMIT')
-IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.1')
+IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.2')
 CI_RUN = os.environ.get('PLX_RELEASE_CI', 'https://github.com/square-com-de/plx/actions/workflows/release.yml')
 
 
@@ -27,7 +27,7 @@ def prepare():
     cfg = configparser.ConfigParser()
     cfg.read(ROOT / 'plugin.cfg')
     version = cfg['PLUGIN']['VERSION']
-    if version != '0.1.1':
+    if version != '0.1.2':
         raise ValueError('Update release provenance and notes for the new version first.')
     if '@sha256:' not in IMAGE:
         raise ValueError('Set PLX_RELEASE_IMAGE to the reviewed immutable image digest.')
@@ -56,7 +56,7 @@ def prepare():
     shutil.copytree(ROOT / 'docs', bundle / 'docs')
     shutil.copytree(ROOT / 'icons', bundle / 'icons')
     compose = (ROOT / 'compose.registry.yaml').read_text()
-    expected = 'image: ghcr.io/square-com-de/plx:0.1.1'
+    expected = 'image: ghcr.io/square-com-de/plx:0.1.2'
     if compose.count(expected) != 1:
         raise ValueError('Unexpected registry compose image declaration.')
     (bundle / 'compose.yaml').write_text(compose.replace(expected, 'image: ' + IMAGE))

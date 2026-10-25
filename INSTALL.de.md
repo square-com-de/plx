@@ -2,7 +2,7 @@
 
 [English](INSTALL.md) · [README](README.de.md)
 
-Voraussetzung: Linux-Docker-Host mit `docker compose`, `curl` und Docker-Zugriff, z.B. in einer Administratorshell. Bei Proxmox läuft Docker in einer normalen Linux-VM, nicht auf dem Hypervisor. Portainer verwendet dieselbe Compose-Datei. PLX0.1.1 bleibt eine **Preview**.
+Voraussetzung: Linux-Docker-Host mit `docker compose`, `curl` und Docker-Zugriff, z.B. in einer Administratorshell. Bei Proxmox läuft Docker in einer normalen Linux-VM, nicht auf dem Hypervisor. Portainer verwendet dieselbe Compose-Datei. PLX0.1.2 bleibt eine **Preview**.
 
 ## Start
 
@@ -11,7 +11,7 @@ IP oder DNS-Namen des Servers wählen, den du im Browser öffnen möchtest. **19
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.1/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,12 +49,14 @@ docker compose ps
 
 ## Alternativen und Grenzen
 
-**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-0.1.1.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. Technische ID `porsche2lox` beim Update erhalten. Die getrennte LoxBerry-Reverse-Proxy-Grenze mit internem HTTP wird durch diesen Docker-Erststart nicht behoben; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
+**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-0.1.2.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. Technische ID `porsche2lox` beim Update erhalten. Für LoxBerry-TLS-Terminierung mit internem HTTP müssen die vertrauenswürdigen Proxy-Adressen unten ausdrücklich konfiguriert werden; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
 
-Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.1.md).
+Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.2.md).
 
-[Abnahme des neuen veröffentlichten 0.1.1-Quickstarts](docs/QUICKSTART-0.1.1.md): frisches Volume, strenger LAN-/Browserlogin, Neustart/Neuerstellung und passende kalte Wiederherstellung bestanden. Die Testgrenzen bleiben dort ausdrücklich genannt.
+[Historische Abnahme des veröffentlichten 0.1.1-Quickstarts](docs/QUICKSTART-0.1.1.md): frisches Volume, strenger LAN-/Browserlogin, Neustart/Neuerstellung und passende kalte Wiederherstellung bestanden. Die Testgrenzen bleiben dort ausdrücklich genannt.
 
-### LoxBerry hinter HTTPS-Proxy (unveröffentlichter Fix)
+### LoxBerry hinter HTTPS-Proxy
 
-Ein HTTPS-Proxy mit internem HTTP benötigt eine ausdrückliche Liste vertrauenswürdiger unmittelbarer Proxy-Adressen. [Konfiguration und Sicherheitsregeln](docs/REVERSE-PROXY.md). Das öffentliche ZIP0.1.1 enthält diesen Fix noch nicht; direkte HTTPS-Verbindungen bleiben unterstützt.
+Ein HTTPS-Proxy mit internem HTTP benötigt eine ausdrückliche Liste vertrauenswürdiger unmittelbarer Proxy-Adressen. [Konfiguration und Sicherheitsregeln](docs/REVERSE-PROXY.md). Der Fix gehört ab0.1.2 zum Plugin; das öffentliche0.1.1 bleibt unverändert; direkte HTTPS-Verbindungen bleiben unterstützt.
+
+[PLX 0.1.2 Preview: tested public Docker and LoxBerry artifacts, results and limits](docs/QUICKSTART-0.1.2.md).
