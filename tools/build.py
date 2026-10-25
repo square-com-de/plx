@@ -10,6 +10,8 @@ INCLUDE = ['plugin.cfg', 'preroot.sh', 'preupgrade.sh', 'postinstall.sh', 'postr
 
 
 def build():
+    from check_branding import check_source
+    check_source()
     output = ROOT / 'dist'
     output.mkdir(exist_ok=True)
     metadata = configparser.ConfigParser()

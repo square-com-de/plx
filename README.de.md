@@ -1,4 +1,6 @@
-> **PLX 0.1.2 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.2). Kein Stable-Release. Vorgesehenes Docker-Image: `ghcr.io/square-com-de/plx:0.1.2` (AMD64/ARM64), nach Veröffentlichung ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
+> Upcoming 0.1.3 Preview: new original PLX artwork. Downloads become available after review/build/publication; not yet published.
+
+> **PLX 0.1.3 Preview** — [Downloads und Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3). Kein Stable-Release. Vorgesehenes Docker-Image: `ghcr.io/square-com-de/plx:0.1.3` (AMD64/ARM64), nach Veröffentlichung ohne GitHub-Token abrufbar. [Stand und Abnahme](RELEASE.md).
 
 <p align="center"><a href="README.de.md">Deutsch</a> | <a href="README.md">English</a></p>
 <p align="center"><img src="icons/icon.svg" width="112" alt="PLX app icon"></p>
@@ -39,7 +41,7 @@ Auf einem Linux-Docker-Host in einem neuen Verzeichnis ausführen; **192.0.2.10 
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.2/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,7 +51,7 @@ Danach `https://<dein-server>:8443` öffnen, Benutzer `admin` und das in deiner 
 
 Portainer verwendet dieselbe Release-Compose-Datei. LoxBerry4 bleibt [Alternative](INSTALL.de.md#alternativen-und-grenzen) mit dediziertem Plugin-ZIP. Podman/Rootless und echter ARM64-Betrieb behalten ihren getrennten nicht abgenommenen Status. Bestehende0.1.0-Installationen/-Dateien werden nicht heimlich ersetzt.
 
-Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.2](docs/RELEASE-0.1.2.md).
+Einfaches MQTT ist Standard: gewünschte Werte auswählen, `porsche2lox/#` abonnieren. Erweiterte Einstellungen später optional ohne Neuinstallation. [Handbuch](docs/MANUAL.de.md) · [Änderungen0.1.2](docs/RELEASE-0.1.3.md).
 
 ## Feedback & Kontakt
 
@@ -63,9 +65,9 @@ Hilfreich sind PLX-Version, Docker-/LoxBerry-Umgebung, Fahrzeugmodell und eine k
 
 ## Release-Stand und Grenzen
 
-**0.1.2 Preview.** Der Start mit automatischem Passwort und hostpassendem TLS wurde für0.1.1 abgenommen; die exakte0.1.2-Artefaktabnahme bleibt in [#1](https://github.com/square-com-de/plx/issues/1) geführt. Frühere0.1.0-Nachweise zu Anmeldung, Fahrzeugabruf und zwei Druckwerten bleiben historisch und sind kein neuer echter Porsche-Test von0.1.2.
+**0.1.3 Preview ist in Vorbereitung.** Diese Änderung ersetzt nur das Projektlogo. Die öffentliche Artefaktabnahme von 0.1.2 ist separat dokumentiert; ein neuer echter Porsche-Login, eine Token-Erneuerung oder ein Fahrzeugabruf für 0.1.3 wird nicht behauptet.
 
-Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.2.md) und [Testnachweise](docs/TESTS.md).
+Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Die Tests bestätigen nicht jedes Porsche-Modell, jeden Vertrag oder zukünftige API-Versionen. Siehe [Release-Hinweise](docs/RELEASE-0.1.3.md) und [Testnachweise](docs/TESTS.md).
 
 **Datenalter beachten:** Einfaches MQTT sendet den zuletzt gemeldeten Wert und bei fehlenden Werten `null`. Es hat keinen Heartbeat und keine zusätzlichen Verfügbarkeitsthemen. Gespeicherte Brokerwerte bleiben auch nach Verbindungsabbruch oder Dienstende erhalten. Alter/Status in PLX prüfen oder für entsprechende Automationen das ausführliche Format verwenden. Ein Cloud-Abruf ist keine neue Messung des Fahrzeugs.
 

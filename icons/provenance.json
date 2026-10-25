@@ -1,0 +1,11 @@
+{
+  "original": "plx-logo-original.png",
+  "sha256": "bbd8b07d633b944703f651eacbf96984956b6b6e0f5fb6803e93caaffa63470b",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "source": "User-selected original from Porsche Logo Verwenden, message 2ce07000-088f-4296-b553-9e32f74dc2f9",
+  "treatment": "Unchanged original PNG; SVG wrappers embed byte-identical PNG, no redraw/recolor/crop",
+  "svg_sha256": "80922de7ddb0baa8756c92c510236c43470a289dbfeab2931150d5bbf5caf519"
+}

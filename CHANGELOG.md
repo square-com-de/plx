@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 Preview
+
+- Replace the former crest app icon with the exact user-selected original PLX artwork, in UI, README, plugin and container assets.
+- Regenerate simulated preview screenshots and record artwork provenance; no Porsche/API/MQTT behavior changes.
+
+
 ## 0.1.2 Preview — prepared, not published
 
 - Recognize TLS termination only from explicitly configured immediate proxy IPs and one unambiguous X-Forwarded-Proto value.

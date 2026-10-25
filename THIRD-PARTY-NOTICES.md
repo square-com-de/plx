@@ -8,10 +8,8 @@ PLX installs unmodified, pinned Python wheels from PyPI. It does not vendor upst
 
 The LoxBerry V4 sample was used to understand the plugin interface and directory layout. PLX hooks and frontend were written for this integration; the sample's demonstration files are not bundled. https://github.com/mschlenstedt/LoxBerry-Plugin-SamplePlugin-V4
 
-Porsche and Loxone are trademarks of their respective owners. This integration is independent and unsupported by Porsche. The surrounding app-icon artwork and earlier connection monogram were created for PLX. The current icon embeds the Porsche crest described below. No proprietary Porsche font is bundled.
+Porsche and Loxone are trademarks of their respective owners. This integration is independent and unsupported by Porsche. No proprietary Porsche font is bundled.
 
-The PLX app icon contains the Porsche crest as requested for this integration. Source: https://cdn.ui.porsche.com/porsche-design-system/crest/porsche-crest.19b4292@3x.webp (linked by https://www.porsche.com/germany/). Porsche crest and brand remain the property of Porsche. PLX is an independent project.
+## PLX artwork
 
-## Release preparation
-
-PLX’s own source code is licensed under MIT; see LICENSE. Third-party dependencies and Porsche branding are excluded from that grant and retain their respective terms. The MIT license grants no trademark rights or ownership of Porsche artwork. Attribution does not extend the original rights. Vehicle images are fetched from the signed-in account; private image-cache files are not bundled. The public dashboard screenshot includes a Porsche Connect model illustration alongside simulated measurements. Porsche retains the rights to that model artwork; it is not covered by the PLX MIT grant. Docker images install dependency wheels; retain their bundled license metadata.
+From 0.1.3 the project icon uses the user-selected original PLX artwork: abstract silver vehicle line, dark smart-home circuit motif and red X. The original PNG is retained byte-for-byte in `icons/plx-logo-original.png`; SVG delivery wrappers embed that same PNG. Provenance and checksums are in `icons/provenance.json`. It replaces the former Porsche crest app icon. The icon is project artwork, not a Porsche badge or endorsement. Historical versions and Git history may retain prior artwork until separately withdrawn; no history rewrite is performed by this change.
