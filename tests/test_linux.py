@@ -31,10 +31,10 @@ def port():
 
 def test_real_mqtt_retained_and_deletion(tmp_path):
     broker_port = port()
-    config = tmp_path/'mosquitto.conf'
-    config.write_text(f'listener {broker_port} 127.0.0.1\nallow_anonymous true\n')
+    # No config file: Mosquitto's default is local-only anonymous access.
+    # This also works when a distro profile restricts config-file locations.
     broker_log = (tmp_path/'broker.log').open('w+')
-    proc = subprocess.Popen(['mosquitto','-c',str(config)], stdout=subprocess.DEVNULL, stderr=broker_log)
+    proc = subprocess.Popen(['mosquitto','-p',str(broker_port)], stdout=subprocess.DEVNULL, stderr=broker_log)
     try:
         deadline=time.monotonic()+5
         while time.monotonic()<deadline:
