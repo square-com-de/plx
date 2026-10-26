@@ -46,7 +46,7 @@ def test_deselection_deletes_all_retained_parameter_routes():
     assert base+'/api_ok' not in deleted
 
 
-def test_save_deselection_cleans_broker_before_persisting(tmp_path):
+def test_save_deselection_queues_cleanup_without_blocking_persistence(tmp_path):
     async def run():
         calls=[]
         app,_=service(tmp_path, publisher=lambda config,values:calls.append(values))
@@ -55,11 +55,13 @@ def test_save_deselection_cleans_broker_before_persisting(tmp_path):
         new=copy.deepcopy(app.config);new['publish_parameters']=[];new['publish_fields']=[]
         await app.command({'action':'save','params':new})
         assert app.config['publish_parameters']==[]
+        assert not calls and app.pending_cleanup
+        await app.retry_cleanup()
         assert any((app.config['mqtt']['prefix']+'/taycan/parameters/e_range/value','') in values for values in calls)
     asyncio.run(run())
 
 
-def test_enable_mqtt_cleans_deselected_topics_once(tmp_path):
+def test_enable_mqtt_does_not_delete_unselected_catalog_topics(tmp_path):
     async def run():
         calls=[]
         app,_=service(tmp_path,publisher=lambda config,values:calls.append(values))
@@ -68,7 +70,7 @@ def test_enable_mqtt_cleans_deselected_topics_once(tmp_path):
         app.config['publish_parameters']=[];app.config['publish_fields']=[]
         await app.publish_status()
         key=app.config['mqtt']['prefix']+'/taycan/parameters/gps_location/value'
-        assert (key,'') in calls[-1]
+        assert (key,'') not in calls[-1]
         await app.publish_status()
         assert not any(topic==key for topic,_ in calls[-1])
     asyncio.run(run())

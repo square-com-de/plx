@@ -2,6 +2,8 @@
 import threading
 import json
 import ssl
+import socket
+import time
 
 import paho.mqtt.client as mqtt
 
@@ -73,10 +75,15 @@ def publish(config, payloads):
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
     def on_connect(_client, _userdata, _flags, reason, _properties):
-        accepted.append(not reason.is_failure)
+        accepted.append(None if not reason.is_failure else ('auth' if reason.value in (134, 135) else 'rejected'))
         ready.set()
 
     client.on_connect = on_connect
+    denied = threading.Event()
+    def on_publish(_client, _userdata, _mid, reason, _properties):
+        if reason.is_failure:
+            denied.set()
+    client.on_publish = on_publish
     if config["username"]:
         client.username_pw_set(config["username"], config["password"])
     if config["tls"]:
@@ -85,8 +92,10 @@ def publish(config, payloads):
     try:
         client.connect(config["host"], config["port"], keepalive=30)
         client.loop_start()
-        if not ready.wait(7) or not accepted or not accepted[0]:
-            raise ConnectionError("MQTT-Anmeldung fehlgeschlagen.")
+        if not ready.wait(7) or not accepted:
+            raise MQTTError('timeout')
+        if accepted[0]:
+            raise MQTTError(accepted[0])
         import time
         deadline = time.monotonic() + 10
         for topic, payload in payloads:
@@ -95,8 +104,96 @@ def publish(config, payloads):
                 raise TimeoutError("MQTT-Zeitlimit erreicht.")
             message = client.publish(topic, payload, qos=1, retain=True)
             message.wait_for_publish(timeout=remaining)
+            if denied.is_set():
+                raise MQTTError('rejected')
             if not message.is_published():
                 raise TimeoutError("MQTT hat die Übertragung nicht bestätigt.")
     finally:
         client.disconnect()
         client.loop_stop()
+
+
+class MQTTError(ConnectionError):
+    """Stable, secret-free category exposed to the UI."""
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+def failure_code(exc):
+    if isinstance(exc, MQTTError):
+        return exc.code
+    if isinstance(exc, ssl.SSLError):
+        return 'tls'
+    if isinstance(exc, (TimeoutError, socket.timeout)):
+        return 'timeout'
+    if isinstance(exc, OSError):
+        return 'unreachable'
+    return 'delivery'
+
+
+class BrokerMonitor:
+    """A separate, idle connection tracks broker login and disconnects.
+
+    It never subscribes or publishes; delivery acknowledgement is kept separate.
+    Callbacks only write the state of this client, so an old connection cannot
+    overwrite the state after a configuration change.
+    """
+    def __init__(self):
+        self.client = None
+        self.config = None
+        self.state = {'state': 'disabled', 'error': None}
+        self.lock = threading.RLock()
+
+    def view(self):
+        with self.lock:
+            return dict(self.state)
+
+    def configure(self, config):
+        if config == self.config:
+            return
+        self.close()
+        self.config = dict(config)
+        if not config['enabled']:
+            return
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        with self.lock:
+            self.client = client
+            self.state = {'state': 'connecting', 'error': None}
+
+        def state(value, error=None):
+            with self.lock:
+                if self.client is client:
+                    self.state = {'state': value, 'error': error}
+
+        def connected(_client, _userdata, _flags, reason, _properties):
+            state('error', 'auth' if reason.value in (134, 135) else 'rejected') if reason.is_failure else state('connected')
+
+        def disconnected(_client, _userdata, _flags, reason, _properties):
+            # Preserve a precise CONNACK failure until the next connect attempt.
+            with self.lock:
+                if self.client is client and self.state['state'] != 'error':
+                    state('disconnected')
+
+        client.on_connect = connected
+        client.on_disconnect = disconnected
+        client.on_connect_fail = lambda *_: state('error', 'unreachable')
+        if config['username']:
+            client.username_pw_set(config['username'], config['password'])
+        client.connect_timeout = 5
+        client.reconnect_delay_set(min_delay=3, max_delay=30)
+        try:
+            if config['tls']:
+                client.tls_set_context(ssl.create_default_context())
+            client.connect_async(config['host'], config['port'], keepalive=15)
+            client.loop_start()
+        except Exception as exc:
+            state('error', failure_code(exc))
+
+    def close(self):
+        with self.lock:
+            client, self.client = self.client, None
+            self.state = {'state': 'disabled', 'error': None}
+        if client:
+            client.disconnect()
+            client.loop_stop()

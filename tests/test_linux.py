@@ -31,14 +31,22 @@ def port():
 
 def test_real_mqtt_retained_and_deletion(tmp_path):
     broker_port = port()
-    config = tmp_path/'mosquitto.conf'
-    config.write_text(f'listener {broker_port} 127.0.0.1\nallow_anonymous true\n')
-    proc = subprocess.Popen(['mosquitto','-c',str(config)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # No config file: Mosquitto's default is local-only anonymous access.
+    # This also works when a distro profile restricts config-file locations.
+    broker_log = (tmp_path/'broker.log').open('w+')
+    proc = subprocess.Popen(['mosquitto','-p',str(broker_port)], stdout=subprocess.DEVNULL, stderr=broker_log)
     try:
-        for _ in range(100):
+        deadline=time.monotonic()+5
+        while time.monotonic()<deadline:
+            if proc.poll() is not None:
+                broker_log.seek(0)
+                pytest.fail('Isolated broker exited during startup: '+broker_log.read())
             with socket.socket() as s:
                 if s.connect_ex(('127.0.0.1',broker_port)) == 0: break
             time.sleep(.02)
+        else:
+            broker_log.seek(0)
+            pytest.fail('Isolated broker did not become ready: '+broker_log.read())
         mqtt = {'host':'127.0.0.1','port':broker_port,'username':'','password':'','tls':False}
         publish(mqtt, [('porsche2lox/test/soc','42')])
         result = subprocess.run(['mosquitto_sub','-h','127.0.0.1','-p',str(broker_port),'-t','porsche2lox/test/soc','-C','1','-W','2'],capture_output=True,text=True,check=True)
@@ -49,6 +57,7 @@ def test_real_mqtt_retained_and_deletion(tmp_path):
     finally:
         proc.terminate()
         proc.wait(timeout=5)
+        broker_log.close()
 
 
 def test_php_csrf_https_and_real_unix_socket(tmp_path):

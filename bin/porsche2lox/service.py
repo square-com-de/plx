@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 
 from .core import DEFAULTS, FIELDS, DataError, parse_overview, read_json, refresh_age, validate_config, write_private
-from .mqtt import messages, publish, selection_deletions, selection_routes
+from .mqtt import messages, publish, selection_deletions, selection_routes, BrokerMonitor, failure_code
 from .loxone import enrich_schema, make_exports
 from .parameters import READ_MEASUREMENTS, LABELS, category
 from .compact import compact_rows
@@ -56,6 +56,11 @@ class Service:
             write_private(self.config_path, self.config)
         self.porsche = adapter or Porsche(self.data_dir / "session.json")
         self.publisher = publisher
+        self.monitor = BrokerMonitor() if publisher is publish else None
+        self.cleanup_path = self.data_dir / 'mqtt-cleanup.json'
+        self.pending_cleanup = read_json(self.cleanup_path, [])
+        self.cleanup_attempt = 0
+        self.mqtt_error = None
         self.snapshots = read_json(self.data_dir / "status.json", {})
         for snapshot in self.snapshots.values():
             enrich_schema(snapshot)
@@ -86,12 +91,14 @@ class Service:
         config = json.loads(json.dumps(self.config))
         config["mqtt"]["password_set"] = bool(config["mqtt"].pop("password"))
         return {
-            "version": "0.1.0", "config": config, "login": self.login,
+            "version": "0.1.5", "config": config, "login": self.login,
             "parameter_catalog": [{"key": key, "label": LABELS.get(key, key.replace("_", " ").capitalize()), "group": category(key)} for key in READ_MEASUREMENTS],
             "vehicles": self.vehicles, "job": self.job, "busy": self.busy,
             "images": {v["alias"]: int(self.image_path(v["vin"]).stat().st_mtime) for v in self.config["vehicles"] if self.image_path(v["vin"]).exists()},
             "snapshots": {v["alias"]: refresh_age(self.snapshots.get(v["alias"], {}), now, self.config["max_age_s"])
                           for v in self.config["vehicles"]},
+            "mqtt_status": self.monitor.view() if self.monitor else {'state': 'disabled' if not self.config['mqtt']['enabled'] else 'unknown', 'error': None},
+            "mqtt_cleanup_pending": bool(self.pending_cleanup), "mqtt_delivery_error": self.mqtt_error,
             "mqtt_ok": self.mqtt_ok, "next_poll_epoch": int(self.next_poll) if self.next_poll else None,
             "auth_blocked": self.auth_blocked,
         }
@@ -216,6 +223,42 @@ class Service:
         else:
             self.job = {"state": "ok", "message": "Status abgerufen. Unbekanntes oder zu hohes Messalter bleibt als ungültig markiert."}
 
+    @staticmethod
+    def broker_identity(config):
+        return tuple(config[key] for key in ('host', 'port', 'tls'))
+
+    async def retry_cleanup(self):
+        if not self.pending_cleanup:
+            return
+        # Remove reselected routes before retrying, including after a restart.
+        current = selection_routes(self.config, self.snapshots)
+        queue = []
+        for entry in self.pending_cleanup:
+            topics = set(entry['topics'])
+            if self.broker_identity(entry['mqtt']) == self.broker_identity(self.config['mqtt']):
+                topics -= current
+                # Use updated credentials when the broker identity is unchanged.
+                entry = dict(entry, mqtt=dict(self.config['mqtt']))
+            if topics:
+                queue.append(dict(entry, topics=sorted(topics)))
+        self.pending_cleanup = queue
+        write_private(self.cleanup_path, queue)
+        if not queue:
+            return
+        entry = queue[0]
+        try:
+            await asyncio.to_thread(self.publisher, entry['mqtt'], [(topic, '') for topic in entry['topics']])
+        except Exception as exc:
+            self.mqtt_error = failure_code(exc)
+            # A retired/unreachable broker must not starve later entries.
+            self.pending_cleanup.append(self.pending_cleanup.pop(0))
+            write_private(self.cleanup_path, self.pending_cleanup)
+        else:
+            self.pending_cleanup.pop(0)
+            write_private(self.cleanup_path, self.pending_cleanup)
+            self.mqtt_error = None
+        self.cleanup_attempt = time.time()
+
     async def publish_status(self, config=None, force_invalid=False):
         config = config or self.config
         if not config["mqtt"]["enabled"]:
@@ -236,17 +279,14 @@ class Service:
             try:
                 await asyncio.to_thread(self.publisher, config['mqtt'], payloads)
                 self.mqtt_ok = True
-            except Exception:
+                self.mqtt_error = None
+            except Exception as exc:
+                self.mqtt_error = failure_code(exc)
                 self.mqtt_ok = False
             self.last_mqtt = time.time()
             return
         now = int(time.time())
-        selection_signature = json.dumps([config['mqtt']['host'],config['mqtt']['port'],config['mqtt']['username'],config['mqtt']['tls'],config['mqtt']['prefix'],config['vehicles'],config.get('publish_fields'),config.get('publish_parameters'),sorted(selection_routes(dict(config,publish_fields=list(FIELDS),publish_parameters=list(READ_MEASUREMENTS)),self.snapshots))], sort_keys=True)
         payloads = []
-        if self.cleaned_selection != selection_signature:
-            # Also clean stale retained topics when MQTT was off during selection.
-            all_topics = dict(config, publish_fields=list(FIELDS), publish_parameters=list(READ_MEASUREMENTS))
-            payloads.extend(selection_deletions(all_topics, config, self.snapshots))
         payloads.append((f"{config['mqtt']['prefix']}/heartbeat", str(now)))
         for vehicle in config["vehicles"]:
             snapshot = refresh_age(self.snapshots.get(vehicle["alias"], {key: None for key in FIELDS}), now, config["max_age_s"])
@@ -259,8 +299,9 @@ class Service:
         try:
             await asyncio.to_thread(self.publisher, config["mqtt"], payloads)
             self.mqtt_ok = True
-            self.cleaned_selection = selection_signature
-        except Exception:
+            self.mqtt_error = None
+        except Exception as exc:
+            self.mqtt_error = failure_code(exc)
             self.mqtt_ok = False
         self.last_mqtt = time.time()
 
@@ -295,22 +336,24 @@ class Service:
             known = {v["vin"] for v in self.vehicles} | {v["vin"] for v in self.config["vehicles"]}
             if any(v["vin"] not in known for v in candidate["vehicles"]):
                 raise ValueError("Bitte zuerst anmelden und ein Fahrzeug aus der Liste auswählen.")
-            # Invalidate previous retained routes before any routing change.
+            # Persist cleanup intent first. A broker outage must not discard the
+            # desired selection. Private outbox survives restarts and is retried.
             self.saving = True
             try:
-                if self.config.get('mqtt_format', 'detailed') == 'detailed' and candidate.get('mqtt_format') == 'detailed':
-                    await self.publish_status(config=self.config, force_invalid=True)
-                    if self.config["mqtt"]["enabled"] and self.mqtt_ok is False:
-                        raise ValueError("Alte MQTT-Topics konnten nicht als ungültig markiert werden. Bitte Brokerverbindung wiederherstellen und erneut speichern.")
                 removed = selection_deletions(self.config, candidate, self.snapshots)
+                queue = list(self.pending_cleanup)
                 if removed and self.config['mqtt']['enabled']:
-                    try:
-                        await asyncio.to_thread(self.publisher, self.config['mqtt'], removed)
-                    except Exception:
-                        raise ValueError("Abgewählte MQTT-Werte konnten nicht gelöscht werden. Auswahl wurde nicht gespeichert.") from None
+                    queue.append({'mqtt': dict(self.config['mqtt']), 'topics': [topic for topic, _ in removed]})
+                write_private(self.cleanup_path, queue)
                 previous = self.config
                 write_private(self.config_path, candidate)
                 self.config = candidate
+                self.pending_cleanup = queue
+                self.mqtt_ok = None
+                self.mqtt_error = None
+                self.cleanup_attempt = 0
+                if self.monitor:
+                    self.monitor.configure(candidate['mqtt'])
                 self.snapshots = {v["alias"]: self.snapshots.get(v["alias"], {}) for v in candidate["vehicles"]}
                 mqtt_only = candidate.get('mqtt_format') == 'simple' and candidate['vehicles'] == previous['vehicles']
                 if not mqtt_only:
@@ -318,7 +361,7 @@ class Service:
                 if not mqtt_only or any(candidate[key] != previous[key] for key in ('enabled', 'interval_s')):
                     self.next_poll = max(time.time(), self.last_poll + 300)
                 self.last_mqtt = 0
-                self.job = {"state": "ok", "message": "Einstellungen gespeichert."}
+                self.job = {"state": "ok", "message": "Einstellungen gespeichert. Alte MQTT-Werte werden noch bereinigt." if self.pending_cleanup else "Einstellungen gespeichert."}
             finally:
                 self.saving = False
         elif action in ("login", "captcha", "vehicles", "poll", "logout", "cancel"):
@@ -331,7 +374,12 @@ class Service:
 
     async def tick(self):
         while not self.stopping.is_set():
+            if self.monitor:
+                self.monitor.configure(self.config['mqtt'])
             if not self.busy:
+                async with self.control_lock:
+                    if self.pending_cleanup and time.time() - self.cleanup_attempt >= 30:
+                        await self.retry_cleanup()
                 await self.porsche.expire_login()
                 if self.login.get("state") == "captcha" and not self.porsche.pending:
                     self.login = {"state": "expired"}
@@ -339,7 +387,8 @@ class Service:
                 if self.config["enabled"] and self.config["vehicles"] and not self.auth_blocked and not self.porsche.pending and time.time() >= self.next_poll:
                     self.launch("poll", {})
                 elif self.config["enabled"] and time.time() - self.last_mqtt >= 60:
-                    await self.publish_status()
+                    async with self.control_lock:
+                        await self.publish_status()
             try:
                 await asyncio.wait_for(self.stopping.wait(), timeout=2)
             except TimeoutError:
@@ -379,6 +428,8 @@ class Service:
                 self.task.cancel()
                 await asyncio.gather(self.task, return_exceptions=True)
             await self.publish_status(force_invalid=True)
+            if self.monitor:
+                await asyncio.to_thread(self.monitor.close)
             await self.porsche.close()
             socket.unlink(missing_ok=True)
 
