@@ -225,7 +225,7 @@ class Service:
 
     @staticmethod
     def broker_identity(config):
-        return tuple(config[key] for key in ('host', 'port', 'username', 'tls'))
+        return tuple(config[key] for key in ('host', 'port', 'tls'))
 
     async def retry_cleanup(self):
         if not self.pending_cleanup:
@@ -250,6 +250,9 @@ class Service:
             await asyncio.to_thread(self.publisher, entry['mqtt'], [(topic, '') for topic in entry['topics']])
         except Exception as exc:
             self.mqtt_error = failure_code(exc)
+            # A retired/unreachable broker must not starve later entries.
+            self.pending_cleanup.append(self.pending_cleanup.pop(0))
+            write_private(self.cleanup_path, self.pending_cleanup)
         else:
             self.pending_cleanup.pop(0)
             write_private(self.cleanup_path, self.pending_cleanup)

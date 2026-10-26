@@ -69,3 +69,36 @@ def test_monitor_requires_connack_tracks_disconnect_and_ignores_old_callbacks(mo
     assert monitor.view()['state']=='connecting'
     monitor.close()
     assert monitor.view()['state']=='disabled'
+
+
+def test_reselection_with_changed_username_protects_current_route(tmp_path):
+    async def run():
+        calls=[]
+        app,_=service(tmp_path,lambda c,p:calls.extend(p))
+        app.config=validate_config(configured());app.config['mqtt']['enabled']=True
+        old=copy.deepcopy(app.config)
+        new=copy.deepcopy(old);new['publish_fields']=[]
+        await app.command({'action':'save','params':new})
+        old['mqtt']['username']='new-user'
+        await app.command({'action':'save','params':old})
+        await app.retry_cleanup()
+        assert not calls and not app.pending_cleanup
+    asyncio.run(run())
+
+
+def test_failed_old_broker_does_not_starve_new_broker_cleanup(tmp_path):
+    async def run():
+        calls=[]
+        def publisher(c,p):
+            calls.append(c['host'])
+            if c['host']=='retired.example':raise ConnectionRefusedError()
+        app,_=service(tmp_path,publisher)
+        cfg=validate_config(configured())['mqtt']
+        app.pending_cleanup=[{'mqtt':dict(cfg,host='retired.example'),'topics':['old/one']},
+                             {'mqtt':dict(cfg,host='working.example'),'topics':['old/two']}]
+        await app.retry_cleanup()
+        await app.retry_cleanup()
+        assert calls==['retired.example','working.example']
+        assert len(app.pending_cleanup)==1
+        assert app.pending_cleanup[0]['mqtt']['host']=='retired.example'
+    asyncio.run(run())
