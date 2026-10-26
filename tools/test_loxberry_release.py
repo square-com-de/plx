@@ -37,7 +37,7 @@ class PackageTests(unittest.TestCase):
         for name, raw in self.members.items():
             if name.startswith(('bin/', 'webfrontend/')):
                 self.assertEqual(raw, (ROOT/name).read_bytes())
-        self.assertIn(b'0.1.3', (ROOT/'templates/dashboard.html').read_bytes())
+        self.assertIn(b'0.1.5', (ROOT/'templates/dashboard.html').read_bytes())
         self.assertIn(b'0.1.4', self.members['templates/dashboard.html'])
         self.assertIn('ghcr.io/square-com-de/plx:0.1.3', (ROOT/'compose.registry.yaml').read_text())
 

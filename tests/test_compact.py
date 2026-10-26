@@ -102,6 +102,8 @@ def test_migration_deletes_only_actual_old_selected_routes_once(tmp_path):
         app.config=config();app.config['mqtt_format']='detailed';app.snapshots={'taycan':snapshot()}
         new=copy.deepcopy(app.config);new['mqtt_format']='simple'
         await app.command({'action':'save','params':new})
+        assert not calls and app.pending_cleanup
+        await app.retry_cleanup()
         assert len(calls)==1 and len(calls[0])==29
         assert all(value=='' and 'history' not in topic for topic,value in calls[0])
         await app.publish_status()

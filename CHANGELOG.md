@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5 Preview candidate
+
+- Show independent broker connection status and clear save feedback in German and English.
+- Save MQTT selections during broker outages; privately queue only explicitly deselected retained routes and retry after reconnection. Reselection cancels pending deletion.
+- Report safe broker failure categories without exposing credentials; preserve Porsche status independently.
+- No catalogue-wide retained-topic purge. Existing public releases remain unchanged.
+
+
 ## 0.1.4 Preview — LoxBerry new installation only
 
 - Company author square | com and contact plx@square-com.de create a new LoxBerry plugin identity. Not an in-place upgrade; no automatic state migration.

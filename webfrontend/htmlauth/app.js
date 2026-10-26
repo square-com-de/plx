@@ -275,6 +275,21 @@
   "Anmeldung abgebrochen.": "Sign-in cancelled.",
   "Status abgerufen. Unbekanntes oder zu hohes Messalter bleibt als ungültig markiert.": "Status fetched. Data with unknown or excessive age stays marked invalid.",
   "Einstellungen gespeichert.": "Settings saved.",
+  "Speichert …": "Saving …",
+  "Auswahl gespeichert. Alte MQTT-Werte werden nach Wiederverbindung bereinigt.": "Selection saved. Old MQTT values will be cleaned up after reconnection.",
+  "Einstellungen gespeichert. Alte MQTT-Werte werden noch bereinigt.": "Settings saved. Old MQTT values are still being cleaned up.",
+  "Einstellungen gespeichert. MQTT-Anmeldung wird separat geprüft.": "Settings saved. MQTT sign-in is checked separately.",
+  "MQTT verbunden": "MQTT connected",
+  "MQTT · Anmeldung abgelehnt": "MQTT · Sign-in rejected",
+  "MQTT · Broker hat die Anfrage abgelehnt": "MQTT · Broker rejected the request",
+  "MQTT · Broker nicht erreichbar": "MQTT · Broker unreachable",
+  "MQTT · TLS-Zertifikat oder Verbindung ungültig": "MQTT · Invalid TLS certificate or connection",
+  "MQTT · Zeitüberschreitung": "MQTT · Connection timed out",
+  "MQTT · Übertragung fehlgeschlagen": "MQTT · Delivery failed",
+  "MQTT · Deaktiviert": "MQTT · Disabled",
+  "MQTT · Verbindet …": "MQTT · Connecting …",
+  "MQTT · Getrennt, erneuter Versuch": "MQTT · Disconnected, retrying",
+  "MQTT · Noch nicht geprüft": "MQTT · Not checked yet",
   "Anmeldung abgelaufen. Bitte erneut starten.": "Sign-in expired. Please start again.",
   "Bitte erneut bei PLX anmelden und die Seite neu laden.": "Please sign in to PLX again and reload this page.",
   "Nur angehakte Werte werden per MQTT verschickt. Die Auswahl gilt für alle eingerichteten Fahrzeuge. Die Anzeige im Plugin bleibt vollständig. Heartbeat, Fehler- und Gültigkeitssignale bleiben zur Überwachung aktiv.": "Only checked values are sent over MQTT. Your selection applies to all configured vehicles. PLX still displays all data. Heartbeat, error and validity signals remain enabled for monitoring.",
@@ -378,7 +393,10 @@
     language=lang;try{localStorage.setItem('plx.language',lang);}catch(_){} translate();window.dispatchEvent(new Event('plx-language'));
   });switcher.append(b);});
   const headerControls=document.createElement('div');headerControls.className='header-controls';
-  headerControls.append(switcher,document.querySelector('#connect-status'));
+  const connections=document.createElement('div');connections.className='connection-lines';
+  const mqttStatus=document.createElement('span');mqttStatus.id='mqtt-connect-status';mqttStatus.className='connection-status mqtt-status';mqttStatus.setAttribute('role','status');
+  connections.append(document.querySelector('#connect-status'),mqttStatus);
+  headerControls.append(switcher,connections);
   document.querySelector('.hero').append(headerControls);
   window.PLXLanguage={get locale(){return language==='en'?'en-GB':'de-DE';},english,translate};
   let scheduled=false;
@@ -455,6 +473,13 @@
     const connectionText = connected ? 'Porsche Connect verbunden' : saved ? 'Porsche Connect · Sitzung gespeichert' : `Porsche Connect · ${account}`;
     $('#connect-status').textContent = connectionText;
     $('#connect-status').classList.toggle('connected', connected);
+    const mqttState=state.mqtt_status||{state:'unknown'};
+    const mqttErrors={auth:'MQTT · Anmeldung abgelehnt',rejected:'MQTT · Broker hat die Anfrage abgelehnt',unreachable:'MQTT · Broker nicht erreichbar',tls:'MQTT · TLS-Zertifikat oder Verbindung ungültig',timeout:'MQTT · Zeitüberschreitung',delivery:'MQTT · Übertragung fehlgeschlagen'};
+    const mqttLabels={disabled:'MQTT · Deaktiviert',connecting:'MQTT · Verbindet …',connected:'MQTT verbunden',disconnected:'MQTT · Getrennt, erneuter Versuch',unknown:'MQTT · Noch nicht geprüft'};
+    const mqttText=mqttState.state==='error'?(mqttErrors[mqttState.error]||mqttErrors.delivery):(mqttLabels[mqttState.state]||mqttLabels.unknown);
+    $('#mqtt-connect-status').textContent=mqttText;
+    $('#mqtt-connect-status').classList.toggle('connected',mqttState.state==='connected');
+    $('#mqtt-connect-status').classList.toggle('error',mqttState.state==='error');
     $('#login-state').textContent = connected ? 'Verbunden' : account;
     $('#login-state').classList.toggle('valid', connected);
     $('#account-title').textContent = connected ? 'Mit Porsche Connect verbunden' : saved ? 'Porsche-Sitzung gespeichert' : 'Mit Porsche verbinden';
@@ -656,8 +681,10 @@
     const config=structuredClone(state.config);config.mqtt.password=null;config.mqtt_format=$('#publish-format').value;
     config.publish_fields=[...$('#publish-options').querySelectorAll('[data-publish-kind="field"]:checked')].map(n=>n.value);
     config.publish_parameters=[...$('#publish-options').querySelectorAll('[data-publish-kind="parameter"]:checked')].map(n=>n.value);
-    try {state=await api('save',config);publishDirty=false;actionError='';$('#publish-feedback').textContent='Datenauswahl gespeichert.';render();}
+    const button=event.target.querySelector('[type=submit]');button.disabled=true;$('#publish-feedback').textContent='Speichert …';
+    try {state=await api('save',config);publishDirty=false;actionError='';$('#publish-feedback').textContent=state.mqtt_cleanup_pending?'Auswahl gespeichert. Alte MQTT-Werte werden nach Wiederverbindung bereinigt.':'Datenauswahl gespeichert.';render();}
     catch(error){$('#publish-feedback').textContent=error.message;actionError=error.message;notice(actionError,'error');}
+    finally{button.disabled=false;}
   });
   function renderSettings() {
     const form = $('#settings-form'), c = state.config;
@@ -702,8 +729,10 @@
     const vehicles = [...root.querySelectorAll('[data-vin]:checked')].map(check => ({vin:check.dataset.vin, alias:[...root.querySelectorAll('[data-alias]')].find(n => n.dataset.alias === check.dataset.vin).value}));
     const config = {mqtt_format:state.config.mqtt_format||'detailed',publish_fields:state.config.publish_fields,publish_parameters:state.config.publish_parameters,enabled:f.enabled.checked, interval_s:Number(f.interval_s.value), max_age_s:Number(f.max_age_s.value), vehicles,
       mqtt:{enabled:f.mqtt_enabled.checked, host:f.host.value.trim(), port:Number(f.port.value), username:f.username.value, password:f.clear_password.checked ? '' : f.mqtt_password.value || null, prefix:f.prefix.value, tls:f.tls.checked}};
-    try {state = await api('save', config); actionError = ''; $('#save-feedback').textContent = 'Gespeichert. Die Fahrzeugauswahl wurde übernommen.'; dirty = false; f.mqtt_password.value = ''; f.clear_password.checked = false; selecting = ''; render();}
+    const button=event.target.querySelector('[type=submit]');button.disabled=true;$('#save-feedback').textContent='Speichert …';
+    try {state = await api('save', config); actionError = ''; $('#save-feedback').textContent = state.mqtt_cleanup_pending?'Einstellungen gespeichert. Alte MQTT-Werte werden noch bereinigt.':'Einstellungen gespeichert. MQTT-Anmeldung wird separat geprüft.'; dirty = false; f.mqtt_password.value = ''; f.clear_password.checked = false; selecting = ''; render();}
     catch(error) {$('#save-feedback').textContent = error.message; actionError = error.message; notice(actionError, 'error'); $('#notice').scrollIntoView({block:'nearest'});}
+    finally{button.disabled=false;}
   });
   function exportSubscriptions() {
     const prefix=state.config.mqtt.prefix;

@@ -314,3 +314,10 @@ body.porsche2lox-page #p2l{max-width:100%;padding:0 6px}
 }
 
 #p2l .transport-warning{padding:12px 14px;border:1px solid #efbdc5;border-radius:4px;background:#fff1f3;color:#ad1931}
+
+/* Keep MQTT and Porsche status compact and independent. */
+#p2l .connection-lines{display:flex;flex-direction:column;align-items:flex-end;gap:7px;grid-row:2 / 4}
+#p2l .mqtt-status::before{content:'●';font-size:7px;margin-right:7px;color:#a1a3a8}
+#p2l .mqtt-status.connected::before{color:#d5001c}
+#p2l .mqtt-status.error{color:#ad1931}
+@media(max-width:700px){#p2l .connection-lines{align-items:flex-start;min-width:0}}
