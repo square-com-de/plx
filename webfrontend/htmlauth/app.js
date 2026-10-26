@@ -729,10 +729,10 @@
     const vehicles = [...root.querySelectorAll('[data-vin]:checked')].map(check => ({vin:check.dataset.vin, alias:[...root.querySelectorAll('[data-alias]')].find(n => n.dataset.alias === check.dataset.vin).value}));
     const config = {mqtt_format:state.config.mqtt_format||'detailed',publish_fields:state.config.publish_fields,publish_parameters:state.config.publish_parameters,enabled:f.enabled.checked, interval_s:Number(f.interval_s.value), max_age_s:Number(f.max_age_s.value), vehicles,
       mqtt:{enabled:f.mqtt_enabled.checked, host:f.host.value.trim(), port:Number(f.port.value), username:f.username.value, password:f.clear_password.checked ? '' : f.mqtt_password.value || null, prefix:f.prefix.value, tls:f.tls.checked}};
-    const button=event.target.querySelector('[type=submit]');button.disabled=true;$('#save-feedback').textContent='Speichert …';
+    const buttons=[...event.target.querySelectorAll('[type=submit]')];buttons.forEach(button=>button.disabled=true);$('#save-feedback').textContent='Speichert …';
     try {state = await api('save', config); actionError = ''; $('#save-feedback').textContent = state.mqtt_cleanup_pending?'Einstellungen gespeichert. Alte MQTT-Werte werden noch bereinigt.':'Einstellungen gespeichert. MQTT-Anmeldung wird separat geprüft.'; dirty = false; f.mqtt_password.value = ''; f.clear_password.checked = false; selecting = ''; render();}
     catch(error) {$('#save-feedback').textContent = error.message; actionError = error.message; notice(actionError, 'error'); $('#notice').scrollIntoView({block:'nearest'});}
-    finally{button.disabled=false;}
+    finally{buttons.forEach(button=>button.disabled=false);}
   });
   function exportSubscriptions() {
     const prefix=state.config.mqtt.prefix;
