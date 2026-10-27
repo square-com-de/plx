@@ -1,6 +1,6 @@
 services:
   plx:
-    image: ghcr.io/square-com-de/plx:0.1.3
+    image: ghcr.io/square-com-de/plx:0.1.5
     ports:
       - "${PLX_BIND_ADDRESS:-0.0.0.0}:${PLX_PORT:-8443}:8443"
     environment:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare the explicit 0.1.4 LoxBerry fresh-install release; never build/push Docker."""
+"""Prepare the explicit 0.1.5 LoxBerry Preview package; never build/push Docker."""
 import argparse
 import configparser
 import hashlib
@@ -13,8 +13,8 @@ import urllib.request
 from zipfile import ZipFile
 from build import ROOT, build
 
-VERSION = '0.1.4'
-ARCHIVE = f'PLX-LoxBerry-{VERSION}-New-Installation.zip'
+VERSION = '0.1.5'
+ARCHIVE = f'PLX-LoxBerry-Plugin-{VERSION}.zip'
 REPO = 'square-com-de/plx'
 
 
@@ -79,14 +79,14 @@ def prepare():
     require(old_identity != new_identity, 'Fresh-install identity must differ from historical author')
     manifest = {
         'name': 'PLX', 'plugin_version': VERSION, 'status': 'preview',
-        'distribution': 'LoxBerry 4 plugin only', 'installation': 'new installation, not an in-place upgrade',
+        'distribution': 'LoxBerry 4 plugin only', 'installation': 'update from square | com 0.1.4; new installation from historical author identity',
         'author': 'square | com', 'author_email': 'plx@square-com.de',
         'source_commit': git('rev-parse', 'HEAD'), 'source_tree': git('rev-parse', 'HEAD^{tree}'),
         'source_dirty': bool(git('status', '--porcelain')),
         'plugin_zip': ARCHIVE, 'members_sha256': members,
         'generated_member': 'templates/dashboard.html: version badge rendered from plugin.cfg',
         'historical_identity': old_identity, 'new_identity': new_identity,
-        'docker': {'unchanged_version': '0.1.3', 'image_published_by_this_release': False},
+        'docker': {'version': VERSION, 'image_published_by_this_script': False},
         'installation_test': 'not executed on a LoxBerry host for this new identity; package checks only',
     }
     (destination/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')

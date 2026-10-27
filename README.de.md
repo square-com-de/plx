@@ -3,13 +3,13 @@
 <p align="center"><strong>Porsche-Connect-Status – mit genau den MQTT-Werten, die dein Zuhause braucht.</strong></p>
 <p align="center"><a href="#schnellstart">Schnellstart</a> · <a href="INSTALL.de.md">Installation</a> · <a href="docs/MANUAL.de.md">Handbuch</a> · <a href="README.md">English</a></p>
 
-**Docker 0.1.3 Preview** · [Downloads & Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release-Stand](RELEASE.md)
+**Docker + LoxBerry 0.1.5 Preview** · [Downloads & Prüfsummen](https://github.com/square-com-de/plx/releases/tag/v0.1.5) · [Release-Stand](RELEASE.md)
 
 Betreibe PLX auf deinem eigenen Server, sieh die von deinem Porsche gemeldeten Daten und wähle aus, was Loxone oder ein anderer MQTT-Empfänger erhalten soll. Docker und das LoxBerry-4-Plugin verwenden dieselbe deutsche und englische Weboberfläche.
 
 ## Ein Blick auf PLX
 
-![PLX-0.1.3-Übersicht mit Fahrzeugbild, Batterie und Reichweite](docs/preview/public-overview.png)
+![PLX-0.1.5-Übersicht mit Fahrzeugbild, Batterie und Reichweite](docs/preview/public-overview.png)
 
 *Die echte PLX-Oberfläche mit simulierten Messwerten, kein Screenshot eines angemeldeten Nutzerkontos. Das Modellbild stammt aus Porsche Connect. Verfügbare Daten hängen von Fahrzeug und Connect-Vertrag ab.*
 
@@ -24,6 +24,8 @@ Betreibe PLX auf deinem eigenen Server, sieh die von deinem Porsche gemeldeten D
 
 PLX liest Statusdaten; es steuert das Fahrzeug nicht fern und weckt es nicht auf. **Porsche-Cloud und ein kompatibles Porsche-Connect-Konto bleiben erforderlich.** Ein eigener PLX-Server macht die Fahrzeug-API nicht lokal.
 
+MQTT-Anmeldung und Speichern haben eigene Statusmeldungen. Die Auswahl bleibt auch bei einem nicht erreichbaren Broker gespeichert.
+
 ## Schnellstart
 
 Für eine **frische Installation** auf einem Linux-Host mit Docker Compose und `curl`. Eine Administratorshell mit Docker-Zugriff verwenden. Das öffentliche Image benötigt kein GitHub-Konto und keinen Registry-Token.
@@ -33,7 +35,7 @@ Für eine **frische Installation** auf einem Linux-Host mit Docker Compose und `
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.5/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -45,7 +47,7 @@ docker compose exec -T plx cat /data/config/web-password.txt
 
 PLX erzeugt Passwort und TLS-Dateien einmalig in einem **persistenten benannten Volume**, zusammen mit Einstellungen und einer gegebenenfalls gespeicherten Porsche-Sitzung. Compose-Verzeichnis/Projekt und Volume bei Updates erhalten; kein `down -v` verwenden. [Sicherung, Update und Rückweg](INSTALL.de.md#update-sicherung-und-rückweg).
 
-Das ist der dokumentierte Release-Compose-Weg mit [historischen Schnellstart-Nachweisen](docs/QUICKSTART-0.1.2.md). Eine frische Installation des exakten 0.1.3-Images hat zusätzlich [Portainer-, Anmelde-, Neustart- und HTTPS-Proxy-Prüfungen](docs/DEPLOYMENT-0.1.3.md) bestanden. Die Berichte beschreiben ihren tatsächlichen Umfang, nicht jeden Host oder Installationsweg.
+Das ist der dokumentierte Release-Compose-Weg mit [historischen Schnellstart-Nachweisen](docs/QUICKSTART-0.1.2.md). Eine frische Installation des früheren 0.1.3-Images hat zusätzlich [Portainer-, Anmelde-, Neustart- und HTTPS-Proxy-Prüfungen](docs/DEPLOYMENT-0.1.3.md) bestanden. Die Berichte beschreiben ihren tatsächlichen Umfang, nicht jeden Host oder Installationsweg.
 
 ## Erste Nutzung
 
@@ -61,7 +63,7 @@ Eine Webproxy-Adresse ist nicht automatisch ein MQTT-Broker. PLX verwendet eine 
 | Deine Umgebung | Einstieg |
 | --- | --- |
 | Portainer | [Separaten Stack anlegen](INSTALL.de.md#portainer), Release-Compose verwenden, `PLX_HOST` setzen und das Passwort in der Containerkonsole lesen. |
-| LoxBerry 4 | [PLX-LoxBerry-0.1.4-New-Installation.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.4/PLX-LoxBerry-0.1.4-New-Installation.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. **0.1.4 Preview ist eine Neuinstallation mit neuer Firmenkennung, KEIN direktes Upgrade.** Beim Entfernen des alten Plugins können Einstellungen und Sitzungen gelöscht werden. [Zuerst lesen](docs/RELEASE-0.1.4-LoxBerry.md). [Installation](INSTALL.de.md#alternativen-und-grenzen). |
+| LoxBerry 4 | [PLX-LoxBerry-Plugin-0.1.5.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. **Update ab square \| com 0.1.4 mit gleicher Plugin-Kennung. Historische dubctrl-Versionen erfordern eine Neuinstallation.** Beim Entfernen des alten Plugins können Einstellungen und Sitzungen gelöscht werden. [Zuerst lesen](docs/RELEASE-0.1.5.md). [Installation](INSTALL.de.md#alternativen-und-grenzen). |
 | LoxBerry hinter einem HTTPS-Proxy | [Unmittelbaren vertrauenswürdigen Proxy konfigurieren](docs/REVERSE-PROXY.md); die Plugininstallation allein erkennt deinen Proxy nicht. |
 | Proxmox oder eigene Container-Einrichtung | [Anleitung für Container, Sicherung und Rückweg](docs/PROXMOX-CONTAINER.de.md). Docker in einer Linux-VM betreiben, nicht auf dem Hypervisor. |
 
@@ -69,7 +71,7 @@ PLX im vertrauenswürdigen LAN betreiben. Andere Ports, Zertifikatswechsel, Reve
 
 ## Grenzen der Preview
 
-**0.1.3 ist Preview, nicht Stable.** Für Linux/AMD64 liegen Laufzeitnachweise vor. AMD64-/ARM64-Images sind veröffentlicht; echter ARM64-Betrieb, Podman/Rootless und native Installation außerhalb LoxBerry sind weiterhin nicht abgenommen. Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Eine erfolgreiche Installation beweist keinen echten Porsche-Login, keine Token-Erneuerung und keine Unterstützung jedes Modells. [Release-Hinweise](docs/RELEASE-0.1.3.md) · [Tests](docs/TESTS.md).
+**0.1.5 ist Preview, nicht Stable.** Für Linux/AMD64 liegen Laufzeitnachweise vor. AMD64-/ARM64-Images sind veröffentlicht; echter ARM64-Betrieb, Podman/Rootless und native Installation außerhalb LoxBerry sind weiterhin nicht abgenommen. Die vollständige Abnahme über MQTT Gateway bis zum Loxone-Miniserver bleibt offen. Eine erfolgreiche Installation beweist keinen echten Porsche-Login, keine Token-Erneuerung und keine Unterstützung jedes Modells. [Release-Hinweise](docs/RELEASE-0.1.5.md) · [Tests](docs/TESTS.md).
 
 **Für Automationen, die frische Daten brauchen:** Einfaches MQTT sendet den zuletzt gemeldeten Wert oder bei fehlenden Werten `null`, ohne Heartbeat-/Verfügbarkeitstopics. Gespeicherte Brokerwerte können nach Containerstopp oder Verbindungsabbruch bestehen bleiben. Alter/Status in PLX prüfen oder das ausführliche Format für Frischesignale verwenden. Ein Cloud-Abruf ist keine neue Fahrzeugmessung. [Handbuch](docs/MANUAL.de.md).
 

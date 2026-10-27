@@ -15,7 +15,7 @@ from zipfile import ZipFile
 from build import build, ROOT
 
 IMAGE_COMMIT = os.environ.get('PLX_RELEASE_COMMIT')
-IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.3')
+IMAGE = os.environ.get('PLX_RELEASE_IMAGE', 'ghcr.io/square-com-de/plx:0.1.5')
 CI_RUN = os.environ.get('PLX_RELEASE_CI', 'https://github.com/square-com-de/plx/actions/workflows/release.yml')
 
 
@@ -27,7 +27,7 @@ def prepare():
     cfg = configparser.ConfigParser()
     cfg.read(ROOT / 'plugin.cfg')
     version = cfg['PLUGIN']['VERSION']
-    if version != '0.1.3':
+    if version != '0.1.5':
         raise ValueError('Update release provenance and notes for the new version first.')
     if '@sha256:' not in IMAGE:
         raise ValueError('Set PLX_RELEASE_IMAGE to the reviewed immutable image digest.')
@@ -50,13 +50,16 @@ def prepare():
                     Path(name).name in {'settings.json', 'session.json'} or
                     name.endswith(('.pem', '.key', '.pyc', '.sock'))):
                 raise ValueError('Unexpected private/runtime file in plugin archive.')
-    shutil.copy2(package, bundle / package.name)
+    from prepare_loxberry_release import verify_archive
+    members = verify_archive(package)
+    plugin_name = f'PLX-LoxBerry-Plugin-{version}.zip'
+    shutil.copy2(package, bundle / plugin_name)
     for name in ('README.md', 'README.de.md', 'README.en.md', 'INSTALL.md', 'INSTALL.de.md', 'RELEASE.md', 'CHANGELOG.md', 'SECURITY.md', 'CONTRIBUTING.md', 'LICENSE', 'THIRD-PARTY-NOTICES.md'):
         shutil.copy2(ROOT / name, bundle / name)
     shutil.copytree(ROOT / 'docs', bundle / 'docs')
     shutil.copytree(ROOT / 'icons', bundle / 'icons')
     compose = (ROOT / 'compose.registry.yaml').read_text()
-    expected = 'image: ghcr.io/square-com-de/plx:0.1.3'
+    expected = 'image: ghcr.io/square-com-de/plx:0.1.5'
     if compose.count(expected) != 1:
         raise ValueError('Unexpected registry compose image declaration.')
     (bundle / 'compose.yaml').write_text(compose.replace(expected, 'image: ' + IMAGE))
@@ -70,10 +73,12 @@ def prepare():
         'container': {'image': IMAGE, 'source_commit': IMAGE_COMMIT or git('rev-parse', 'HEAD'),
                       'ci_run': CI_RUN, 'platforms': ['linux/amd64', 'linux/arm64'],
                       'visibility': 'public'},
-        'plugin_zip': package.name,
+        'plugin_zip': plugin_name, 'members_sha256': members,
+        'plugin_update_from': 'square | com 0.1.4; historical author requires fresh installation',
         'docker_bundle': f'PLX-Docker-{version}.tar.gz',
         'docker_bundle_kind': 'compose-and-docs; image pulled from GHCR',
-        'acceptance_pending': ['miniserver-acceptance'],
+        'acceptance_pending': ['physical-miniserver-chain', 'real-arm64-runtime', 'podman-rootless-runtime'],
+        'acceptance_record': 'https://github.com/square-com-de/plx/issues/1',
     }
     (bundle / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     # Separate Docker distribution: Compose and documentation, no plugin or private data.
@@ -94,13 +99,11 @@ def prepare():
                 info.size = len(data)
                 info.mode = 0o644
                 archive.addfile(info, io.BytesIO(data))
-    lines = []
-    for path in sorted(bundle.rglob('*')):
-        if path.is_file() and path.name != 'SHA256SUMS':
-            lines.append(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + path.relative_to(bundle).as_posix())
+    release_files = [plugin_name, docker_name+'.tar.gz', 'manifest.json', 'compose.yaml']
+    lines = [hashlib.sha256((bundle/name).read_bytes()).hexdigest()+'  '+name for name in sorted(release_files)]
     (bundle / 'SHA256SUMS').write_text('\n'.join(lines) + '\n')
     from check_branding import inspect_bytes
-    for artifact in (bundle / package.name, bundle / (docker_name + '.tar.gz')):
+    for artifact in (bundle / plugin_name, bundle / (docker_name + '.tar.gz')):
         inspect_bytes(artifact.name, artifact.read_bytes())
     print(f'Prepared {bundle} ({len(lines)} checksummed artifacts); no publication performed.')
 

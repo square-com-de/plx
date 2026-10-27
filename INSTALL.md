@@ -2,7 +2,7 @@
 
 [Deutsch](INSTALL.de.md) · [README](README.md)
 
-Requires a Linux Docker host with `docker compose` and `curl`, with Docker access (for example an administrator shell). Proxmox users run Docker in a normal Linux VM, not on the hypervisor. Portainer uses the same Compose file. PLX 0.1.3 remains a **Preview**.
+Requires a Linux Docker host with `docker compose` and `curl`, with Docker access (for example an administrator shell). Proxmox users run Docker in a normal Linux VM, not on the hypervisor. Portainer uses the same Compose file. PLX 0.1.5 remains a **Preview**.
 
 ## Start
 
@@ -11,7 +11,7 @@ Choose the server IP or DNS name you will open in your browser. Replace **192.0.
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.5/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,9 +49,9 @@ docker compose ps
 
 ## Alternatives and limits
 
-**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-0.1.4-New-Installation.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. **New installation only:** this company identity is not an in-place upgrade. Remove an older PLX/Porsche2Lox plugin through its plugin manager before importing; settings/session may be removed. No automatic data migration. [Details and limits](docs/RELEASE-0.1.4-LoxBerry.md). For LoxBerry TLS termination with an HTTP backend, configure the explicit trusted proxy peers below; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
+**LoxBerry alternative:** import the dedicated `PLX-LoxBerry-Plugin-0.1.5.zip` through LoxBerry4's plugin manager, over direct HTTPS, using its existing web login. Do not import the generic source ZIP. **Update from square | com 0.1.4:** use the plugin manager update. For historical dubctrl versions, this company identity requires a new installation. Only for the historical author identity, remove the old plugin through its plugin manager before importing; settings/session may be removed. No automatic data migration. [Details and limits](docs/RELEASE-0.1.5.md). For LoxBerry TLS termination with an HTTP backend, configure the explicit trusted proxy peers below; [gate #1](https://github.com/square-com-de/plx/issues/1) remains explicit.
 
-Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.3.md).
+Docker Linux/Proxmox is preferred; prior clean-VM evidence is documented separately from this new first-start flow. Podman/rootless, native outside LoxBerry and real ARM64 runtime are not qualified by manifest availability alone. The laboratory firewall incident in the historical test report is **not** an end-user installation step. No certificate trust, device account, broker credential or multicast reachability is promised automatically. [Manual](docs/MANUAL.md) · [Release notes](docs/RELEASE-0.1.5.md).
 
 [Historical published0.1.1 quickstart acceptance](docs/QUICKSTART-0.1.1.md): fresh volume, verified LAN/browser login, restart/recreation and matching cold restore passed. Test limits remain explicit.
 
