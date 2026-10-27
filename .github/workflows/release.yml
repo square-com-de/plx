@@ -1,29 +1,39 @@
-name: Publish PLX Preview
+name: PLX 0.1.5 Preview
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        description: Build candidate, or publish the exact accepted candidate
+        type: choice
+        options: [candidate, publish]
+        default: candidate
+      candidate_run_id:
+        description: Successful candidate run ID (publish only)
+        type: string
+        default: ''
 permissions:
   contents: read
 concurrency:
-  group: plx-release-0.1.3
+  group: plx-release-0.1.5
   cancel-in-progress: false
 jobs:
-  release:
-    if: github.repository == 'square-com-de/plx'
+  candidate:
+    if: github.repository == 'square-com-de/plx' && github.ref == 'refs/heads/main' && inputs.phase == 'candidate'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
     env:
       PLX_HOST: 127.0.0.1
       PLX_BIND_ADDRESS: 127.0.0.1
-    permissions:
-      contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - name: Check release and image are explicitly absent
-        run: python tools/check_release_absent.py 0.1.3
+      - name: Refuse existing release, tag or versioned image
+        run: python tools/check_release_absent.py 0.1.5
       - name: Install test dependencies
         run: |
           sudo apt-get update
@@ -32,12 +42,12 @@ jobs:
           python -m pip install pytest==8.4.2
       - name: Unit and local integration tests
         run: python -m pytest tests -q
-      - name: Build and smoke-test standalone container
+      - name: Fresh container smoke test
         run: |
           docker compose config --quiet
           docker compose up -d --build --wait --wait-timeout 90
           docker compose exec -T plx python /app/healthcheck.py
-      - name: Stop isolated test container
+      - name: Stop only the isolated test container
         if: always()
         run: docker compose down -v
       - uses: docker/setup-qemu-action@v4
@@ -47,39 +57,77 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish versioned AMD64 and ARM64 image
+      - name: Build the immutable candidate image
         id: image
         uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/square-com-de/plx:0.1.3
+          tags: ghcr.io/square-com-de/plx:candidate-0.1.5-${{ github.sha }}
           labels: |
-            org.opencontainers.image.version=0.1.3
+            org.opencontainers.image.version=0.1.5
             org.opencontainers.image.revision=${{ github.sha }}
-      - name: Build both distributions with fixed image digest
+      - name: Prepare final distributions without publishing a release
         env:
           PLX_RELEASE_IMAGE: ghcr.io/square-com-de/plx@${{ steps.image.outputs.digest }}
           PLX_RELEASE_COMMIT: ${{ github.sha }}
           PLX_RELEASE_CI: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           python tools/prepare_release.py
-          cd dist/release-v0.1.3
+          cd dist/release-v0.1.5
           sha256sum --check SHA256SUMS
-          python -c 'import json; d=json.load(open("manifest.json")); assert not d["source_dirty"]; assert "@sha256:" in d["container"]["image"]'
-      - name: Publish GitHub preview release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: plx-release-0.1.5
+          path: |
+            dist/release-v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip
+            dist/release-v0.1.5/PLX-Docker-0.1.5.tar.gz
+            dist/release-v0.1.5/compose.yaml
+            dist/release-v0.1.5/manifest.json
+            dist/release-v0.1.5/SHA256SUMS
+          if-no-files-found: error
+  publish:
+    if: github.repository == 'square-com-de/plx' && github.ref == 'refs/heads/main' && inputs.phase == 'publish'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+      packages: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CANDIDATE_RUN: ${{ inputs.candidate_run_id }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Download the exact accepted candidate
         run: |
-          gh release create v0.1.3 \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title 'PLX 0.1.3 Preview' \
-            --prerelease \
-            --notes-file docs/RELEASE-0.1.3.md \
-            dist/release-v0.1.3/PLX-LoxBerry-0.1.3.zip \
-            dist/release-v0.1.3/PLX-Docker-0.1.3.tar.gz \
-            dist/release-v0.1.3/SHA256SUMS \
-            dist/release-v0.1.3/manifest.json \
-            dist/release-v0.1.3/compose.yaml
+          [[ "$CANDIDATE_RUN" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN" > candidate-run.json
+          gh run download "$CANDIDATE_RUN" --repo "$GITHUB_REPOSITORY" --name plx-release-0.1.5 --dir dist/approved
+          python tools/verify_release_candidate.py dist/approved "$GITHUB_SHA" candidate-run.json
+          python tools/check_release_absent.py 0.1.5
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Promote the accepted image without rebuilding
+        run: |
+          image=$(python -c 'import json; print(json.load(open("dist/approved/manifest.json"))["container"]["image"])')
+          docker buildx imagetools create --tag ghcr.io/square-com-de/plx:0.1.5 "$image"
+          python tools/verify_release_image.py dist/approved/manifest.json
+      - name: Publish only the accepted files as Preview
+        run: |
+          git tag v0.1.5 "$GITHUB_SHA"
+          git push origin refs/tags/v0.1.5
+          gh release create v0.1.5 --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+            --title 'PLX 0.1.5 Preview — Docker and LoxBerry plugin' \
+            --notes-file docs/RELEASE-0.1.5.md \
+            dist/approved/PLX-LoxBerry-Plugin-0.1.5.zip \
+            dist/approved/PLX-Docker-0.1.5.tar.gz \
+            dist/approved/compose.yaml dist/approved/manifest.json dist/approved/SHA256SUMS

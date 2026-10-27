@@ -2,7 +2,7 @@
 
 [English](INSTALL.md) · [README](README.de.md)
 
-Voraussetzung: Linux-Docker-Host mit `docker compose`, `curl` und Docker-Zugriff, z.B. in einer Administratorshell. Bei Proxmox läuft Docker in einer normalen Linux-VM, nicht auf dem Hypervisor. Portainer verwendet dieselbe Compose-Datei. PLX0.1.3 bleibt eine **Preview**.
+Voraussetzung: Linux-Docker-Host mit `docker compose`, `curl` und Docker-Zugriff, z.B. in einer Administratorshell. Bei Proxmox läuft Docker in einer normalen Linux-VM, nicht auf dem Hypervisor. Portainer verwendet dieselbe Compose-Datei. PLX0.1.5 bleibt eine **Preview**.
 
 ## Start
 
@@ -11,7 +11,7 @@ IP oder DNS-Namen des Servers wählen, den du im Browser öffnen möchtest. **19
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.5/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -49,9 +49,9 @@ docker compose ps
 
 ## Alternativen und Grenzen
 
-**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-0.1.4-New-Installation.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. **Nur Neuinstallation:** Die neue Firmenkennung ist kein direktes Upgrade. Ein älteres PLX/Porsche2Lox zuerst über dessen Pluginverwaltung entfernen; dabei können Einstellungen/Sitzung gelöscht werden. Keine automatische Datenübernahme. [Details und Grenzen (Englisch)](docs/RELEASE-0.1.4-LoxBerry.md). Für LoxBerry-TLS-Terminierung mit internem HTTP müssen die vertrauenswürdigen Proxy-Adressen unten ausdrücklich konfiguriert werden; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
+**LoxBerry als Alternative:** Dediziertes `PLX-LoxBerry-Plugin-0.1.5.zip` über Pluginverwaltung von LoxBerry4 mit direktem HTTPS und bestehender Webanmeldung importieren, nicht das allgemeine Quellcode-ZIP. **Update ab square | com 0.1.4:** Pluginverwaltung verwenden. Bei historischen dubctrl-Versionen ist wegen der anderen Firmenkennung eine Neuinstallation erforderlich. Nur bei historischer Autorenkennung das alte Plugin zuerst über dessen Pluginverwaltung entfernen; dabei können Einstellungen/Sitzung gelöscht werden. Keine automatische Datenübernahme. [Details und Grenzen (Englisch)](docs/RELEASE-0.1.5.md). Für LoxBerry-TLS-Terminierung mit internem HTTP müssen die vertrauenswürdigen Proxy-Adressen unten ausdrücklich konfiguriert werden; [Gate #1](https://github.com/square-com-de/plx/issues/1) bleibt ausdrücklich bestehen.
 
-Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.3.md).
+Docker Linux/Proxmox bevorzugt. Frühere Clean-VM-Nachweise bleiben vom neuen Erststart getrennt. Podman/Rootless, Native außerhalb LoxBerry und echter ARM64-Betrieb sind durch verfügbare Manifeste nicht automatisch abgenommen. Die historische Lab-Firewallstörung ist **kein** Endnutzer-Installationsschritt. Zertifikatsvertrauen, Gerätekonto, Brokerzugang oder Multicast-Erreichbarkeit werden nicht magisch zugesagt. [Handbuch](docs/MANUAL.de.md) · [Release-Hinweise](docs/RELEASE-0.1.5.md).
 
 [Historische Abnahme des veröffentlichten 0.1.1-Quickstarts](docs/QUICKSTART-0.1.1.md): frisches Volume, strenger LAN-/Browserlogin, Neustart/Neuerstellung und passende kalte Wiederherstellung bestanden. Die Testgrenzen bleiben dort ausdrücklich genannt.
 

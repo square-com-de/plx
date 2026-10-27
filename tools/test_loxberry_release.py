@@ -38,8 +38,8 @@ class PackageTests(unittest.TestCase):
             if name.startswith(('bin/', 'webfrontend/')):
                 self.assertEqual(raw, (ROOT/name).read_bytes())
         self.assertIn(b'0.1.5', (ROOT/'templates/dashboard.html').read_bytes())
-        self.assertIn(b'0.1.4', self.members['templates/dashboard.html'])
-        self.assertIn('ghcr.io/square-com-de/plx:0.1.3', (ROOT/'compose.registry.yaml').read_text())
+        self.assertIn(VERSION.encode(), self.members['templates/dashboard.html'])
+        self.assertIn('ghcr.io/square-com-de/plx:0.1.5', (ROOT/'compose.registry.yaml').read_text())
 
     def test_private_state_and_unsafe_members_are_rejected(self):
         for path in ['data/session.json', 'config/settings.json', 'config/trusted-proxies.json',
@@ -54,7 +54,7 @@ class PackageTests(unittest.TestCase):
     def test_historical_author_or_wrong_version_is_rejected(self):
         cfg = self.members['plugin.cfg']
         for invalid in [cfg.replace(b'NAME=square | com', b'NAME=dubctrl'),
-                        cfg.replace(b'VERSION=0.1.4', b'VERSION=0.1.3')]:
+                        cfg.replace(b'VERSION=0.1.5', b'VERSION=0.1.4')]:
             with self.assertRaises(ValueError): verify_archive(self.modified(cfg=invalid))
 
 

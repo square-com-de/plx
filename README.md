@@ -3,13 +3,13 @@
 <p align="center"><strong>Porsche Connect status, with only the MQTT values your smart home needs.</strong></p>
 <p align="center"><a href="#quick-start">Quick start</a> · <a href="INSTALL.md">Installation</a> · <a href="docs/MANUAL.md">Manual</a> · <a href="README.de.md">Deutsch</a></p>
 
-**Docker 0.1.3 Preview** · [Downloads & checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.3) · [Release status](RELEASE.md)
+**Docker + LoxBerry 0.1.5 Preview** · [Downloads & checksums](https://github.com/square-com-de/plx/releases/tag/v0.1.5) · [Release status](RELEASE.md)
 
 Run PLX on your own server, view the data your Porsche reports, and choose what to send to Loxone or another MQTT consumer. Docker and the LoxBerry 4 plugin share the same German/English web interface.
 
 ## See it in action
 
-![PLX 0.1.3 dashboard showing a vehicle image, battery and range](docs/preview/public-overview.png)
+![PLX 0.1.5 dashboard showing a vehicle image, battery and range](docs/preview/public-overview.png)
 
 *The real PLX interface with simulated measurements, not a live account screenshot. The model illustration comes from Porsche Connect. Available data depends on your vehicle and Connect contract.*
 
@@ -20,6 +20,7 @@ Run PLX on your own server, view the data your Porsche reports, and choose what 
 - **Explore reported data:** search and filter parameters such as tires, charging, doors, climate, trips and maintenance where supported.
 - **Send only selected MQTT values:** in Simple mode, two selected tire pressures produce two numeric value topics in bar.
 - **Prepare Loxone inputs:** export selected numeric values as XML/CSV; detailed MQTT is available when you need freshness signals.
+- **See connection and save feedback:** independent Porsche/MQTT status, with selections saved even when the broker is unavailable.
 - **Use the same interface in two languages:** German/English, in Docker or as a LoxBerry 4 plugin.
 
 PLX reads status; it does not remote-control or wake your car. **It still needs Porsche's cloud and a compatible Porsche Connect account.** Hosting PLX yourself does not make the vehicle API local.
@@ -33,7 +34,7 @@ Replace **192.0.2.10** below with the IP or DNS name of your Docker server, with
 ```sh
 set -eu
 mkdir plx && cd plx
-curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.3/compose.yaml
+curl -fLO https://github.com/square-com-de/plx/releases/download/v0.1.5/compose.yaml
 printf 'PLX_HOST=192.0.2.10\n' > .env
 docker compose up -d --wait --wait-timeout 90
 docker compose exec -T plx cat /data/config/web-password.txt
@@ -45,7 +46,7 @@ docker compose exec -T plx cat /data/config/web-password.txt
 
 PLX generates its password and TLS files once in a **persistent named volume**, alongside settings and any saved Porsche session. Keep the same Compose directory/project and volume for updates; do not use `down -v`. [Backup, update and recovery](INSTALL.md#update-backup-and-recovery).
 
-This is the documented release Compose workflow, with [historical quickstart evidence](docs/QUICKSTART-0.1.2.md). A fresh deployment of the exact 0.1.3 image also passed [Portainer, login, restart and HTTPS-proxy checks](docs/DEPLOYMENT-0.1.3.md). These records describe their actual scopes, not every host or installation method.
+This is the documented release Compose workflow, with [historical quickstart evidence](docs/QUICKSTART-0.1.2.md). A fresh deployment of the earlier 0.1.3 image also passed [Portainer, login, restart and HTTPS-proxy checks](docs/DEPLOYMENT-0.1.3.md). These records describe their actual scopes, not every host or installation method.
 
 ## First use
 
@@ -61,7 +62,7 @@ A web-proxy address is not automatically an MQTT broker. PLX uses its own sessio
 | Your setup | Start here |
 | --- | --- |
 | Portainer | [Create a separate stack](INSTALL.md#portainer) with the release Compose file; set `PLX_HOST` and read the password in its container console. |
-| LoxBerry 4 | [Import PLX-LoxBerry-0.1.4-New-Installation.zip](https://github.com/square-com-de/plx/releases/download/v0.1.4/PLX-LoxBerry-0.1.4-New-Installation.zip) through the plugin manager — not GitHub's source ZIP. **0.1.4 Preview is a new company-identity installation, not an in-place upgrade.** Removing the old plugin can delete its settings and sessions. [Read first](docs/RELEASE-0.1.4-LoxBerry.md). [Installation](INSTALL.md#alternatives-and-limits). |
+| LoxBerry 4 | [Import PLX-LoxBerry-Plugin-0.1.5.zip](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip) through the plugin manager — not GitHub's source ZIP. **Updates from square | com 0.1.4 preserve the plugin identity. Historical dubctrl versions require a new installation.** Removing the old plugin can delete its settings and sessions. [Read first](docs/RELEASE-0.1.5.md). [Installation](INSTALL.md#alternatives-and-limits). |
 | LoxBerry behind an HTTPS proxy | [Configure the immediate trusted proxy](docs/REVERSE-PROXY.md); installing the plugin alone does not identify your proxy. |
 | Proxmox or a custom container setup | [Container, backup and recovery guide](docs/PROXMOX-CONTAINER.md). Run Docker in a Linux VM, not on the hypervisor. |
 
@@ -69,7 +70,7 @@ Keep PLX on a trusted LAN. Other ports, certificate changes, reverse proxies and
 
 ## Preview boundaries
 
-**0.1.3 is Preview, not Stable.** Linux/AMD64 has runtime evidence. AMD64/ARM64 images are published, but real ARM64, Podman/rootless and native installation outside LoxBerry remain unqualified. Complete MQTT Gateway → Loxone Miniserver acceptance remains open. A successful installation is not proof of live Porsche login, token refresh or support for every model. [Release notes](docs/RELEASE-0.1.3.md) · [Tests](docs/TESTS.md).
+**0.1.5 is Preview, not Stable.** Linux/AMD64 has runtime evidence. AMD64/ARM64 images are published, but real ARM64, Podman/rootless and native installation outside LoxBerry remain unqualified. Complete MQTT Gateway → Loxone Miniserver acceptance remains open. A successful installation is not proof of live Porsche login, token refresh or support for every model. [Release notes](docs/RELEASE-0.1.5.md) · [Tests](docs/TESTS.md).
 
 **For automations that depend on fresh data:** Simple MQTT sends the last reported value, or `null` when missing, without heartbeat/availability topics. Retained broker values can survive a stopped container or failed connection. Check age/status in PLX, or use detailed mode for freshness signals. A cloud refresh is not a new vehicle measurement. [Manual](docs/MANUAL.md).
 

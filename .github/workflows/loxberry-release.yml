@@ -1,15 +1,14 @@
 name: PLX LoxBerry package
 on:
   pull_request:
-    paths: [plugin.cfg, tools/build.py, tools/prepare_loxberry_release.py, tools/test_loxberry_release.py, docs/RELEASE-0.1.4-LoxBerry.md, .github/workflows/loxberry-release.yml]
+    paths: [plugin.cfg, tools/build.py, tools/prepare_loxberry_release.py, tools/test_loxberry_release.py, docs/RELEASE-0.1.5.md, .github/workflows/loxberry-release.yml]
   push:
     branches: [main]
     paths: [plugin.cfg, tools/build.py, tools/prepare_loxberry_release.py, tools/test_loxberry_release.py, .github/workflows/loxberry-release.yml]
-  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: plx-loxberry-0.1.4-${{ github.event_name }}
+  group: plx-loxberry-0.1.5-${{ github.event_name }}
   cancel-in-progress: false
 jobs:
   package:
@@ -25,41 +24,12 @@ jobs:
           python tools/prepare_loxberry_release.py
           python tools/test_loxberry_release.py
           python tools/check_docs.py
-          python tools/check_branding.py dist/loxberry-0.1.4/PLX-LoxBerry-0.1.4-New-Installation.zip
-          cd dist/loxberry-0.1.4
+          python tools/check_branding.py dist/loxberry-0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip
+          cd dist/loxberry-0.1.5
           sha256sum --check SHA256SUMS
           python -c 'import json; d=json.load(open("manifest.json")); assert not d["source_dirty"]'
       - uses: actions/upload-artifact@v6
         with:
-          name: plx-loxberry-0.1.4
-          path: dist/loxberry-0.1.4/
+          name: plx-loxberry-0.1.5
+          path: dist/loxberry-0.1.5/
           if-no-files-found: error
-  publish:
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'square-com-de/plx' && github.ref == 'refs/heads/main'
-    needs: package
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
-        with:
-          name: plx-loxberry-0.1.4
-          path: dist/loxberry-0.1.4
-      - name: Refuse an existing release or tag
-        run: python tools/prepare_loxberry_release.py --check-absent
-      - name: Create the exact source tag without replacement
-        run: |
-          git tag v0.1.4 "$GITHUB_SHA"
-          git push origin refs/tags/v0.1.4
-      - name: Publish only the dedicated LoxBerry fresh-install package
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd dist/loxberry-0.1.4
-          sha256sum --check SHA256SUMS
-          gh release create v0.1.4 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title 'PLX 0.1.4 Preview — LoxBerry new installation' --prerelease --verify-tag \
-            --notes-file "$GITHUB_WORKSPACE/docs/RELEASE-0.1.4-LoxBerry.md" \
-            PLX-LoxBerry-0.1.4-New-Installation.zip SHA256SUMS manifest.json
