@@ -63,7 +63,7 @@ Eine Webproxy-Adresse ist nicht automatisch ein MQTT-Broker. PLX verwendet eine 
 | Deine Umgebung | Einstieg |
 | --- | --- |
 | Portainer | [Separaten Stack anlegen](INSTALL.de.md#portainer), Release-Compose verwenden, `PLX_HOST` setzen und das Passwort in der Containerkonsole lesen. |
-| LoxBerry 4 | [PLX-LoxBerry-Plugin-0.1.5.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. **Update ab square | com 0.1.4 mit gleicher Plugin-Kennung. Historische dubctrl-Versionen erfordern eine Neuinstallation.** Beim Entfernen des alten Plugins können Einstellungen und Sitzungen gelöscht werden. [Zuerst lesen](docs/RELEASE-0.1.5.md). [Installation](INSTALL.de.md#alternativen-und-grenzen). |
+| LoxBerry 4 | [PLX-LoxBerry-Plugin-0.1.5.zip importieren](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip), über die Pluginverwaltung – nicht GitHubs Quellcode-ZIP. **Update ab square \| com 0.1.4 mit gleicher Plugin-Kennung. Historische dubctrl-Versionen erfordern eine Neuinstallation.** Beim Entfernen des alten Plugins können Einstellungen und Sitzungen gelöscht werden. [Zuerst lesen](docs/RELEASE-0.1.5.md). [Installation](INSTALL.de.md#alternativen-und-grenzen). |
 | LoxBerry hinter einem HTTPS-Proxy | [Unmittelbaren vertrauenswürdigen Proxy konfigurieren](docs/REVERSE-PROXY.md); die Plugininstallation allein erkennt deinen Proxy nicht. |
 | Proxmox oder eigene Container-Einrichtung | [Anleitung für Container, Sicherung und Rückweg](docs/PROXMOX-CONTAINER.de.md). Docker in einer Linux-VM betreiben, nicht auf dem Hypervisor. |
 

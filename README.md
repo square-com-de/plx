@@ -62,7 +62,7 @@ A web-proxy address is not automatically an MQTT broker. PLX uses its own sessio
 | Your setup | Start here |
 | --- | --- |
 | Portainer | [Create a separate stack](INSTALL.md#portainer) with the release Compose file; set `PLX_HOST` and read the password in its container console. |
-| LoxBerry 4 | [Import PLX-LoxBerry-Plugin-0.1.5.zip](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip) through the plugin manager — not GitHub's source ZIP. **Updates from square | com 0.1.4 preserve the plugin identity. Historical dubctrl versions require a new installation.** Removing the old plugin can delete its settings and sessions. [Read first](docs/RELEASE-0.1.5.md). [Installation](INSTALL.md#alternatives-and-limits). |
+| LoxBerry 4 | [Import PLX-LoxBerry-Plugin-0.1.5.zip](https://github.com/square-com-de/plx/releases/download/v0.1.5/PLX-LoxBerry-Plugin-0.1.5.zip) through the plugin manager — not GitHub's source ZIP. **Updates from square \| com 0.1.4 preserve the plugin identity. Historical dubctrl versions require a new installation.** Removing the old plugin can delete its settings and sessions. [Read first](docs/RELEASE-0.1.5.md). [Installation](INSTALL.md#alternatives-and-limits). |
 | LoxBerry behind an HTTPS proxy | [Configure the immediate trusted proxy](docs/REVERSE-PROXY.md); installing the plugin alone does not identify your proxy. |
 | Proxmox or a custom container setup | [Container, backup and recovery guide](docs/PROXMOX-CONTAINER.md). Run Docker in a Linux VM, not on the hypervisor. |
 
