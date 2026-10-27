@@ -1,3 +1,11 @@
+// LoxBerry's shell owns <head>; add the same icons used by standalone pages.
+(() => {
+  if(document.head.querySelector('[data-plx-favicon]')) return;
+  for(const [rel,type,sizes,file] of [['icon','image/png','32x32','favicon.png'],['icon','image/vnd.microsoft.icon','16x16 32x32 48x48','favicon.ico'],['apple-touch-icon','image/png','180x180','apple-touch-icon.png']]) {
+    const link=document.createElement('link');link.dataset.plxFavicon='';link.rel=rel;link.type=type;link.sizes=sizes;link.href=new URL(file+'?v=plx-x1',document.baseURI);document.head.append(link);
+  }
+})();
+
 (() => {
   'use strict';
   // Presentation-only translations: MQTT keys, saved values and API payloads stay unchanged.

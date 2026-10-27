@@ -11,3 +11,18 @@ The former public overview screenshot showed the crest; seven other screenshots 
 Public releases v0.1.0, v0.1.1 and v0.1.2 contain confirmed old-logo binaries in the dedicated LoxBerry ZIP and Docker bundle. Their Compose/manifest/checksum companions refer to those distributions. Old release IDs, asset IDs, exact URLs, digest checks and private rollback copies are recorded by the maintainer before withdrawal. The new version must be published and checked first, then confirmed old release assets and registry versions can be withdrawn as authorized. Do not replace old version bytes with new artwork or silently reuse a version tag.
 
 Registry versions require exact package IDs and filesystem/logo proof before targeted deletion; a tag name alone is insufficient. Historical Git commits, source archives, cached images, forks and third-party mirrors may retain old artwork after release withdrawal. Removing all historical blob reachability needs a separate, explicit Git-history rewrite decision and cannot be claimed here. No Taycan/production update is included. Current implementation, tested artifacts, completed withdrawals and inaccessible historical copies must be reported separately.
+
+
+## Browser icon
+
+The favicon uses only the silver/red X extracted from the approved original PLX
+logo. `icons/favicon-mark.svg` defines the vector clipping region against
+`icons/plx-logo-original.png`; no new artwork or Porsche crest is introduced.
+The original logo is unchanged. The exported PNGs have transparent backgrounds.
+
+Authoring only: install `sharp`, then run `node tools/export_favicon.cjs` to export
+`favicon.png` (32 px), `favicon.ico` (16/32/48 px PNG frames), and
+`apple-touch-icon.png` (180 px) into `webfrontend/htmlauth/`.
+Standalone serves only these three fixed public icon routes without a sign-in;
+login and app pages declare the same versioned URLs. The authenticated LoxBerry
+UI adds the links to its shell head; LoxBerry's platform authentication is unchanged.

@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir --require-hashes -r /tmp/requirements.lock.txt \
     && rm /tmp/requirements.lock.txt
 COPY bin/porsche2lox /app/bin/porsche2lox
 COPY templates/dashboard.html /app/templates/dashboard.html
-COPY webfrontend/htmlauth/app.css webfrontend/htmlauth/app.js webfrontend/htmlauth/logo.svg /app/webfrontend/htmlauth/
+COPY webfrontend/htmlauth/app.css webfrontend/htmlauth/app.js webfrontend/htmlauth/logo.svg webfrontend/htmlauth/favicon.png webfrontend/htmlauth/favicon.ico webfrontend/htmlauth/apple-touch-icon.png /app/webfrontend/htmlauth/
 COPY docker/healthcheck.py /app/healthcheck.py
 COPY LICENSE THIRD-PARTY-NOTICES.md /app/
 USER 10001:10001
