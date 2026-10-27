@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="690 700 340 340" width="256" height="256">
+  <title>PLX mark extracted from the approved original logo</title>
+  <defs><clipPath id="mark"><path d="M720 780H799L859 833L937 780H1007L902 874L990 963H921L860 909L798 963H710L811 871Z"/></clipPath></defs>
+  <image x="0" y="0" width="1254" height="1254" xlink:href="plx-logo-original.png" clip-path="url(#mark)"/>
+</svg>

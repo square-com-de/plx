@@ -25,6 +25,8 @@ from urllib.parse import parse_qs, urlsplit
 ACTIONS = {'status', 'save', 'login', 'captcha', 'vehicles', 'poll', 'logout', 'cancel', 'loxone_export'}
 MAX_BODY = 30000
 MAX_REPLY = 4194304
+FAVICON_LINKS = '<link data-plx-favicon rel="icon" type="image/png" sizes="32x32" href="favicon.png?v=plx-x1"><link data-plx-favicon rel="icon" type="image/vnd.microsoft.icon" sizes="16x16 32x32 48x48" href="favicon.ico?v=plx-x1"><link data-plx-favicon rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=plx-x1">'
+PUBLIC_ICONS = {'/favicon.png': 'image/png', '/favicon.ico': 'image/vnd.microsoft.icon', '/apple-touch-icon.png': 'image/png'}
 
 
 class Application:
@@ -170,7 +172,7 @@ class Handler(BaseHTTPRequestHandler):
         language_script = "<script>(()=>{let lang='de';try{lang=localStorage.getItem('plx.language')==='en'?'en':'de'}catch(_){}const texts={'Dein Porsche x Loxone in Deinem intelligenten Zuhause.':'Your Porsche x Loxone in your smart home.','Benutzername':'Username','PLX-Passwort':'PLX password','Anmelden':'Sign in','Die Anmeldung bei Porsche erfolgt anschließend in PLX.':'You can sign in to Porsche inside PLX.','Anmeldung nicht möglich. Zugangsdaten prüfen oder eine Minute warten.':'Unable to sign in. Check your credentials or wait one minute.'};const originals=new WeakMap();function apply(){document.documentElement.lang=lang;document.title=lang==='en'?'PLX · Sign in':'PLX · Anmelden';const w=document.createTreeWalker(document.querySelector('main'),NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n.parentElement.closest('#login-language'))continue;const source=originals.get(n)||n.nodeValue;originals.set(n,source);const t=source.trim();n.nodeValue=lang==='en'?source.replace(t,texts[t]||t):source}document.querySelectorAll('#login-language button').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.lang===lang));b.style.background=b.dataset.lang===lang?'#101114':'white';b.style.color=b.dataset.lang===lang?'white':'#62656b'})}const switcher=document.createElement('div');switcher.id='login-language';switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Language / Sprache');switcher.style.cssText='position:fixed;top:16px;right:20px;display:flex;gap:4px';for(const l of ['de','en']){const b=document.createElement('button');b.type='button';b.textContent=l.toUpperCase();b.dataset.lang=l;b.style.cssText='margin:0;width:auto;padding:7px 11px;cursor:pointer';b.onclick=()=>{lang=l;try{localStorage.setItem('plx.language',lang)}catch(_){}apply()};switcher.append(b)}document.body.append(switcher);apply()})();</script>"
         language_script = language_script.replace('<script>', '<script nonce="' + nonce + '">', 1)
         error = html.escape(error)
-        self.respond(401, f'''<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX · Anmelden</title><style>body{{margin:0;background:#f3f3f4;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#101114}}main{{max-width:360px;margin:12vh auto;padding:30px;background:white;border-radius:18px}}h1{{margin:0}}p{{color:#62656b}}label{{display:block;margin-top:16px}}input,button{{box-sizing:border-box;width:100%;padding:12px;border:1px solid #c9cbd0;border-radius:6px;font:inherit}}button{{margin-top:24px;background:#101114;color:white}}.error{{color:#a71930}}</style><main><h1>PLX</h1><p>Dein Porsche x Loxone in Deinem intelligenten Zuhause.</p><form action="/auth/login" method="post"><label>Benutzername<input name="username" autocomplete="username" required maxlength="100"></label><label>PLX-Passwort<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button>Anmelden</button><p class="error" role="alert">{error}</p></form><p>Die Anmeldung bei Porsche erfolgt anschließend in PLX.</p></main>{language_script}</html>''', script_nonce=nonce)
+        self.respond(401, f'''<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX · Anmelden</title>{FAVICON_LINKS}<style>body{{margin:0;background:#f3f3f4;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#101114}}main{{max-width:360px;margin:12vh auto;padding:30px;background:white;border-radius:18px}}h1{{margin:0}}p{{color:#62656b}}label{{display:block;margin-top:16px}}input,button{{box-sizing:border-box;width:100%;padding:12px;border:1px solid #c9cbd0;border-radius:6px;font:inherit}}button{{margin-top:24px;background:#101114;color:white}}.error{{color:#a71930}}</style><main><h1>PLX</h1><p>Dein Porsche x Loxone in Deinem intelligenten Zuhause.</p><form action="/auth/login" method="post"><label>Benutzername<input name="username" autocomplete="username" required maxlength="100"></label><label>PLX-Passwort<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button>Anmelden</button><p class="error" role="alert">{error}</p></form><p>Die Anmeldung bei Porsche erfolgt anschließend in PLX.</p></main>{language_script}</html>''', script_nonce=nonce)
 
     def same_origin(self):
         origin = self.headers.get('Origin')
@@ -190,6 +192,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path)
+        # Public, fixed icon allowlist only; account/model data stays authenticated.
+        if path.path in PUBLIC_ICONS:
+            self.respond(200, (self.app.root / 'webfrontend/htmlauth' / path.path[1:]).read_bytes(), PUBLIC_ICONS[path.path])
+            return
         if path.path == '/healthz':
             self.respond(200 if self.app.ready() else 503, b'ready' if self.app.ready() else b'starting', 'text/plain')
             return
@@ -212,7 +218,7 @@ class Handler(BaseHTTPRequestHandler):
             content = content.replace('auf deinem LoxBerry gespeichert', 'in deinem eigenen PLX-Datenspeicher gespeichert')
             content = content.replace('Die bestehende App verwendet porsche/taycan. PLX veröffentlicht in einem eigenen Namensraum.', 'Docker: Broker-Adresse im Netzwerk verwenden; 127.0.0.1 bezeichnet diesen Container. PLX nutzt eigene Topics.')
             logout = f'<form action="/auth/logout" method="post" class="plx-logout"><input type="hidden" name="csrf" value="{csrf}"><button>PLX abmelden</button></form>'
-            self.respond(200, '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX</title><style>body{margin:0;background:white}.plx-logout{max-width:1280px;margin:12px auto;padding:0 12px;text-align:right}.plx-logout button{border:1px solid #ddd;background:white;color:#62656b;border-radius:5px;padding:7px 12px;cursor:pointer}</style></head><body>' + content + logout + '</body></html>')
+            self.respond(200, '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLX</title>' + FAVICON_LINKS + '<style>body{margin:0;background:white}.plx-logout{max-width:1280px;margin:12px auto;padding:0 12px;text-align:right}.plx-logout button{border:1px solid #ddd;background:white;color:#62656b;border-radius:5px;padding:7px 12px;cursor:pointer}</style></head><body>' + content + logout + '</body></html>')
             return
         assets = {'/app.css': 'text/css; charset=utf-8', '/app.js': 'text/javascript; charset=utf-8', '/logo.svg': 'image/svg+xml'}
         if path.path in assets:
