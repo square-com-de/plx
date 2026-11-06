@@ -78,3 +78,11 @@ Runtime-Status einschließlich nicht abgenommenem Podman/Rootless: [Installation
 ## Sicherung und Hilfe
 
 [Update-/Sicherungsanleitung](../INSTALL.de.md#update-sicherung-und-rückweg) beachten. Datenvolume beziehungsweise Plugin-Daten und Zugangsdaten geschützt sichern: Sie können Tokens, Standort-/Fahrtdaten und TLS-Schlüssel enthalten. Für [GitHub-Feedback](https://github.com/square-com-de/plx/issues/new?template=feedback_question.md) nur bereinigte Bilder/Logs verwenden. Schwachstellen siehe [Sicherheit](../SECURITY.md).
+
+## Ausgewählte Messwerte nach Loxone kopieren
+
+Im Tab Loxone stehen die gespeicherten ausgewählten Messwerte mit zuletzt abgerufenem Wert, Einheit und Verfügbarkeit. Suche nach deutschem oder englischem Namen, Topic oder Wert oder filtere nach Fahrzeugalias. Die Liste nutzt dieselbe serverseitige Zuordnung wie CSV/XML: gespeichertes MQTT-Präfix, Alias und einfaches/ausführliches Format. Das ausführliche Format zeigt bekannte Einzelwertpfade; unbekannte Fahrzeugfelder werden nicht erfunden. Verfügbarkeit ist keine Altersfreigabe; Messalter und Freigabesignale weiter beachten.
+
+Pro Zeile gibt es **MQTT-Topic kopieren** und **Loxone-Erkennung kopieren**. Für mehrere Zeilen sichtbare Messwerte auswählen und ausgewählte Topics oder Erkennungen kopieren; pro Zeile entsteht ein Eintrag. Die Mehrfachkopie berücksichtigt den aktuellen Filter. Text-/unbekannte Typen und Topics oberhalb der bestehenden UDP-Längengrenze erhalten keine numerische Erkennung und werden bei der Erkennungskopie ausgelassen. Aufklappbarer Klartext bleibt manuell markierbar, auch wenn die Zwischenablage fehlt oder den Zugriff ablehnt.
+
+Die Liste zeigt die **gespeicherte** MQTT-Auswahl, keine ungespeicherten Häkchen. Gespeicherte Werte neu laden liest nur den PLX-Zwischenspeicher. Kopieren und Filtern speichern keine Einstellungen, veröffentlichen kein MQTT und rufen keine Porsche-Fahrzeugdaten ab. CSV- und XML-Downloads bleiben erhalten.

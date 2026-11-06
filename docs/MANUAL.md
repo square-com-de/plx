@@ -78,3 +78,11 @@ Runtime support, including the unqualified Podman/rootless path: [installation m
 ## Backup and support
 
 Follow the [update/backup guide](../INSTALL.md#update-backup-and-recovery). Protect the complete data volume/plugin data and credentials; they can contain Porsche tokens, location/trip data and TLS keys. Send only sanitized screenshots/logs in [GitHub feedback](https://github.com/square-com-de/plx/issues/new?template=feedback_question.md). See [security reporting](../SECURITY.md) for vulnerabilities.
+
+## Copy selected measurements into Loxone
+
+The Loxone tab now lists saved selected measurements with their last fetched value, unit and availability. Search by name (German or English), topic or value, or filter by vehicle alias. The list uses the same server mapping as CSV/XML: configured MQTT prefix, alias and simple/detailed format. Detailed format lists cached leaf fields; it does not invent unknown vehicle fields. Availability is not a freshness guarantee; continue to check measurement age and validity signals.
+
+Use **Copy MQTT topic** or **Copy Loxone recognition** on an individual row. For multiple rows, select the visible measurements and copy the selected topics or recognitions; each entry occupies one line. Bulk copy uses the current filter. Text/unknown types and topics beyond the existing UDP length limit have no numeric recognition and are omitted from recognition copies. The expandable plain text remains selectable, including when clipboard access is unavailable or denied.
+
+The list reflects the **saved** MQTT selection, not unsaved checkboxes. Reload saved values only reads PLX's cache. Copying and filtering do not save settings, publish MQTT, or request Porsche vehicle data. CSV and XML downloads remain available.

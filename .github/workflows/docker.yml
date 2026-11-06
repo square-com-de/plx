@@ -40,6 +40,8 @@ jobs:
           python -m pip install pytest==8.4.2
       - name: Unit and local integration tests
         run: python -m pytest tests -q
+      - name: Selected measurement copy helpers
+        run: node --test tests/test_selected_copy.cjs
       - name: Build and smoke-test standalone container
         run: |
           docker compose config --quiet
