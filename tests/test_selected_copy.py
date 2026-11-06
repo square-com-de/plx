@@ -36,7 +36,7 @@ def test_simple_selection_custom_prefix_multiple_aliases_and_missing_values():
 
 
 def test_detailed_copy_uses_published_leaf_routes_and_exact_xml_recognitions():
-    config,snapshots=setup('detailed');rows=selected_copy_rows(config,snapshots)
+    config,snapshots=setup('detailed');rows=[r for r in selected_copy_rows(config,snapshots) if r['group']=='measurement']
     assert len(rows)==2  # car_b has no cached leaf schema yet, not invented.
     assert rows[0]['topic']=='custom_plx/car_a/fields/tire_pressure_front_left/actualPressureBar/value'
     published=dict(messages('custom_plx','car_a',snapshots['car_a'],config['publish_parameters'],[]))
@@ -61,7 +61,7 @@ def test_text_and_oversized_topics_never_offer_a_false_udp_recognition():
     snapshots['c'*32]=snapshots.pop('car_a')
     snapshots['c'*32]['parameters']['HVAC_SUMMARY']['value']={'mode':'STANDBY','n'*48:2.4}
     rows=selected_copy_rows(config,snapshots)
-    assert all(r['recognition'] is None for r in rows)
+    assert all(r['recognition'] is None for r in rows if r['group']=='measurement')
     assert next(r for r in rows if r['kind']=='number')['unsupported']=='too_long'
     result=make_exports(config,snapshots)
     assert result['too_long_count']==2 and 'Topic für UDP zu lang' in result['csv']
@@ -86,7 +86,7 @@ def test_scalar_main_value_selection_and_false_are_not_treated_as_missing():
         config['vehicles']=config['vehicles'][:1]
         config.update(publish_fields=['soc','direct_charge_enabled'],publish_parameters=[])
         snapshots['car_a'].update(soc=0,direct_charge_enabled=0)
-        rows=selected_copy_rows(config,snapshots)
+        rows=[r for r in selected_copy_rows(config,snapshots) if r['group']=='measurement']
         assert [r['topic'] for r in rows]==['custom_plx/car_a/soc','custom_plx/car_a/direct_charge_enabled']
         assert all(r['available'] and r['value']==0 and r['recognition'] for r in rows)
         assert not any('range_km' in r['topic'] for r in rows)

@@ -48,3 +48,13 @@ test('mapping refresh clears old manual bulk copy before a failed reload',async(
  assert.equal(elements['#copy-bulk-plain'].open,false);
  assert.equal(elements['#copy-feedback'].textContent,'Reload failed');
 });
+
+test('diagnostic bulk selection respects vehicle and global heartbeat filters',()=>{
+ const diagnostics=[{vehicle:'car_a',group:'diagnostic',topic:'plx/car_a/data_valid',label:'Datenfreigabe',value:0,recognition:'MQTT:\\iplx/car_a/data_valid=\\i\\v'},
+ {vehicle:'',group:'diagnostic',topic:'plx/heartbeat',label:'PLX Heartbeat',value:null,recognition:'MQTT:\\iplx/heartbeat=\\i\\v'}];
+ const all=[...rows,...diagnostics],selected=new Set(all.map(r=>r.topic));
+ assert.deepEqual(copy.filter(all,'','__global__',x=>x,'diagnostic'),[diagnostics[1]]);
+ assert.deepEqual(copy.filter(all,'','car_a',x=>x,'diagnostic'),[diagnostics[0]]);
+ assert.equal(copy.lines(copy.filter(all,'','',x=>x,'diagnostic'),selected,'topic').text,'plx/car_a/data_valid\nplx/heartbeat');
+ assert.equal(copy.lines(copy.filter(all,'','__global__',x=>x,'diagnostic'),selected,'recognition').text,diagnostics[1].recognition);
+});
