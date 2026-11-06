@@ -51,7 +51,7 @@ def leaves(value, path=(), result=None):
     else:
         converted,kind,unit=scalar(value)
         if path and not unit:
-            unit={'percent':'%','kilometers':'km','latitude':'°','longitude':'°'}.get(str(path[-1]),'')
+            unit={'percent':'%','kilometers':'km','latitude':'°','longitude':'°','actualPressureBar':'bar','differenceBar':'bar'}.get(str(path[-1]),'')
         result[path_id(path)]={'value':converted,'kind':kind,'unit':unit,'label':' · '.join(map(str,path)) or 'Wert'}
     return result
 
@@ -89,16 +89,20 @@ def flat_topics(prefix, alias, name, parameter):
 
 def export_rows(config,snapshots):
     if config.get('mqtt_format', 'detailed') == 'simple':
-        return [{k:row[k] for k in ('topic','label','unit','kind')} for row in compact_rows(config,snapshots)]
+        return [{**row, 'vehicle': vehicle['alias'], 'measurement': True, 'available': row['value'] is not None}
+                for vehicle in config['vehicles']
+                for row in compact_rows(dict(config, vehicles=[vehicle]), snapshots)]
     from .parameters import READ_MEASUREMENTS
     rows=[]
-    def add(topic,label,unit='',kind='number'):
-        rows.append({'topic':topic,'label':label,'unit':unit,'kind':kind})
+    def add(topic,label,unit='',kind='number',value=None,measurement=False,vehicle=''):
+        rows.append({'topic':topic,'label':label,'unit':unit,'kind':kind,
+                     'value':value,'available':value is not None,'measurement':measurement,'vehicle':vehicle})
     for vehicle in config['vehicles']:
         alias=vehicle['alias'];base=f"{config['mqtt']['prefix']}/{alias}"
+        snapshot=snapshots.get(alias,{})
         for key in config.get('publish_fields',BASE_FIELDS):
             label,unit=BASE_FIELDS[key]
-            add(f'{base}/{key}',f'{alias} · {label}',unit)
+            add(f'{base}/{key}',f'{alias} · {label}',unit,value=snapshot.get(key),measurement=True,vehicle=alias)
             add(f'{base}/{key}_available',f'{alias} · {label} verfügbar','0/1')
         for key,label in HEALTH_FIELDS.items():
             add(f'{base}/{key}',f'{alias} · {label}','Unixzeit' if key.endswith('_epoch') else 's' if key=='data_age_s' else '')
@@ -110,10 +114,33 @@ def export_rows(config,snapshots):
             for field,suffix,unit in [('available','verfügbar','0/1'),('data_valid','gültig','0/1'),('measurement_epoch','Messzeitpunkt','Unixzeit')]:
                 add(f'{group}/{field}',f'{label} · {suffix}',unit)
             for route,field in flat_topics(config['mqtt']['prefix'],alias,name,p):
-                add(route+'/value',label+' · '+field['label'],field['unit'],field['kind'])
+                add(route+'/value',label+' · '+field['label'],field['unit'],field['kind'],
+                    value=field['value'] if field['available'] else None,measurement=True,vehicle=alias)
                 add(route+'/available',label+' · '+field['label']+' verfügbar','0/1')
     add(config['mqtt']['prefix']+'/heartbeat','PLX · Heartbeat','Unixzeit')
     return rows
+
+
+
+def loxone_recognition(row):
+    """One eligibility rule for XML, CSV and individual copy actions."""
+    if row['kind'] != 'number' or len(row['topic'].encode()) + 40 > 220:
+        return None
+    return 'MQTT:\\i' + row['topic'] + '=\\i\\v'
+
+
+def selected_copy_rows(config, snapshots):
+    """Read cached selected measurements using the exporter, never poll/publish."""
+    result = []
+    for row in export_rows(config, snapshots):
+        if not row['measurement']:
+            continue
+        check = loxone_recognition(row)
+        result.append({k: row[k] for k in ('topic', 'label', 'unit', 'kind', 'value', 'available', 'vehicle')} | {
+            'recognition': check,
+            'unsupported': 'text' if row['kind'] != 'number' else 'too_long' if check is None else None,
+        })
+    return result
 
 
 def make_exports(config,snapshots,port=11883,source='',scope='selected'):
@@ -130,10 +157,11 @@ def make_exports(config,snapshots,port=11883,source='',scope='selected'):
     ET.SubElement(root,'Info',templateType='1',minVersion='14051207')
     numeric=0;text=0;too_long=0
     for row in rows:
-        if row['kind']!='number':text+=1;continue
-        # The LoxBerry SDK bundles pairs into 220-character UDP packets.
-        if len(row['topic'].encode())+40>220:too_long+=1;continue
-        check='MQTT:\\i'+row['topic']+'=\\i\\v'
+        check=loxone_recognition(row)
+        if check is None:
+            if row['kind']!='number':text+=1
+            else:too_long+=1
+            continue
         comment=row['topic']+('; Zuletzt gemeldeter Wert; nicht verfügbar: null.' if config.get('mqtt_format')=='simple' else '; Freigabe/Verfügbarkeit und Heartbeat beachten.')
         if row['unit']=='0/1':comment+=' Zustände: open/locked/on/active/connected=1, Gegenwert=0 (je nach Feld).'
         ET.SubElement(root,'VirtualInUdpCmd',Title=row['label'],Comment=comment,Address='',Check=check,Signed='true',Analog='true',SourceValLow='0',DestValLow='0',SourceValHigh='100',DestValHigh='100',DefVal='0',MinVal='-9007199254740991',MaxVal='9007199254740991',Unit='<v>'+(' '+row['unit'] if row['unit'] not in ('0/1','Unixzeit','') else ''),HintText=('Zuletzt gemeldeter Wert; fehlend: null. Messalter in PLX.' if config.get('mqtt_format')=='simple' else 'Unbekannte Werte sind nicht 0. Freigabesignale verwenden.'))
@@ -142,5 +170,5 @@ def make_exports(config,snapshots,port=11883,source='',scope='selected'):
     xml='\ufeff<?xml version="1.0" encoding="utf-8"?>\r\n'+ET.tostring(root,encoding='unicode').replace('\n','\r\n')+'\r\n'
     output=io.StringIO();writer=csv.writer(output,delimiter=';',lineterminator='\r\n')
     writer.writerow(['Topic','Bezeichnung','Einheit','Typ','UDP-Befehlserkennung'])
-    for row in rows:writer.writerow([row['topic'],row['label'],row['unit'],row['kind'],'MQTT:\\i'+row['topic']+'=\\i\\v' if row['kind']=='number' else 'Text: HTTP-Texteingang verwenden'])
+    for row in rows:writer.writerow([row['topic'],row['label'],row['unit'],row['kind'],loxone_recognition(row) or ('Text: HTTP-Texteingang verwenden' if row['kind']!='number' else 'Topic für UDP zu lang')])
     return {'xml':xml,'csv':'\ufeff'+output.getvalue(),'numeric_count':numeric,'text_count':text,'too_long_count':too_long,'port':port,'subscriptions':[config['mqtt']['prefix']+'/#']}

@@ -10,6 +10,36 @@
   'use strict';
   // Presentation-only translations: MQTT keys, saved values and API payloads stay unchanged.
   const messages = {
+  "Ausgewählte Messwerte in Loxone verwenden": "Use selected measurements in Loxone",
+  "Gespeicherte Datenauswahl und zuletzt abgerufene Werte. Kopieren verändert keine Einstellungen und ruft keine Fahrzeugdaten ab.": "Saved data selection and last fetched values. Copying does not change settings or request vehicle data.",
+  "Messwerte durchsuchen": "Search measurements",
+  "Name, Topic oder Wert …": "Name, topic or value …",
+  "Fahrzeug": "Vehicle",
+  "Alle Fahrzeuge": "All vehicles",
+  "Gespeicherte Werte neu laden": "Reload saved values",
+  "Sichtbare auswählen": "Select visible",
+  "Sichtbare abwählen": "Deselect visible",
+  "Ausgewählt / sichtbar:": "Selected / visible:",
+  "MQTT-Topic kopieren": "Copy MQTT topic",
+  "Loxone-Erkennung kopieren": "Copy Loxone recognition",
+  "Klartext anzeigen / manuell kopieren": "Show plain text / copy manually",
+  "Loxone-Erkennung": "Loxone recognition",
+  "Topic für numerische UDP-Erkennung zu lang.": "Topic too long for numeric UDP recognition.",
+  "Für diesen Werttyp gibt es keine numerische UDP-Erkennung.": "No numeric UDP recognition is available for this value type.",
+  "Keine passenden Messwerte.": "No matching measurements.",
+  "Keine gespeicherten Messwerte ausgewählt oder noch keine exportierbaren Felder bekannt.": "No saved measurements selected or no exportable fields known yet.",
+  "Ausgewählte MQTT-Topics kopieren": "Copy selected MQTT topics",
+  "Ausgewählte Loxone-Erkennungen kopieren": "Copy selected Loxone recognitions",
+  "Mehrfachkopie berücksichtigt die sichtbare Auswahl: ein Eintrag pro Zeile. Nicht unterstützte Erkennungen werden ausgelassen. Verfügbarkeit bedeutet nicht, dass der Messwert aktuell ist; Messalter und Freigaben weiterhin beachten.": "Bulk copy uses the visible selection: one entry per line. Unsupported recognitions are omitted. Availability does not mean the value is current; continue to check measurement age and validity signals.",
+  "Mehrfachkopie als Klartext": "Bulk copy as plain text",
+  "Zum manuellen Kopieren": "For manual copying",
+  "Kopiert": "Copied",
+  "Bitte den markierten Klartext manuell kopieren.": "Please copy the selected plain text manually.",
+  "Gespeicherte Werte werden geladen …": "Loading saved values …",
+  "Nicht unterstützte Erkennungen wurden ausgelassen.": "Unsupported recognitions were omitted.",
+  "Verfügbar": "Available",
+  "MQTT-Topic": "MQTT topic",
+
   "Bitte PLX über HTTPS öffnen. Anmeldung und Speichern sind über HTTP gesperrt.": "Please open PLX over HTTPS. Sign-in and saving are blocked over HTTP.",
   "Einfaches MQTT sendet den zuletzt gemeldeten Wert ohne Altersfreigabe; fehlende Werte sind null. Das Messalter siehst du in PLX.": "Simple MQTT sends the last reported value without a freshness signal; missing values are null. Check measurement age in PLX.",
   "Im ausführlichen MQTT-Format melden data_valid und available die Freigabe. Auch ein neuer Cloud-Abruf kann alte Fahrzeugdaten liefern.": "Detailed MQTT provides data_valid and available signals. A new cloud fetch can still return old vehicle data.",
@@ -413,6 +443,26 @@
   translate();observe();
 })();
 
+// Selected-copy helpers consume server mappings; never construct MQTT routes.
+/* PLX_COPY_HELPERS_START */
+const PLXCopy = (() => {
+  const normalize = value => String(value).toLowerCase().replaceAll('ß','ss').normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+  function filter(rows, query, vehicle, translate = value => value) {
+    const words=normalize(query).trim().split(/\s+/).filter(Boolean);
+    return rows.filter(row=>(!vehicle||row.vehicle===vehicle)&&words.every(word=>normalize([row.label,translate(row.label),row.topic,JSON.stringify(row.value),row.unit].join(' ')).includes(word)));
+  }
+  function lines(rows, selected, kind) {
+    const chosen=rows.filter(row=>selected.has(row.topic));
+    const usable=chosen.map(row=>kind==='recognition'?row.recognition:row.topic).filter(Boolean);
+    return {text:usable.join('\n'),skipped:chosen.length-usable.length};
+  }
+  async function write(text, clipboard) {
+    try {if(!clipboard?.writeText)return false;await clipboard.writeText(text);return true;} catch (_) {return false;}
+  }
+  return {filter,lines,write};
+})();
+/* PLX_COPY_HELPERS_END */
+
 (() => {
   'use strict';
   const root = document.querySelector('#p2l');
@@ -568,6 +618,7 @@
     applyParameterFilters();
     renderPublishSelection();
     $('#subscription').value = exportSubscriptions().join('\n');
+    refreshCopyRows();
   }
   const parameterNames = {percent:'Akkustand',kilometers:'Kilometer',lastModified:'Messzeitpunkt',chargingPower:'Ladeleistung',chargingPowerkW:'Ladeleistung',maxChargingPowerkW:'Maximale Ladeleistung',chargingRate:'Ladegeschwindigkeit',chargingRatekmPerMin:'Ladegeschwindigkeit',targetSoC:'Ladeziel',targetSoc:'Ladeziel',mode:'Modus',state:'Zustand',status:'Status',latitude:'Breitengrad',longitude:'Längengrad',actualPressureBar:'Reifendruck',differenceBar:'Abweichung',pressure:'Druck',temperature:'Temperatur',targetTemperature:'Zieltemperatur',isOpen:'Geöffnet',isLocked:'Verriegelt',isOn:'Eingeschaltet',isEnabled:'Aktiviert',value:'Wert',unit:'Einheit'};
   const parameterStates = {CHARGING:'Lädt',DIRECT:'Direktladen',NORMAL:'Normal',OFF:'Aus',ON:'An',LOCK:'Verriegeln',HIDDEN:'Nicht eingeblendet',NOT_AVAILABLE:'Nicht verfügbar',AC:'AC',DC:'DC'};
@@ -720,10 +771,77 @@
       const aliasLabel = node('label', 'Technischer Name für Loxone/MQTT (z. B. taycan)'); aliasLabel.append(alias); div.append(label, aliasLabel); select.append(div);
     });
   }
+  let copyRows=[],copyKey='',copyGeneration=0,copySelection=new Set();
+  function visibleCopyRows() {
+    return PLXCopy.filter(copyRows,$('#copy-search').value,$('#copy-vehicle').value,window.PLXLanguage.english);
+  }
+  function copyCount() {
+    const rows=visibleCopyRows();
+    $('#copy-count').textContent=`${rows.filter(row=>copySelection.has(row.topic)).length} / ${rows.length}`;
+    $('#copy-topics').disabled=!rows.some(row=>copySelection.has(row.topic));
+    $('#copy-recognitions').disabled=!rows.some(row=>copySelection.has(row.topic)&&row.recognition);
+  }
+  function showCopyText(text, area) {
+    const details=area.closest('details');if(details)details.open=true;
+    area.value=text;area.focus();area.select();
+  }
+  async function copyMapped(text, area) {
+    if(!text)return;
+    const copied=await PLXCopy.write(text,navigator.clipboard);
+    if(!copied)showCopyText(text,area.isConnected?area:$('#copy-bulk-text'));
+    $('#copy-feedback').textContent=copied?'Kopiert':'Bitte den markierten Klartext manuell kopieren.';
+  }
+  function renderCopyRows() {
+    const list=$('#copy-rows'),opened=new Set([...list.querySelectorAll('details[open]')].map(n=>n.dataset.topic));
+    list.replaceChildren();
+    for(const row of visibleCopyRows()) {
+      const card=node('article',undefined,'copy-row');
+      const title=row.label.split(' · ').map(part=>parameterNames[part]||part).join(' · ');
+      const choice=node('label',undefined,'copy-choice'),check=node('input');check.type='checkbox';check.checked=copySelection.has(row.topic);check.setAttribute('aria-label',title);check.dataset.copyTopic=row.topic;
+      check.addEventListener('change',()=>{if(check.checked)copySelection.add(row.topic);else copySelection.delete(row.topic);copyCount();});choice.append(check,node('strong',title));
+      const current=node('div',undefined,'copy-current');current.append(node('span',!row.available?'—':(typeof row.value==='object'?JSON.stringify(row.value):parameterValue(row.value))+(row.unit?' '+row.unit:'')),node('small',row.available?'Verfügbar':'Nicht verfügbar','hint'));
+      const actions=node('div',undefined,'copy-actions'),topic=node('button','MQTT-Topic kopieren','secondary'),recognition=node('button','Loxone-Erkennung kopieren','secondary');topic.type=recognition.type='button';recognition.disabled=!row.recognition;
+      const details=node('details',undefined,'copy-plain');details.dataset.topic=row.topic;details.open=opened.has(row.topic);details.append(node('summary','Klartext anzeigen / manuell kopieren'));
+      function plain(label,value) {const wrapper=node('label',label),area=node('textarea');area.readOnly=true;area.rows=2;area.value=value;area.spellcheck=false;area.addEventListener('focus',()=>area.select());wrapper.append(area);details.append(wrapper);return area;}
+      const topicText=plain('MQTT-Topic',row.topic),recognitionText=row.recognition?plain('Loxone-Erkennung',row.recognition):null;
+      if(!row.recognition)details.append(node('p',row.unsupported==='too_long'?'Topic für numerische UDP-Erkennung zu lang.':'Für diesen Werttyp gibt es keine numerische UDP-Erkennung.','hint'));
+      topic.addEventListener('click',()=>copyMapped(row.topic,topicText));recognition.addEventListener('click',()=>copyMapped(row.recognition,recognitionText));
+      actions.append(topic,recognition);card.append(choice,current,actions,details);list.append(card);
+    }
+    if(!list.children.length)list.append(node('p',copyRows.length?'Keine passenden Messwerte.':'Keine gespeicherten Messwerte ausgewählt oder noch keine exportierbaren Felder bekannt.','hint'));
+    copyCount();
+  }
+  async function refreshCopyRows(force=false) {
+    if(!state||!$('#loxone').classList.contains('active'))return;
+    const key=JSON.stringify([state.config.mqtt.prefix,state.config.mqtt_format,state.config.vehicles,state.config.publish_fields,state.config.publish_parameters,Object.entries(state.snapshots||{}).map(([alias,s])=>[alias,s.last_fetch_epoch])]);
+    if(!force&&key===copyKey)return;
+    // A changed saved configuration must not leave old routes available to copy.
+    const generation=++copyGeneration;copyKey=key;copyRows=[];
+    $('#copy-bulk-text').value='';$('#copy-bulk-plain').open=false;$('#copy-feedback').textContent='';
+    $('#copy-rows').replaceChildren(node('p','Gespeicherte Werte werden geladen …','hint'));copyCount();$('#copy-feedback').textContent='';
+    try {
+      const result=await api('loxone_export',{rows_only:true});if(generation!==copyGeneration)return;
+      copyRows=result.rows;copySelection=new Set([...copySelection].filter(topic=>copyRows.some(row=>row.topic===topic)));
+      const vehicle=$('#copy-vehicle'),previous=vehicle.value;vehicle.replaceChildren(node('option','Alle Fahrzeuge'));vehicle.firstChild.value='';
+      for(const alias of new Set(copyRows.map(row=>row.vehicle))){const option=node('option',alias);option.value=alias;vehicle.append(option);}vehicle.value=[...vehicle.options].some(n=>n.value===previous)?previous:'';
+      renderCopyRows();$('#copy-feedback').textContent='';
+    } catch(error) {if(generation===copyGeneration){copyKey='';$('#copy-feedback').textContent=error.message;}}
+  }
+  $('#copy-bulk-text').addEventListener('focus',event=>event.target.select());
+  $('#copy-search').addEventListener('input',renderCopyRows);$('#copy-vehicle').addEventListener('change',renderCopyRows);
+  $('#copy-refresh').addEventListener('click',()=>refreshCopyRows(true));
+  for(const [id,checked] of [['copy-select-visible',true],['copy-clear-visible',false]])$('#'+id).addEventListener('click',()=>{for(const row of visibleCopyRows()){if(checked)copySelection.add(row.topic);else copySelection.delete(row.topic);}renderCopyRows();});
+  for(const [id,kind] of [['copy-topics','topic'],['copy-recognitions','recognition']])$('#'+id).addEventListener('click',async()=>{
+    const result=PLXCopy.lines(visibleCopyRows(),copySelection,kind);if(!result.text)return;
+    $('#copy-bulk-text').value=result.text;await copyMapped(result.text,$('#copy-bulk-text'));
+    if(result.skipped)$('#copy-feedback').append(document.createTextNode(' · '),node('span','Nicht unterstützte Erkennungen wurden ausgelassen.'));
+  });
+
   function openTab(id) {
     root.querySelectorAll('.tab,.panel').forEach(n => n.classList.remove('active'));
     root.querySelector(`.tab[data-tab="${id}"]`).classList.add('active');
     $(`#${id}`).classList.add('active');
+    if(id==='loxone')refreshCopyRows();
   }
   root.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => openTab(button.dataset.tab)));
   $('#show-login').addEventListener('click', () => {loginExpanded = !loginExpanded; render();});
@@ -760,6 +878,6 @@
   $('#export').addEventListener('click',()=>downloadLoxone('csv'));
   $('#export-xml').addEventListener('click',()=>downloadLoxone('xml'));
   async function update() {try {if (!pending) {state = await api('status'); render();}} catch(error) {notice(error.message, 'error');} finally {setTimeout(update, 3000);}}
-  window.addEventListener('plx-language',()=>{render();window.PLXLanguage.translate();});
+  window.addEventListener('plx-language',()=>{render();renderCopyRows();window.PLXLanguage.translate();});
   update();
 })();

@@ -14,7 +14,7 @@ from pathlib import Path
 
 from .core import DEFAULTS, FIELDS, DataError, parse_overview, read_json, refresh_age, validate_config, write_private
 from .mqtt import messages, publish, selection_deletions, selection_routes, BrokerMonitor, failure_code
-from .loxone import enrich_schema, make_exports
+from .loxone import enrich_schema, make_exports, selected_copy_rows
 from .parameters import READ_MEASUREMENTS, LABELS, category
 from .compact import compact_rows
 from .porsche import Porsche, SessionExpired
@@ -310,6 +310,8 @@ class Service:
             params = request.get('params', {})
             if not isinstance(params, dict):
                 raise ValueError('Ungültige Exportanfrage.')
+            if params.get('rows_only') is True:
+                return {'rows': selected_copy_rows(self.config, self.snapshots)}
             return make_exports(self.config, self.snapshots, params.get('port',11883), params.get('source',''),params.get('scope','selected'))
         if request.get("action", "status") == "status":
             return self.view()
