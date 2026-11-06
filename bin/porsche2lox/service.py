@@ -311,7 +311,7 @@ class Service:
             if not isinstance(params, dict):
                 raise ValueError('Ungültige Exportanfrage.')
             if params.get('rows_only') is True:
-                return {'rows': selected_copy_rows(self.config, self.snapshots)}
+                return {'rows': selected_copy_rows(self.config, self.view()['snapshots'])}
             return make_exports(self.config, self.snapshots, params.get('port',11883), params.get('source',''),params.get('scope','selected'))
         if request.get("action", "status") == "status":
             return self.view()

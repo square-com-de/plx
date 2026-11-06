@@ -323,7 +323,7 @@ body.porsche2lox-page #p2l{max-width:100%;padding:0 6px}
 @media(max-width:700px){#p2l .connection-lines{align-items:flex-start;min-width:0}}
 
 /* Saved measurement mapping, shared by Docker and LoxBerry. */
-#p2l .copy-filters{display:grid;grid-template-columns:minmax(0,2fr) minmax(140px,1fr) auto;gap:12px;align-items:end}
+#p2l .copy-filters{display:grid;grid-template-columns:minmax(0,2fr) minmax(110px,1fr) minmax(160px,1fr);gap:12px;align-items:end}
 #p2l .copy-filters label{margin:0}
 #p2l .copy-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,180px) auto;gap:12px;align-items:center;background:#f3f3f4;padding:14px;border-radius:8px;margin:10px 0}
 #p2l .copy-choice{display:flex;align-items:center;gap:10px;margin:0;min-width:0}
@@ -350,3 +350,5 @@ body.porsche2lox-page #p2l{max-width:100%;padding:0 6px}
   #p2l .copy-actions button{flex:1 1 160px}
   #p2l .copy-current{margin-left:28px}
 }
+
+#p2l .copy-group-title{font-size:13px;margin:18px 0 8px;color:var(--muted)}

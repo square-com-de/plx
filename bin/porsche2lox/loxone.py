@@ -103,20 +103,20 @@ def export_rows(config,snapshots):
         for key in config.get('publish_fields',BASE_FIELDS):
             label,unit=BASE_FIELDS[key]
             add(f'{base}/{key}',f'{alias} · {label}',unit,value=snapshot.get(key),measurement=True,vehicle=alias)
-            add(f'{base}/{key}_available',f'{alias} · {label} verfügbar','0/1')
+            add(f'{base}/{key}_available',f'{alias} · {label} verfügbar','0/1',vehicle=alias)
         for key,label in HEALTH_FIELDS.items():
-            add(f'{base}/{key}',f'{alias} · {label}','Unixzeit' if key.endswith('_epoch') else 's' if key=='data_age_s' else '')
+            add(f'{base}/{key}',f'{alias} · {label}','Unixzeit' if key.endswith('_epoch') else 's' if key=='data_age_s' else '',vehicle=alias)
         parameters=snapshots.get(alias,{}).get('parameters',{})
         for name in config.get('publish_parameters',READ_MEASUREMENTS):
             p=parameters.get(name,{})
             label=f"{alias} · {p.get('label',name)}"
             group=f'{base}/parameters/{name.lower()}'
             for field,suffix,unit in [('available','verfügbar','0/1'),('data_valid','gültig','0/1'),('measurement_epoch','Messzeitpunkt','Unixzeit')]:
-                add(f'{group}/{field}',f'{label} · {suffix}',unit)
+                add(f'{group}/{field}',f'{label} · {suffix}',unit,vehicle=alias)
             for route,field in flat_topics(config['mqtt']['prefix'],alias,name,p):
                 add(route+'/value',label+' · '+field['label'],field['unit'],field['kind'],
                     value=field['value'] if field['available'] else None,measurement=True,vehicle=alias)
-                add(route+'/available',label+' · '+field['label']+' verfügbar','0/1')
+                add(route+'/available',label+' · '+field['label']+' verfügbar','0/1',vehicle=alias)
     add(config['mqtt']['prefix']+'/heartbeat','PLX · Heartbeat','Unixzeit')
     return rows
 
@@ -130,17 +130,43 @@ def loxone_recognition(row):
 
 
 def selected_copy_rows(config, snapshots):
-    """Read cached selected measurements using the exporter, never poll/publish."""
+    """Copy exporter rows that the selected publisher format actually emits."""
+    detailed = config.get('mqtt_format', 'detailed') != 'simple'
+    payloads = {}
+    if detailed:
+        # Use the publisher's pure routing/serialization helper, never a broker.
+        from .mqtt import messages
+        for vehicle in config['vehicles']:
+            payloads.update(messages(config['mqtt']['prefix'], vehicle['alias'],
+                                     snapshots.get(vehicle['alias'], {}),
+                                     config.get('publish_parameters'), config.get('publish_fields')))
     result = []
+    heartbeat = config['mqtt']['prefix'] + '/heartbeat'
     for row in export_rows(config, snapshots):
-        if not row['measurement']:
+        global_heartbeat = detailed and row['topic'] == heartbeat
+        if detailed and row['topic'] not in payloads and not global_heartbeat:
             continue
         check = loxone_recognition(row)
-        result.append({k: row[k] for k in ('topic', 'label', 'unit', 'kind', 'value', 'available', 'vehicle')} | {
+        value = row['value']
+        if detailed and not row['measurement']:
+            # Diagnostic values are the publisher's cached numeric payloads.
+            # No timestamp is invented for the heartbeat: its last sent value
+            # is not retained in PLX's cache (last_mqtt also includes failures).
+            raw = payloads.get(row['topic'], '')
+            try:
+                value = float(raw) if '.' in raw else int(raw)
+                if not math.isfinite(value): value = None
+            except (ValueError, TypeError, OverflowError):
+                value = None
+        result.append({k: row[k] for k in ('topic', 'label', 'unit', 'kind')} | {
+            'value': value, 'available': value is not None,
+            'vehicle': row['vehicle'],
+            'group': 'measurement' if row['measurement'] else 'diagnostic',
+            'value_note': 'heartbeat_not_cached' if global_heartbeat else None,
             'recognition': check,
             'unsupported': 'text' if row['kind'] != 'number' else 'too_long' if check is None else None,
         })
-    return result
+    return sorted(result, key=lambda row: row['group'] == 'diagnostic')
 
 
 def make_exports(config,snapshots,port=11883,source='',scope='selected'):

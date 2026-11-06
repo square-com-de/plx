@@ -10,6 +10,30 @@
   'use strict';
   // Presentation-only translations: MQTT keys, saved values and API payloads stay unchanged.
   const messages = {
+  "Dieses MQTT-Format sendet keine Diagnosesignale.": "This MQTT format does not send diagnostic signals.",
+  "Messwerte und Diagnose in Loxone verwenden": "Use measurements and diagnostics in Loxone",
+  "Einfaches Format: Diagnose- und Freigabesignale sowie Heartbeat werden nicht gesendet. Dafür unter Ausgabeoptionen „Ausführliche Daten + Diagnose“ wählen und die Datenauswahl speichern.": "Simple format: diagnostic and validity signals and heartbeat are not sent. To use them, choose “Detailed data + diagnostics” in the output options and save the data selection.",
+  "Ausführliches Format: Diagnose- und Freigabesignale sind kopierbar. Werte stammen aus dem aktuellen PLX-Cache, nicht aus einem neuen Fahrzeugabruf.": "Detailed format: diagnostic and validity signals can be copied. Values come from the current PLX cache, not a new vehicle fetch.",
+  "Ausgabeoptionen anzeigen": "Show output options",
+  "Bereich": "Category",
+  "Alle Bereiche": "All categories",
+  "Messwerte": "Measurements",
+  "Diagnose & Freigaben": "Diagnostics & validity",
+  "Global · ohne Fahrzeug": "Global · no vehicle",
+  "Kein gespeicherter Sendewert": "No cached sent value",
+  "Der globale Heartbeat wird im ausführlichen Format gesendet. Sein letzter Sendewert wird nicht im Cache gespeichert.": "The global heartbeat is sent in detailed format. Its last sent value is not stored in the cache.",
+  "Diagnose- und Überwachungssignale gibt es nur im ausführlichen MQTT-Format.": "Diagnostic and monitoring signals are only sent in detailed MQTT format.",
+  "Dieses eine Abonnement empfängt alle PLX-Nachrichten. Welche Fahrzeugwerte gesendet werden, bestimmst du oben mit den Häkchen. Diagnose- und Überwachungssignale gibt es nur im ausführlichen MQTT-Format.": "This subscription receives all PLX messages. Use the checkboxes above to select vehicle values. Diagnostic and monitoring signals are only sent in detailed MQTT format.",
+  "Datenfreigabe": "Data validity",
+  "API erreichbar": "API reachable",
+  "Fehlercode": "Error code",
+  "Messalter": "Measurement age",
+  "Messalter bekannt": "Measurement age known",
+  "Letzter Abruf": "Last fetch",
+  "verfügbar": "available",
+  "gültig": "valid",
+  "Nur angehakte Fahrzeugwerte werden gesendet. Diagnose und Überwachung gibt es nur im ausführlichen Format.": "Only checked vehicle values are sent. Diagnostics and monitoring are available only in detailed format.",
+
   "Ausgewählte Messwerte in Loxone verwenden": "Use selected measurements in Loxone",
   "Gespeicherte Datenauswahl und zuletzt abgerufene Werte. Kopieren verändert keine Einstellungen und ruft keine Fahrzeugdaten ab.": "Saved data selection and last fetched values. Copying does not change settings or request vehicle data.",
   "Messwerte durchsuchen": "Search measurements",
@@ -447,9 +471,9 @@
 /* PLX_COPY_HELPERS_START */
 const PLXCopy = (() => {
   const normalize = value => String(value).toLowerCase().replaceAll('ß','ss').normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
-  function filter(rows, query, vehicle, translate = value => value) {
+  function filter(rows, query, vehicle, translate = value => value, group = '') {
     const words=normalize(query).trim().split(/\s+/).filter(Boolean);
-    return rows.filter(row=>(!vehicle||row.vehicle===vehicle)&&words.every(word=>normalize([row.label,translate(row.label),row.topic,JSON.stringify(row.value),row.unit].join(' ')).includes(word)));
+    return rows.filter(row=>(!vehicle||(vehicle==='__global__'?row.vehicle==='':row.vehicle===vehicle))&&(!group||(row.group||'measurement')===group)&&words.every(word=>normalize([row.label,translate(row.label),row.topic,JSON.stringify(row.value),row.unit].join(' ')).includes(word)));
   }
   function lines(rows, selected, kind) {
     const chosen=rows.filter(row=>selected.has(row.topic));
@@ -773,7 +797,7 @@ const PLXCopy = (() => {
   }
   let copyRows=[],copyKey='',copyGeneration=0,copySelection=new Set();
   function visibleCopyRows() {
-    return PLXCopy.filter(copyRows,$('#copy-search').value,$('#copy-vehicle').value,window.PLXLanguage.english);
+    return PLXCopy.filter(copyRows,$('#copy-search').value,$('#copy-vehicle').value,window.PLXLanguage.english,$('#copy-kind').value);
   }
   function copyCount() {
     const rows=visibleCopyRows();
@@ -792,28 +816,37 @@ const PLXCopy = (() => {
     $('#copy-feedback').textContent=copied?'Kopiert':'Bitte den markierten Klartext manuell kopieren.';
   }
   function renderCopyRows() {
+    if(!state)return;
+    const simple=(state.config.mqtt_format||'detailed')==='simple';
+    $('#copy-diagnostic-help').textContent=simple?'Einfaches Format: Diagnose- und Freigabesignale sowie Heartbeat werden nicht gesendet. Dafür unter Ausgabeoptionen „Ausführliche Daten + Diagnose“ wählen und die Datenauswahl speichern.':'Ausführliches Format: Diagnose- und Freigabesignale sind kopierbar. Werte stammen aus dem aktuellen PLX-Cache, nicht aus einem neuen Fahrzeugabruf.';
+    $('#copy-format-options').hidden=!simple;
     const list=$('#copy-rows'),opened=new Set([...list.querySelectorAll('details[open]')].map(n=>n.dataset.topic));
     list.replaceChildren();
+    let group='';
     for(const row of visibleCopyRows()) {
+      const category=row.group||'measurement';
+      if(group!==category){group=category;list.append(node('h4',group==='diagnostic'?'Diagnose & Freigaben':'Messwerte','copy-group-title'));}
       const card=node('article',undefined,'copy-row');
       const title=row.label.split(' · ').map(part=>parameterNames[part]||part).join(' · ');
       const choice=node('label',undefined,'copy-choice'),check=node('input');check.type='checkbox';check.checked=copySelection.has(row.topic);check.setAttribute('aria-label',title);check.dataset.copyTopic=row.topic;
       check.addEventListener('change',()=>{if(check.checked)copySelection.add(row.topic);else copySelection.delete(row.topic);copyCount();});choice.append(check,node('strong',title));
-      const current=node('div',undefined,'copy-current');current.append(node('span',!row.available?'—':(typeof row.value==='object'?JSON.stringify(row.value):parameterValue(row.value))+(row.unit?' '+row.unit:'')),node('small',row.available?'Verfügbar':'Nicht verfügbar','hint'));
+      const current=node('div',undefined,'copy-current');current.append(node('span',!row.available?'—':(typeof row.value==='object'?JSON.stringify(row.value):parameterValue(row.value))+(row.unit?' '+row.unit:'')),node('small',row.value_note==='heartbeat_not_cached'?'Kein gespeicherter Sendewert':row.available?'Verfügbar':'Nicht verfügbar','hint'));
+      if(row.vehicle==='')current.append(node('small','Global · ohne Fahrzeug','hint'));
       const actions=node('div',undefined,'copy-actions'),topic=node('button','MQTT-Topic kopieren','secondary'),recognition=node('button','Loxone-Erkennung kopieren','secondary');topic.type=recognition.type='button';recognition.disabled=!row.recognition;
       const details=node('details',undefined,'copy-plain');details.dataset.topic=row.topic;details.open=opened.has(row.topic);details.append(node('summary','Klartext anzeigen / manuell kopieren'));
       function plain(label,value) {const wrapper=node('label',label),area=node('textarea');area.readOnly=true;area.rows=2;area.value=value;area.spellcheck=false;area.addEventListener('focus',()=>area.select());wrapper.append(area);details.append(wrapper);return area;}
       const topicText=plain('MQTT-Topic',row.topic),recognitionText=row.recognition?plain('Loxone-Erkennung',row.recognition):null;
+      if(row.value_note==='heartbeat_not_cached')details.append(node('p','Der globale Heartbeat wird im ausführlichen Format gesendet. Sein letzter Sendewert wird nicht im Cache gespeichert.','hint'));
       if(!row.recognition)details.append(node('p',row.unsupported==='too_long'?'Topic für numerische UDP-Erkennung zu lang.':'Für diesen Werttyp gibt es keine numerische UDP-Erkennung.','hint'));
       topic.addEventListener('click',()=>copyMapped(row.topic,topicText));recognition.addEventListener('click',()=>copyMapped(row.recognition,recognitionText));
       actions.append(topic,recognition);card.append(choice,current,actions,details);list.append(card);
     }
-    if(!list.children.length)list.append(node('p',copyRows.length?'Keine passenden Messwerte.':'Keine gespeicherten Messwerte ausgewählt oder noch keine exportierbaren Felder bekannt.','hint'));
+    if(!visibleCopyRows().length)list.append(node('p',simple&&$('#copy-kind').value==='diagnostic'?'Dieses MQTT-Format sendet keine Diagnosesignale.':copyRows.length?'Keine passenden Messwerte.':'Keine gespeicherten Messwerte ausgewählt oder noch keine exportierbaren Felder bekannt.','hint'));
     copyCount();
   }
   async function refreshCopyRows(force=false) {
     if(!state||!$('#loxone').classList.contains('active'))return;
-    const key=JSON.stringify([state.config.mqtt.prefix,state.config.mqtt_format,state.config.vehicles,state.config.publish_fields,state.config.publish_parameters,Object.entries(state.snapshots||{}).map(([alias,s])=>[alias,s.last_fetch_epoch])]);
+    const key=JSON.stringify([state.config.mqtt.prefix,state.config.mqtt_format,state.config.vehicles,state.config.publish_fields,state.config.publish_parameters,Object.entries(state.snapshots||{}).map(([alias,s])=>[alias,s.last_fetch_epoch,s.data_valid,s.api_ok,s.auth_required,s.error_code,s.age_known])]);
     if(!force&&key===copyKey)return;
     // A changed saved configuration must not leave old routes available to copy.
     const generation=++copyGeneration;copyKey=key;copyRows=[];
@@ -823,11 +856,13 @@ const PLXCopy = (() => {
       const result=await api('loxone_export',{rows_only:true});if(generation!==copyGeneration)return;
       copyRows=result.rows;copySelection=new Set([...copySelection].filter(topic=>copyRows.some(row=>row.topic===topic)));
       const vehicle=$('#copy-vehicle'),previous=vehicle.value;vehicle.replaceChildren(node('option','Alle Fahrzeuge'));vehicle.firstChild.value='';
-      for(const alias of new Set(copyRows.map(row=>row.vehicle))){const option=node('option',alias);option.value=alias;vehicle.append(option);}vehicle.value=[...vehicle.options].some(n=>n.value===previous)?previous:'';
+      for(const alias of new Set(copyRows.map(row=>row.vehicle))){const option=node('option',alias||'Global · ohne Fahrzeug');option.value=alias||'__global__';vehicle.append(option);}vehicle.value=[...vehicle.options].some(n=>n.value===previous)?previous:'';
       renderCopyRows();$('#copy-feedback').textContent='';
     } catch(error) {if(generation===copyGeneration){copyKey='';$('#copy-feedback').textContent=error.message;}}
   }
   $('#copy-bulk-text').addEventListener('focus',event=>event.target.select());
+  $('#copy-kind').addEventListener('change',renderCopyRows);
+  $('#copy-format-options').addEventListener('click',()=>{const options=$('.mqtt-advanced');options.open=true;options.scrollIntoView({block:'center',behavior:'smooth'});});
   $('#copy-search').addEventListener('input',renderCopyRows);$('#copy-vehicle').addEventListener('change',renderCopyRows);
   $('#copy-refresh').addEventListener('click',()=>refreshCopyRows(true));
   for(const [id,checked] of [['copy-select-visible',true],['copy-clear-visible',false]])$('#'+id).addEventListener('click',()=>{for(const row of visibleCopyRows()){if(checked)copySelection.add(row.topic);else copySelection.delete(row.topic);}renderCopyRows();});
