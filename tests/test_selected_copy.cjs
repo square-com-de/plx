@@ -58,3 +58,12 @@ test('diagnostic bulk selection respects vehicle and global heartbeat filters',(
  assert.equal(copy.lines(copy.filter(all,'','',x=>x,'diagnostic'),selected,'topic').text,'plx/car_a/data_valid\nplx/heartbeat');
  assert.equal(copy.lines(copy.filter(all,'','__global__',x=>x,'diagnostic'),selected,'recognition').text,diagnostics[1].recognition);
 });
+
+test('copy filters and language event are safe before initial status loads',()=>{
+ const script=fs.readFileSync(path.join(__dirname,'../webfrontend/htmlauth/app.js'),'utf8');
+ const render=script.slice(script.indexOf('  function renderCopyRows() {'),script.indexOf('  async function refreshCopyRows('));
+ for(const state of [null,undefined]){
+  const run=new Function('state','$',render+';return renderCopyRows;')(state,()=>{throw Error('DOM must not be accessed before status');});
+  assert.doesNotThrow(()=>run());
+ }
+});

@@ -816,6 +816,7 @@ const PLXCopy = (() => {
     $('#copy-feedback').textContent=copied?'Kopiert':'Bitte den markierten Klartext manuell kopieren.';
   }
   function renderCopyRows() {
+    if(!state)return;
     const simple=(state.config.mqtt_format||'detailed')==='simple';
     $('#copy-diagnostic-help').textContent=simple?'Einfaches Format: Diagnose- und Freigabesignale sowie Heartbeat werden nicht gesendet. Dafür unter Ausgabeoptionen „Ausführliche Daten + Diagnose“ wählen und die Datenauswahl speichern.':'Ausführliches Format: Diagnose- und Freigabesignale sind kopierbar. Werte stammen aus dem aktuellen PLX-Cache, nicht aus einem neuen Fahrzeugabruf.';
     $('#copy-format-options').hidden=!simple;
