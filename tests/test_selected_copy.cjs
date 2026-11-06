@@ -21,3 +21,30 @@ test('clipboard success, rejection and missing API report whether manual fallbac
  assert.equal(await copy.write('topic',undefined),false);
  assert.equal(await copy.write('topic',{writeText:async()=>{throw Error('denied')}}),false);
 });
+
+test('mapping refresh clears old manual bulk copy before a failed reload',async()=>{
+ const script=fs.readFileSync(path.join(__dirname,'../webfrontend/htmlauth/app.js'),'utf8');
+ const refresh=script.slice(script.indexOf('  async function refreshCopyRows('),script.indexOf("  $('#copy-bulk-text').addEventListener"));
+ const elements={
+  '#loxone':{classList:{contains:()=>true}},
+  '#copy-bulk-text':{value:'MQTT:\\iold/car/value=\\i\\v'},
+  '#copy-bulk-plain':{open:true},
+  '#copy-feedback':{textContent:'Kopiert'},
+  '#copy-rows':{replaceChildren:()=>{}},
+ };
+ const state={config:{mqtt:{prefix:'new_prefix'},mqtt_format:'simple',vehicles:[{alias:'new_car'}],publish_fields:['soc'],publish_parameters:[]},snapshots:{}};
+ let rejectReload,requested=false;
+ const api=()=>{requested=true;return new Promise((_,reject)=>rejectReload=reject);};
+ const run=new Function('state','$','api','node','copyCount',
+  "let copyKey='old_mapping',copyGeneration=0,copyRows=['old'];"+refresh+';return refreshCopyRows;')
+  (state,id=>elements[id],api,()=>({}),()=>{});
+ const pending=run();
+ assert.equal(requested,true);
+ assert.equal(elements['#copy-bulk-text'].value,'');
+ assert.equal(elements['#copy-bulk-plain'].open,false);
+ assert.equal(elements['#copy-feedback'].textContent,'');
+ rejectReload(new Error('Reload failed'));await pending;
+ assert.equal(elements['#copy-bulk-text'].value,'');
+ assert.equal(elements['#copy-bulk-plain'].open,false);
+ assert.equal(elements['#copy-feedback'].textContent,'Reload failed');
+});

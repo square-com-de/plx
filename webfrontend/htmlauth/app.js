@@ -816,7 +816,9 @@ const PLXCopy = (() => {
     const key=JSON.stringify([state.config.mqtt.prefix,state.config.mqtt_format,state.config.vehicles,state.config.publish_fields,state.config.publish_parameters,Object.entries(state.snapshots||{}).map(([alias,s])=>[alias,s.last_fetch_epoch])]);
     if(!force&&key===copyKey)return;
     // A changed saved configuration must not leave old routes available to copy.
-    const generation=++copyGeneration;copyKey=key;copyRows=[];$('#copy-rows').replaceChildren(node('p','Gespeicherte Werte werden geladen …','hint'));copyCount();$('#copy-feedback').textContent='';
+    const generation=++copyGeneration;copyKey=key;copyRows=[];
+    $('#copy-bulk-text').value='';$('#copy-bulk-plain').open=false;$('#copy-feedback').textContent='';
+    $('#copy-rows').replaceChildren(node('p','Gespeicherte Werte werden geladen …','hint'));copyCount();$('#copy-feedback').textContent='';
     try {
       const result=await api('loxone_export',{rows_only:true});if(generation!==copyGeneration)return;
       copyRows=result.rows;copySelection=new Set([...copySelection].filter(topic=>copyRows.some(row=>row.topic===topic)));
