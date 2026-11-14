@@ -64,46 +64,52 @@ Diese Anleitung gilt für **Ausführliche Daten + Diagnose / Detailed data + dia
 - **MQTT2LOX direkt:** Als Subscribe-Topic ausschließlich beispielsweise `porsche2lox/taycan/error_code` eintragen. Den Nachrichteninhalt numerisch auswerten. Keine UDP-Befehlserkennung erforderlich. Die konkrete Einstellung der numerischen Auswertung hängt von der verwendeten MQTT2LOX-Version ab.
 - **LoxBerry MQTT Gateway → UDP:** Hier gehört `MQTT:\i<topic>=\i\v` in die **Befehlserkennung eines virtuellen UDP-Eingangsbefehls**. Die exportierte XML kann diese Zuordnung vorbereiten. Diese Zeichenfolge gehört nicht ins MQTT-Abonnement.
 
-### Anschlüsse am Statusbaustein
+### Finale Verschaltung: maximal vier Bedingungen pro Zeile
 
-| Topic / Signal | Anschluss | Bedeutung |
-|---|---|---|
-| `porsche2lox/taycan/api_ok` | I1 | 1 = letzter Porsche-Abruf erfolgreich |
-| `porsche2lox/taycan/error_code` | I2 | 0 = kein Abruffehler |
-| `porsche2lox/taycan/auth_required` | I3 | 1 = erneute Anmeldung erforderlich |
-| Berechnetes Heartbeat-Alter, siehe unten | I4 | Sekunden seit Heartbeat |
-| `porsche2lox/taycan/data_valid` | I5 | Batterie-Messzeit bekannt, zulässiges Alter und Abruf erfolgreich |
+Der Statusbaustein kann in der gezeigten Config-Version vier Bedingungen je Zeile verknüpfen. Deshalb vorab einen **UND-Baustein** verwenden:
 
-Alle Nachrichten als Zahlen empfangen; insbesondere den Heartbeat nicht auf 0/1 begrenzen. Fehlende oder unlesbare Nachrichten nicht als Erfolg behandeln.
+```text
+porsche2lox/taycan/api_ok ──┐
+                          UND ──→ Status I1
+Heartbeat OK (0/1) ────────┘
+Heartbeat OK (0/1) ─────────────→ Status I4
+```
 
-### Heartbeat anhand des Zeitstempels prüfen
+| Signal | Anschluss |
+|---|---|
+| UND aus api_ok und Heartbeat OK | I1 |
+| `porsche2lox/taycan/error_code` | I2 |
+| `porsche2lox/taycan/auth_required` | I3 |
+| Heartbeat OK, digital 0/1 | I4 |
+| `porsche2lox/taycan/data_valid` | I5 |
 
-Einen **Formelbaustein** „PLX Heartbeat-Alter“ anlegen:
+**I4 erwartet in diesem Aufbau 0/1, kein Sekundenalter.** I1=1 bedeutet jetzt bereits: Heartbeat gültig UND letzter Porsche-Abruf erfolgreich. Alle MQTT-Inhalte zunächst numerisch auswerten; den ursprünglichen Unix-Heartbeat nicht auf 0/1 begrenzen. Ein separates PLX-`online`-Topic gibt es nicht: Heartbeat OK ist das Pendant für den laufenden Dienst, api_ok bestätigt nur den letzten Abruf. Alte `porsche/taycan/online`-Signale entfernen.
 
-- I1: Loxone-Zeitfunktion **Unix Timestamp** (UTC).
-- I2: numerischer Inhalt von `porsche2lox/heartbeat` — global, ohne Fahrzeugalias.
-- Formel: `I1-I2`.
-- Ausgang R: an I4 des Statusbausteins.
+### Heartbeat OK erzeugen
 
-Die aktuelle Zeit muss fortlaufend aktualisiert werden, auch wenn keine MQTT-Nachricht mehr eintrifft. PLX veröffentlicht im ausführlichen Modus ungefähr jede Minute; als Ausfallgrenze **180 Sekunden** verwenden. Mehr als 30 Sekunden Zukunftsabweichung (`I4 < -30`) als Zeitfehler behandeln. Beide Systemuhren synchronisieren.
+**Zeitstempelprüfung:** Formelbaustein „PLX Heartbeat-Alter“: I1 = fortlaufend aktualisierte Loxone-Zeitfunktion **Unix Timestamp**, I2 = numerischer Inhalt von `porsche2lox/heartbeat` (global, ohne Alias), Formel `I1-I2`. Das Ergebnis ist das Alter in Sekunden. Daraus **Heartbeat OK = 1** nur bei bekanntem Heartbeat und Alter zwischen **−30 und 180 Sekunden** bilden; sonst 0. Dieses digitale Ergebnis an UND und Status I4 führen. Beide Systemuhren synchronisieren.
 
-Ein bloßer Empfangsimpuls mit Nachlaufzeit reicht nicht: Der Broker kann alte retained-Nachrichten nach einem Neustart erneut liefern. Die Zeitdifferenz lässt einen alten Zeitstempel alt bleiben. Ohne empfangenen Heartbeat keine Freigabe; Grundzustand „Status wird geprüft“, Statuswert 0. Für eine strengere Neustartfreigabe zusätzlich einen nach Programmstart wechselnden Heartbeat verlangen.
+Ein bloßer Empfangsimpuls mit Nachlaufzeit reicht für die Neustartprüfung nicht: Der Broker kann alte retained-Nachrichten erneut liefern. Die Zeitprüfung verwirft alte Zeitstempel. Für strengere Neustartfreigabe zusätzlich einen nach Programmstart wechselnden Heartbeat verlangen. Fehlende/ungültige Eingangswerte niemals als Erfolg behandeln.
 
-### Statusbedingungen
+**Gezeigte vorhandene Variante:** MQTT-Heartbeat → Befehlserkennungsbaustein → **AE** eines Präsenzbausteins namens „Heartbeat“ → Ausgang **P** als digitales Heartbeat OK. Der Nutzer bestätigt den Empfang/Funktion; auf dem Screenshot ist P aktiv. Die genaue Erkennung, Nachlaufzeit und Neustartbehandlung sind daraus nicht vollständig ersichtlich. Insbesondere darf ein dauerhaft anliegender Pegel die Abschaltung nicht verhindern. Diese Variante erst nach Ausfalltest (P spätestens nach 180 Sekunden ohne neue Nachricht = 0) und Test mit altem retained-Heartbeat nach Neustart als vollständig geprüft ansehen. Dies ist keine Empfehlung, unbesehen Standardparameter des Präsenzbausteins zu übernehmen.
 
-Im Statusbaustein folgende Priorität abbilden. Bei mehreren zutreffenden Bedingungen muss die höher stehende Meldung gewinnen; falls die verwendete Config-Version anders priorisiert, nachrangige Bedingungen entsprechend verriegeln.
+### Finale Statuszeilen
 
-| Priorität | Bedingung | Text | Statuswert |
+Die **erste passende Zeile** gewinnt; Reihenfolge wie unten beibehalten. Innerhalb einer Zeile Bedingungen UND-verknüpfen. Die OK-Zeile benötigt jetzt genau vier Bedingungen:
+
+| Reihenfolge | Bedingungen | Statustext | Statuswert |
 |---|---|---|---|
-| 1 | Heartbeat fehlt oder I4 > 180 | ❌ PLX nicht erreichbar | 0 |
-| 2 | I4 < -30 | ⚠️ Zeitabweichung prüfen | 0 |
-| 3 | I3 = 1 | 🔑 Porsche-Anmeldung erforderlich | 0 |
-| 4 | I1 = 0 | ⚠️ Porsche-Abruf fehlgeschlagen | 0 |
-| 5 | I2 ≠ 0 | ⚠️ Porsche-Fehler: `<v2>` | 0 |
-| 6 | I5 = 0 | ⚠️ Fahrzeugdaten veraltet oder Messzeit unbekannt | 0 |
-| 7 | Alle benötigten Signale bekannt; -30 ≤ I4 ≤ 180; I1 = 1; I2 = 0; I3 = 0; I5 = 1 | ✅ Porsche Connect OK · Batteriedaten aktuell | 1 |
+| 1 | I4 = 0 | 🔴 PLX nicht erreichbar | 0 |
+| 2 | I3 = 1 | 🔐 Porsche Login erforderlich | 0 |
+| 3 | I2 ≠ 0 UND I3 = 0 | ⚠️ Porsche API Fehler | 0 |
+| 4 | I1 = 0 UND I3 = 0 | ⚠️ Porsche-Abruf fehlgeschlagen | 0 |
+| 5 | I1 = 1 UND I2 = 0 UND I3 = 0 UND I5 = 1 | ✅ Porsche Connect OK · Batteriedaten aktuell | **1** |
+| 6 | I4 = 1 UND I1 = 1 UND I3 = 0 UND I5 = 0 | ⚠️ Batteriedaten veraltet oder Messzeit unbekannt | 0 |
+| 7 | Keine Bedingung / Grundzustand | Status wird geprüft | 0 |
 
-Die letzte Zeile ausdrücklich als vollständige UND-Bedingung umsetzen, nicht als pauschalen Standardtext. Unbekannte Zustände bleiben gesperrt. Für einzelne Werte zusätzlich deren `*_available` verlangen. Bei automatischen Schaltungen die Freigabe kurz verzögern, weil MQTT-Nachrichten nicht atomar eintreffen.
+Ausfall rot, Anmeldung/API-Fehler orange, Abruffehler/veraltete Daten gelb, OK grün, Grundzustand grau. Der im Screenshot zunächst verwendete Text „Porsche Offline“ ist missverständlich: Ein fehlgeschlagener Cloud-Abruf bedeutet nicht zwangsläufig, dass das Fahrzeug offline ist.
+
+Der Grundzustand allein erkennt fehlende MQTT-Nachrichten nicht; bekannte/gültige Heartbeat-Auswertung und definierte Startwerte sind erforderlich. Für einzelne Messwerte zusätzlich deren `*_available` verlangen. Bei automatischen Schaltungen die Freigabe kurz verzögern, weil MQTT-Nachrichten nicht atomar eintreffen. Statuswert 1 gibt nur den beschriebenen Batterie-/Verbindungszustand frei, nicht pauschal alle Fahrzeugwerte.
 
 **Geltungsbereich:** Das fahrzeugweite `data_valid` bezieht sich auf die Batterie. Es bescheinigt weder frischen Reifendruck noch das Alter aller übrigen Werte. Für Detailparameter zusätzlich `parameters/<parameter>/available`, `parameters/<parameter>/data_valid` und die Verfügbarkeit des betreffenden Feldes prüfen. Ein frischer Cloud-Abruf ist keine neue Fahrzeugmessung. „Dienst erreichbar“ bestätigt den laufenden Veröffentlichungsweg, nicht die aktuelle Erreichbarkeit der Porsche-API; dafür dienen I1–I3.
 
@@ -123,11 +129,27 @@ Offizielle Bausteinreferenzen: [Zeitfunktionen](https://www.loxone.com/dede/kb/z
 
 Use **Detailed data + diagnostics**; simple output does not publish these signals. Replace prefix and alias with your saved configuration. With direct MQTT2LOX, subscribe to the plain topic and decode the payload as a number. The recognition string `MQTT:\i<topic>=\i\v` is only for a virtual UDP input command behind an MQTT-to-UDP gateway.
 
-Connect `api_ok` to status I1, `error_code` to I2, `auth_required` to I3 and vehicle `data_valid` to I5, all below `porsche2lox/taycan/`. For I4, use a Formula block: I1 = continuously updated Loxone **Unix Timestamp**, I2 = numeric global `porsche2lox/heartbeat`, formula `I1-I2`, output R = heartbeat age in seconds.
+The final wiring supports **four conditions per status row**. Feed `api_ok` and a digital **Heartbeat OK** into an AND block; connect its output to status **I1**. Connect `error_code` to **I2**, `auth_required` to **I3**, digital Heartbeat OK separately to **I4**, and vehicle `data_valid` to **I5**. Vehicle topics are below `porsche2lox/taycan/`. There is no separate PLX `online` topic.
 
-Give faults priority: missing heartbeat or age >180 s → offline; age <−30 s → clock error; auth_required=1 → sign in again; api_ok=0 → fetch failed; error_code≠0 → report error; data_valid=0 → battery data stale or measurement time unknown. OK requires all inputs known, age within −30…180 s, api_ok=1, error_code=0, auth_required=0 and data_valid=1. Default/unknown state must remain invalid (status value 0); only OK uses 1. Add each measurement's availability before enabling automation.
+Generate Heartbeat OK from the global numeric `porsche2lox/heartbeat`: Formula I1 = continuously updated Loxone **Unix Timestamp**, I2 = heartbeat, formula `I1-I2`. Convert its result to 1 only when the heartbeat is known and age is within −30…180 seconds; otherwise 0. **Do not connect raw seconds to status I4 in this wiring.** Synchronize clocks; reject stale retained messages after restart. For stricter startup behaviour require a changing heartbeat after program start.
 
-Vehicle data_valid covers the battery measurement, not tire pressure or every other parameter. For detail parameters also check their own availability/validity and field availability. A retained message is not evidence of a live service; compare its timestamp. For stricter startup behaviour require a changing heartbeat after program start. Synchronize both clocks. Test outage, stale retained replay, authentication failure and stale/missing data on an isolated test system before relying on this logic. This guide does not claim completed Miniserver acceptance.
+The user's existing illustrated path is heartbeat → command recognition → Presence block **AE** → **P** as Heartbeat OK. Reception/active P was user-confirmed; timeout settings and stale-retained startup behaviour were not demonstrated. A continuous level must not keep it active indefinitely. Verify P drops within 180 seconds without new messages and does not falsely enable on stale replay. Do not assume default Presence settings implement this.
+
+Status rows, first match wins; AND all conditions within each row:
+
+| Order | Conditions | Message | Value |
+|---|---|---|---|
+| 1 | I4 = 0 | PLX unreachable | 0 |
+| 2 | I3 = 1 | Porsche login required | 0 |
+| 3 | I2 ≠ 0 AND I3 = 0 | Porsche API error | 0 |
+| 4 | I1 = 0 AND I3 = 0 | Porsche fetch failed | 0 |
+| 5 | I1 = 1 AND I2 = 0 AND I3 = 0 AND I5 = 1 | Porsche Connect OK · battery data current | **1** |
+| 6 | I4 = 1 AND I1 = 1 AND I3 = 0 AND I5 = 0 | Battery data stale or measurement time unknown | 0 |
+| 7 | Default | Checking status | 0 |
+
+Use red/orange/yellow for faults, green for OK and grey for the default. Defined startup values and valid heartbeat handling are necessary; a default row alone does not detect missing topics. Vehicle data_valid covers the battery measurement, not tire pressure or every parameter. For detail parameters also check their own availability/validity and field availability. A new cloud fetch is not a new vehicle measurement. Add each selected value's availability and briefly delay automation enablement to allow non-atomic MQTT updates to settle.
+
+Test outage, stale retained replay, authentication/API failure and stale/missing data on an isolated test system before relying on this logic. This documents the user's configuration and confirmed reception, not completed fault/restart or general Miniserver acceptance.
 
 ## Freigabe in Loxone (nur ausführliches Format)
 
