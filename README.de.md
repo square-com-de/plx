@@ -22,7 +22,7 @@ Betreibe PLX auf deinem eigenen Server, sieh die von deinem Porsche gemeldeten D
 - **Loxone-Eingänge vorbereiten:** Ausgewählte numerische Werte als XML/CSV exportieren; für Frischesignale gibt es ausführliches MQTT.
 - **Eine Oberfläche in zwei Sprachen nutzen:** Deutsch/Englisch, in Docker oder als LoxBerry-4-Plugin.
 
-PLX liest Statusdaten; es steuert das Fahrzeug nicht fern und weckt es nicht auf. **Porsche-Cloud und ein kompatibles Porsche-Connect-Konto bleiben erforderlich.** Ein eigener PLX-Server macht die Fahrzeug-API nicht lokal.
+PLX liest Statusdaten und sendet keine Fahrzeugsteuerungs- oder Aufweckbefehle. **Wenn das Auto schläft, kann Porsche Connect weiterhin ältere Messwerte liefern.** Ein Abruf in PLX liest die verfügbaren Cloud-Daten und garantiert keine neue Fahrzeugmessung. Vor der Verwendung in Automationen deshalb Messalter und Gültigkeit prüfen. Ob Porsche intern das Fahrzeug kontaktiert, steuert Porsche; PLX kann nicht garantieren, dass das Fahrzeug bei jeder API-Anfrage schläft. **Porsche-Cloud und ein kompatibles Porsche-Connect-Konto bleiben erforderlich.** Ein eigener PLX-Server macht die Fahrzeug-API nicht lokal.
 
 MQTT-Anmeldung und Speichern haben eigene Statusmeldungen. Die Auswahl bleibt auch bei einem nicht erreichbaren Broker gespeichert.
 
