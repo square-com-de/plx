@@ -23,7 +23,7 @@ Run PLX on your own server, view the data your Porsche reports, and choose what 
 - **See connection and save feedback:** independent Porsche/MQTT status, with selections saved even when the broker is unavailable.
 - **Use the same interface in two languages:** German/English, in Docker or as a LoxBerry 4 plugin.
 
-PLX reads status; it does not remote-control or wake your car. **It still needs Porsche's cloud and a compatible Porsche Connect account.** Hosting PLX yourself does not make the vehicle API local.
+PLX reads status and sends no vehicle-control or wake-up commands. **When your car is asleep, Porsche Connect may continue to return older measurements.** Refreshing PLX reads the available cloud data; it does not guarantee a new vehicle measurement. Check measurement age and validity before using values in automations. Whether Porsche internally contacts the vehicle is controlled by Porsche; PLX cannot guarantee that every API request leaves the vehicle asleep. **It still needs Porsche's cloud and a compatible Porsche Connect account.** Hosting PLX yourself does not make the vehicle API local.
 
 ## Quick start
 
